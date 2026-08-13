@@ -148,10 +148,15 @@ class ChangedFile(BaseModel):
     size_bytes: int = 0
     hunks: list[DiffHunk] = Field(default_factory=list)
 
-    @field_validator("path")
+    @field_validator("path", "old_path")
     @classmethod
-    def _path_safe(cls, v: str) -> str:
-        """P3-3：规范化分隔符后拒绝空路径、绝对路径、盘符、UNC、目录穿越。"""
+    def _path_safe(cls, v: str | None) -> str | None:
+        """P3-3/P1（复验）：path 与 old_path 共用同一路径安全校验。
+
+        规范化分隔符后拒绝空路径、绝对路径、盘符、UNC、目录穿越；None 放行。
+        """
+        if v is None:
+            return v
         if not v:
             raise ValueError("path 不能为空")
         if v.startswith(("\\", "/")):

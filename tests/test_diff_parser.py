@@ -201,6 +201,34 @@ def test_parse_illegal_escape_raises():
         parse_unified_diff(diff)
 
 
+def test_parse_octal_with_8_or_9_raises_diff_parse_error():
+    """P2（复验）：\\128 含 8/9，必须抛 DiffParseError 而非 int() 的 ValueError。"""
+    diff = 'diff --git "a/src/\\128.py" "b/src/\\128.py"\n'
+    with pytest.raises(DiffParseError):
+        parse_unified_diff(diff)
+
+
+def test_parse_rename_unsafe_old_path_rejected():
+    """P1（复验）：old_path 与 path 共用路径安全校验，../ 必须被拒绝。"""
+    diff = (
+        "diff --git a/../secret.py b/src/safe.py\n"
+        "similarity index 100%\n"
+        "rename from ../secret.py\n"
+        "rename to src/safe.py\n"
+    )
+    with pytest.raises(ValueError):
+        parse_unified_diff(diff)
+
+
+def test_changed_file_old_path_safe_direct():
+    """P1（复验）：模型层直接构造不安全 old_path 被拒；合法 old_path 通过。"""
+    with pytest.raises(ValueError):
+        ChangedFile(path="src/safe.py", status=ChangedFileStatus.RENAMED, old_path="../secret.py")
+    with pytest.raises(ValueError):
+        ChangedFile(path="src/safe.py", status=ChangedFileStatus.RENAMED, old_path="C:/secret.py")
+    ChangedFile(path="src/safe.py", status=ChangedFileStatus.RENAMED, old_path="src/old.py")  # ok
+
+
 def test_parse_rename_with_content_change():
     """测试清单 10：rename 且同时包含内容修改。"""
     diff = (

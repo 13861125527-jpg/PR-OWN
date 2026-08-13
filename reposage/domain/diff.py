@@ -87,8 +87,9 @@ def _unquote_git_path(s: str) -> str:
             i += 2
         elif nxt in "01234567":
             digits = inner[i + 1 : i + 4]
-            if len(digits) != 3 or not digits.isdigit():
-                raise DiffParseError(f"非法路径转义（八进制需 3 位）: {s!r}")
+            if len(digits) != 3 or any(d not in "01234567" for d in digits):
+                # P2（复验）：\128 等含 8/9 的"八进制"也必须抛 DiffParseError，而非 int() 的 ValueError
+                raise DiffParseError(f"非法路径转义（八进制需 3 位 0-7）: {s!r}")
             out.append(int(digits, 8))
             i += 4
         else:
