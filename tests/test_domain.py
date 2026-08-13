@@ -73,5 +73,129 @@ def test_finding_lifecycle_transitions():
     assert len(finding.versions) == 1
 
 
+def test_finding_illegal_transition_raises():
+    """P1-2：非法转换（candidate -> published）抛 FindingStateError。"""
+    from reposage.domain.finding import FindingStateError
+
+    finding = Finding(
+        finding_occurrence_id="occ-1",
+        run_id="run-1",
+        fingerprint="fp",
+        cross_run_match_key="key",
+        title="t",
+        severity=Severity.HIGH,
+        confidence=0.9,
+        category=FindingCategory.SECURITY,
+    )
+    with pytest.raises(FindingStateError):
+        finding.record_transition(FindingStatus.PUBLISHED)
+    # 状态未变
+    assert finding.status is FindingStatus.CANDIDATE
+
+
+def test_finding_terminal_state_not_transitionable():
+    """P1-2：终态 published/suppressed 不可继续转换。"""
+    from reposage.domain.finding import FindingStateError
+
+    published = Finding(
+        finding_occurrence_id="occ-2",
+        run_id="run-1",
+        fingerprint="fp",
+        cross_run_match_key="key",
+        title="t",
+        severity=Severity.HIGH,
+        confidence=0.9,
+        category=FindingCategory.SECURITY,
+        status=FindingStatus.PUBLISHED,
+    )
+    with pytest.raises(FindingStateError):
+        published.record_transition(FindingStatus.SCHEMA_VALID)
+
+    suppressed = published.model_copy(update={"status": FindingStatus.SUPPRESSED})
+    with pytest.raises(FindingStateError):
+        suppressed.record_transition(FindingStatus.MERGED)
+
+
+def test_finding_publish_failed_can_retry():
+    """P1-2：publish_failed -> published 是唯一允许的终态例外。"""
+    finding = Finding(
+        finding_occurrence_id="occ-3",
+        run_id="run-1",
+        fingerprint="fp",
+        cross_run_match_key="key",
+        title="t",
+        severity=Severity.HIGH,
+        confidence=0.9,
+        category=FindingCategory.SECURITY,
+        status=FindingStatus.PUBLISH_FAILED,
+    )
+    finding.record_transition(FindingStatus.PUBLISHED)
+    assert finding.status is FindingStatus.PUBLISHED
+
+
 def test_review_run_status_enum():
     assert ReviewRunStatus.PARTIAL.value == "partial"
+
+
+def test_change_request_github_requires_external_id():
+    """P2-1：github_pr 缺 external_id 拒绝。"""
+    from reposage.domain.enums import ChangeRequestSource
+    from reposage.domain.models import ChangeRequest, CommitRef
+
+    with pytest.raises(ValueError):
+        ChangeRequest(
+            source=ChangeRequestSource.GITHUB_PR,
+            base=CommitRef(sha="a" * 7, label="base"),
+            head=CommitRef(sha="b" * 7, label="head"),
+        )
+
+
+def test_change_request_local_forbids_external_id():
+    from reposage.domain.enums import ChangeRequestSource
+    from reposage.domain.models import ChangeRequest, CommitRef
+
+    with pytest.raises(ValueError):
+        ChangeRequest(
+            source=ChangeRequestSource.LOCAL_RANGE,
+            external_id="1",
+            base=CommitRef(sha="a" * 7, label="base"),
+            head=CommitRef(sha="b" * 7, label="head"),
+        )
+
+
+def test_change_request_require_head_locked():
+    from reposage.domain.enums import ChangeRequestSource
+    from reposage.domain.models import ChangeRequest, CommitRef
+
+    req = ChangeRequest(
+        source=ChangeRequestSource.GITHUB_PR,
+        external_id="1",
+        base=CommitRef(sha="a" * 7, label="base"),
+        head=CommitRef(sha="b" * 7, label="head"),
+    )
+    with pytest.raises(ValueError):
+        req.require_head_locked()
+    req.lock_head().require_head_locked()  # 锁定后通过
+
+
+def test_diff_line_added_requires_new_ln():
+    """P2-1：added 行必须有 new_ln。"""
+    from reposage.domain.enums import DiffLineType
+    from reposage.domain.models import DiffLine
+
+    with pytest.raises(ValueError):
+        DiffLine(type=DiffLineType.ADDED, new_ln=None)
+    with pytest.raises(ValueError):
+        DiffLine(type=DiffLineType.REMOVED, old_ln=None)
+
+
+def test_repository_ref_source_fields():
+    """P2-1：github 必须 owner/name；local 必须 local_path。"""
+    from reposage.domain.models import RepositoryRef
+
+    with pytest.raises(ValueError):
+        RepositoryRef(provider="github")
+    with pytest.raises(ValueError):
+        RepositoryRef(provider="local")
+    RepositoryRef(provider="github", owner="o", name="n")  # ok
+    RepositoryRef(provider="local", local_path="C:/repo")  # ok

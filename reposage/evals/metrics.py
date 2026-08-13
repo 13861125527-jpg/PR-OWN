@@ -1,12 +1,18 @@
 """评测指标（evals/metrics.py）。
 
 口径见 11 §5：Precision / Recall / F1 / 位置准确率 / 无缺陷噪声。
+
+P1-1：一对一匹配——每个 Finding 最多命中一条 expected（匹配后消耗），
+保证 hits ≤ min(len(expected), len(findings))；category 必须一致；
+severity 暂不参与匹配（由标注单独核对）。
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Any
+
+from reposage.domain.enums import FindingCategory
 
 
 @dataclass
@@ -23,6 +29,12 @@ class Metrics:
             f"Precision={self.precision:.3f} Recall={self.recall:.3f} F1={self.f1:.3f} "
             f"PositionAcc={self.position_accuracy:.3f} NegativeNoise={self.negative_noise}"
         )
+
+
+def _normalize_category(cat: str | FindingCategory | None) -> str | None:
+    if cat is None:
+        return None
+    return cat.value if isinstance(cat, FindingCategory) else str(cat)
 
 
 def _is_hit(
@@ -43,15 +55,25 @@ def compute_metrics(
     *,
     sample_kind: str = "single_defect",
 ) -> Metrics:
-    """对单个样本计算指标。
+    """对单个样本计算指标（P1-1：一对一匹配）。
 
     expected: list[ExpectedFinding]
     findings: list[Finding]（accepted 状态）
     """
+    used = [False] * len(findings)
     hits = 0
     for exp in expected:
-        if any(_is_hit(f.canonical_path, f.canonical_start_line, exp.path, exp.line) for f in findings):
-            hits += 1
+        exp_cat = _normalize_category(getattr(exp, "category", None))
+        for i, f in enumerate(findings):
+            if used[i]:
+                continue
+            # category 必须一致（P1-1）
+            if exp_cat is not None and _normalize_category(f.category) != exp_cat:
+                continue
+            if _is_hit(f.canonical_path, f.canonical_start_line, exp.path, exp.line):
+                used[i] = True
+                hits += 1
+                break  # 每个 Finding 只消耗一次
 
     recall = hits / len(expected) if expected else 1.0
     precision = hits / len(findings) if findings else (1.0 if not expected else 0.0)

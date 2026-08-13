@@ -6,7 +6,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -25,7 +24,7 @@ from .enums import (
     StageName,
     StageStatus,
 )
-from .models import utcnow
+from .models import ModelUsage, utcnow
 
 
 class StageResult(BaseModel):
@@ -86,7 +85,7 @@ class SourceRunResult(BaseModel):
 
     strategy: ReviewStrategyName
     tasks: list[ReviewTask] = Field(default_factory=list)
-    usages: list[dict[str, Any]] = Field(default_factory=list, description="ModelUsage 序列化列表")
+    usages: list[ModelUsage] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
 
 
@@ -104,6 +103,15 @@ class CommentPlan(BaseModel):
     marker: str = ""
     remote_comment_id: int | None = None
     status: CommentStatus = CommentStatus.PREPARED
+
+
+class PublishCommentResult(BaseModel):
+    """单条评论发布结果（Fake 与真实 Provider 共用契约）。"""
+
+    comment_id: str
+    status: CommentStatus = CommentStatus.PUBLISHED
+    remote_comment_id: int | None = None
+    error: str | None = None
 
 
 class PublishOperation(BaseModel):

@@ -49,6 +49,29 @@ class FindingVersion(BaseModel):
     reason: str = ""
 
 
+class FindingStateError(ValueError):
+    """非法 Finding 状态转换（05 §3 状态机断言）。"""
+
+
+# 合法转换表（05 §3；终态 published/suppressed 不可继续转换，publish_failed→published 例外）
+ALLOWED_TRANSITIONS: dict[FindingStatus, set[FindingStatus]] = {
+    FindingStatus.CANDIDATE: {FindingStatus.SCHEMA_VALID, FindingStatus.SUPPRESSED},
+    FindingStatus.SCHEMA_VALID: {
+        FindingStatus.LOCATION_VALID,
+        FindingStatus.BODY_ONLY,
+        FindingStatus.SUPPRESSED,
+    },
+    FindingStatus.LOCATION_VALID: {FindingStatus.EVIDENCE_VALID, FindingStatus.SUPPRESSED},
+    FindingStatus.EVIDENCE_VALID: {FindingStatus.MERGED, FindingStatus.SUPPRESSED},
+    FindingStatus.MERGED: {FindingStatus.ACCEPTED, FindingStatus.SUPPRESSED, FindingStatus.BODY_ONLY},
+    FindingStatus.ACCEPTED: {FindingStatus.PUBLISHED, FindingStatus.PUBLISH_FAILED},
+    FindingStatus.BODY_ONLY: {FindingStatus.PUBLISHED, FindingStatus.SUPPRESSED},
+    FindingStatus.PUBLISH_FAILED: {FindingStatus.PUBLISHED},
+    FindingStatus.PUBLISHED: set(),
+    FindingStatus.SUPPRESSED: set(),
+}
+
+
 class Finding(BaseModel):
     """正式 Finding（程序驱动生命周期）。"""
 
@@ -83,7 +106,15 @@ class Finding(BaseModel):
         actor: str = "program",
         reason: str = "",
     ) -> Finding:
-        """仅程序调用：推进状态并记录审计。"""
+        """仅程序调用：推进状态并记录审计。
+
+        非法转换（不在 ALLOWED_TRANSITIONS 中，或从终态继续转换）抛 FindingStateError。
+        """
+        allowed = ALLOWED_TRANSITIONS[self.status]
+        if to not in allowed:
+            raise FindingStateError(
+                f"非法状态转换: {self.status.value} -> {to.value}（允许: {sorted(a.value for a in allowed)}）"
+            )
         self.versions.append(
             FindingVersion(from_status=self.status, to_status=to, actor=actor, reason=reason)
         )

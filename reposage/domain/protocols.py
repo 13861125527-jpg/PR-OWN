@@ -1,14 +1,16 @@
 """Provider 抽象协议（domain/protocols.py）。
 
 方向：domain 定义抽象，providers/ 实现并依赖 domain；domain 不得依赖具体 Provider 实现。
+V1 使用的边界一律使用具体类型；V3 专属（tool_loop 的 session/tools）暂以 object/dict 前向声明。
 """
 
 from __future__ import annotations
 
 from typing import Any, Protocol
 
-from .models import ChangeRequest, ModelUsage
-from .run import PublishPlan
+from .finding import Finding, FindingCandidate
+from .models import ChangeRequest, GlobalBudget, ModelUsage, ReviewContext
+from .run import PublishCommentResult, PublishPlan, ReviewRun
 
 
 class GitProvider(Protocol):
@@ -22,8 +24,8 @@ class GitProvider(Protocol):
         """返回 unified diff 原始文本。"""
         ...
 
-    async def publish_comments(self, plan: PublishPlan) -> dict[str, Any]:
-        """按 Saga 发布评论；返回逐条 remote_comment_id 与状态。"""
+    async def publish_comments(self, plan: PublishPlan) -> dict[str, PublishCommentResult]:
+        """按 Saga 发布评论；返回逐条状态（含 remote_comment_id / 失败）。"""
         ...
 
 
@@ -62,7 +64,7 @@ class LLMProvider(Protocol):
         *,
         prompt_hash: str | None = None,
         schema_hash: str | None = None,
-    ) -> tuple[list[Any], ModelUsage]:
+    ) -> tuple[list[FindingCandidate], ModelUsage]:
         """结构化输出（V1 reviewer 用）；返回 (候选列表, usage)。"""
         ...
 
@@ -71,17 +73,30 @@ class LLMProvider(Protocol):
         session: object,
         tools: list[dict[str, Any]],
         *,
-        budget: dict[str, Any],
+        budget: GlobalBudget,
     ) -> ModelResponse:
-        """V3 工具循环（原生 tool calling 或受限 Action JSON 协议）。"""
+        """V3 工具循环（原生 tool calling 或受限 Action JSON 协议）。
+
+        session/tools 为 V3 前向声明：实现时替换为 AgentSession / ToolDefinition。
+        """
         ...
 
 
 class Storage(Protocol):
-    """存储抽象（SQLite 实现）。"""
+    """存储抽象（async；SQLite 实现内部用 to_thread 避免阻塞事件循环）。"""
 
-    async def record_run(self, run: object) -> None: ...
+    async def record_run(self, run: ReviewRun) -> None: ...
 
-    async def record_findings(self, findings: list[Any]) -> None: ...
+    async def record_findings(self, findings: list[Finding]) -> None: ...
 
-    async def record_usage(self, usage: ModelUsage) -> None: ...
+    async def record_usage(self, run_id: str, usage: ModelUsage) -> None: ...
+
+
+__all__ = [
+    "GitProvider",
+    "LLMProvider",
+    "ModelResponse",
+    "Storage",
+    "GlobalBudget",
+    "ReviewContext",
+]

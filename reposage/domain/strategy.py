@@ -6,10 +6,10 @@ ReviewStrategy 是版本演进的核心（03 §5）：任何 Strategy 只返回 
 
 from __future__ import annotations
 
-from typing import Any, Protocol
+from typing import Protocol
 
 from .finding import FindingCandidate
-from .models import ReviewContext
+from .models import GlobalBudget, ReviewContext
 from .run import ReviewRun, SourceRunResult
 
 
@@ -30,5 +30,5 @@ class ReviewStrategy(Protocol):
         self,
         ctx: ReviewContext,
         run: ReviewRun,
-        budget: dict[str, Any],  # 预算快照（AgentBudget 或全局预算）
+        budget: GlobalBudget,
     ) -> StrategyResult: ...

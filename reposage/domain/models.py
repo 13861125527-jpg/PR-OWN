@@ -9,7 +9,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from .enums import (
     ChangedFileStatus,
@@ -42,6 +42,7 @@ __all__ = [
     "ToolCall",
     "ToolResult",
     "ModelUsage",
+    "GlobalBudget",
     "utcnow",
     "ChangedFileStatus",
     "ChangeRequestSource",
@@ -76,6 +77,15 @@ class RepositoryRef(BaseModel):
             raise ValueError("local_path 必须是绝对路径")
         return v
 
+    @model_validator(mode="after")
+    def _check_source_fields(self) -> RepositoryRef:
+        """P2-1：github 必须 owner/name；local 必须绝对 local_path。"""
+        if self.provider == "github" and (not self.owner or not self.name):
+            raise ValueError("github 模式必须提供 owner 与 name")
+        if self.provider == "local" and self.local_path is None:
+            raise ValueError("local 模式必须提供绝对 local_path")
+        return self
+
 
 class CommitRef(BaseModel):
     """提交引用。"""
@@ -103,6 +113,25 @@ class ChangeRequest(BaseModel):
     def lock_head(self) -> ChangeRequest:
         return self.model_copy(update={"head": self.head.model_copy(update={"locked": True})})
 
+    @model_validator(mode="after")
+    def _source_consistency(self) -> ChangeRequest:
+        """P2-1：github_pr 必须 external_id；local_range 必须 external_id=None；label 一致。"""
+        if self.source is ChangeRequestSource.GITHUB_PR and not self.external_id:
+            raise ValueError("github_pr 模式必须提供 external_id")
+        if self.source is ChangeRequestSource.LOCAL_RANGE and self.external_id is not None:
+            raise ValueError("local_range 模式 external_id 必须为 None")
+        if self.head.label not in (None, "head"):
+            raise ValueError("head.label 必须为 'head'")
+        if self.base.label not in (None, "base"):
+            raise ValueError("base.label 必须为 'base'")
+        return self
+
+    def require_head_locked(self) -> ChangeRequest:
+        """审查前置检查：head 未锁定则拒绝（目标 SHA 锁定铁律）。"""
+        if not self.head.locked:
+            raise ValueError("head 未锁定：审查前必须 lock_head()（目标 SHA 锁定铁律）")
+        return self
+
 
 class ChangedFile(BaseModel):
     """变更文件（diff parser 产出）。"""
@@ -127,13 +156,21 @@ class ChangedFile(BaseModel):
 
 
 class DiffLine(BaseModel):
-    """diff 行。"""
+    """diff 行（P2-1：added 必须有 new_ln，removed 必须有 old_ln）。"""
 
     type: DiffLineType
     old_ln: int | None = None
     new_ln: int | None = None
     content: str = ""
     is_blank: bool = False
+
+    @model_validator(mode="after")
+    def _line_number_consistency(self) -> DiffLine:
+        if self.type is DiffLineType.ADDED and self.new_ln is None:
+            raise ValueError("added 行必须提供 new_ln")
+        if self.type is DiffLineType.REMOVED and self.old_ln is None:
+            raise ValueError("removed 行必须提供 old_ln")
+        return self
 
 
 class DiffHunk(BaseModel):
@@ -272,3 +309,40 @@ class ModelUsage(BaseModel):
     schema_repairs: int = 0
     prompt_hash: str | None = None
     schema_hash: str | None = None
+
+
+class GlobalBudget(BaseModel):
+    """全局硬预算（P2-2：admission control，见 10 §7 / 08 §5）。
+
+    Token 为请求前可控硬上限；费用为保守估算（最坏预留）。
+    """
+
+    max_total_tokens: int = Field(default=80000, gt=0)
+    max_cost_usd: float = Field(default=2.0, gt=0.0)
+    max_runtime_seconds: int = Field(default=600, gt=0)
+    reserved_finalize_ratio: float = Field(default=0.10, ge=0.0, le=1.0)
+    tokens_used: int = 0
+    cost_used: float = 0.0
+    started_at: datetime = Field(default_factory=utcnow)
+
+    @property
+    def exploration_tokens(self) -> int:
+        """探索额度 = 总预算 × (1 - 预留比例)。"""
+        return int(self.max_total_tokens * (1 - self.reserved_finalize_ratio))
+
+    def can_admit(self, input_tokens: int, max_output_tokens: int) -> bool:
+        """发送前最坏预留：input + max_output 不超剩余额度才允许（admission control）。"""
+        return self.tokens_used + input_tokens + max_output_tokens <= self.max_total_tokens
+
+    def consume(self, usage: ModelUsage) -> None:
+        """调用后入账（含 late_cancelled 的迟到响应）。"""
+        self.tokens_used += usage.input_tokens + usage.output_tokens
+        self.cost_used += usage.cost_usd
+
+    @property
+    def remaining_tokens(self) -> int:
+        return max(0, self.max_total_tokens - self.tokens_used)
+
+    @property
+    def remaining_cost(self) -> float:
+        return max(0.0, self.max_cost_usd - self.cost_used)
