@@ -1,0 +1,18 @@
+diff --git a/src/app.py b/src/app.py
+index aaaaaaa..bbbbbbb 100644
+--- a/src/app.py
++++ b/src/app.py
+@@ -1,2 +1,3 @@
+ from src import main
++from src import helper
+ def app():
+-    return main.run()
++    return helper.run()
+diff --git a/config/app.yaml b/config/app.yaml
+new file mode 100644
+index 0000000..ccccccc
+--- /dev/null
++++ b/config/app.yaml
+@@ -0,0 +1,2 @@
++debug: true
++port: 8080

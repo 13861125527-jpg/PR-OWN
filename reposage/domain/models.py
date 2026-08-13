@@ -146,6 +146,7 @@ class ChangedFile(BaseModel):
     additions: int = 0
     deletions: int = 0
     size_bytes: int = 0
+    hunks: list[DiffHunk] = Field(default_factory=list)
 
     @field_validator("path")
     @classmethod
@@ -358,3 +359,7 @@ class GlobalBudget(BaseModel):
     @property
     def remaining_cost(self) -> float:
         return max(0.0, self.max_cost_usd - self.cost_used)
+
+
+# ChangedFile.hunks 前向引用 DiffHunk（定义于文件后部），类全部定义后重建
+ChangedFile.model_rebuild()

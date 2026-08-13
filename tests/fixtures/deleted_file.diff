@@ -1,0 +1,9 @@
+diff --git a/src/oldmod.py b/src/oldmod.py
+deleted file mode 100644
+index 4444444..0000000
+--- a/src/oldmod.py
++++ /dev/null
+@@ -1,3 +0,0 @@
+-import sys
+-def gone():
+-    pass
