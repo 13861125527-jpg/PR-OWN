@@ -32,7 +32,7 @@ packages = ["reposage"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
-addopts = "-q"
+addopts = "-q -p no:cacheprovider"
 
 [tool.ruff]
 line-length = 100

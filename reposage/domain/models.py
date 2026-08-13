@@ -330,9 +330,21 @@ class GlobalBudget(BaseModel):
         """探索额度 = 总预算 × (1 - 预留比例)。"""
         return int(self.max_total_tokens * (1 - self.reserved_finalize_ratio))
 
-    def can_admit(self, input_tokens: int, max_output_tokens: int) -> bool:
-        """发送前最坏预留：input + max_output 不超剩余额度才允许（admission control）。"""
-        return self.tokens_used + input_tokens + max_output_tokens <= self.max_total_tokens
+    def can_admit(
+        self,
+        input_tokens: int,
+        max_output_tokens: int,
+        est_cost_usd: float | None = None,
+    ) -> bool:
+        """发送前最坏预留（admission control，10 §7 / P0-R2-3）。
+
+        - Token 维度：input + max_output 不超剩余额度；
+        - 费用维度（P2 复验补充）：提供 est_cost_usd 时同时校验 cost_used + est ≤ max_cost_usd。
+        retry 与 finalize reserve 的费用预留为 V1 调用真实模型前的前置任务（见 14 OQ-1）。
+        """
+        if self.tokens_used + input_tokens + max_output_tokens > self.max_total_tokens:
+            return False
+        return not (est_cost_usd is not None and self.cost_used + est_cost_usd > self.max_cost_usd)
 
     def consume(self, usage: ModelUsage) -> None:
         """调用后入账（含 late_cancelled 的迟到响应）。"""

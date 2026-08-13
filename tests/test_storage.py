@@ -41,11 +41,22 @@ def test_schema_initialized(store: SqliteStorage):
         "tool_calls",
         "tool_results",
         "publish_plans",
+        "publish_operations",
         "published_comments",
         "feedback",
         "pr_caches",
     ):
         assert expected in tables
+
+
+def test_schema_publish_columns(store: SqliteStorage):
+    """P2（复验）：发布模型列必须存在。"""
+    comments_cols = {r[1] for r in store._query("PRAGMA table_info(published_comments)")}
+    assert {"comment_id", "required", "finding_occurrence_id", "remote_comment_id", "marker"} <= comments_cols
+    ops_cols = {r[1] for r in store._query("PRAGMA table_info(publish_operations)")}
+    assert {"op_id", "plan_id", "kind", "status", "detail"} <= ops_cols
+    usage_cols = {r[1] for r in store._query("PRAGMA table_info(usages)")}
+    assert {"schema_hash", "schema_repairs"} <= usage_cols
 
 
 @pytest.mark.asyncio
@@ -158,3 +169,37 @@ async def test_orphan_usage_rejected(store: SqliteStorage):
     usage = ModelUsage(model="m", role="r", input_tokens=1, output_tokens=1, cost_usd=0.0)
     with pytest.raises(sqlite3.IntegrityError):
         await store.record_usage("no-such-run", usage)
+
+
+@pytest.mark.asyncio
+async def test_batch_findings_rollback_on_failure(store: SqliteStorage):
+    """P1（复验）：批量写中途失败必须整体回滚，不能留下半批数据。"""
+    await store.record_run(ReviewRun(run_id="run-1", base_sha="a" * 7, head_sha="b" * 7))
+
+    def mk(occ: str, fp: str) -> Finding:
+        return Finding(
+            finding_occurrence_id=occ,
+            run_id="run-1",
+            fingerprint=fp,
+            cross_run_match_key="k",
+            title="t",
+            severity=Severity.MEDIUM,
+            confidence=0.8,
+            category=FindingCategory.CORRECTNESS,
+        )
+
+    # 第一条 fp="dup" 成功插入，第二条同 fp 违反 UNIQUE(run_id, fingerprint) → 整批回滚
+    with pytest.raises(sqlite3.IntegrityError):
+        await store.record_findings([mk("occ-a", "dup"), mk("occ-b", "dup")])
+
+    # 半批数据不得残留
+    rows = store._query("SELECT * FROM findings WHERE run_id='run-1'")  # noqa: SLF001
+    assert len(rows) == 0
+
+    # 后续写其他记录也不得让第一条"复活"
+    await store.record_usage(
+        "run-1",
+        ModelUsage(model="m", role="r", input_tokens=1, output_tokens=1, cost_usd=0.0),
+    )
+    rows = store._query("SELECT * FROM findings WHERE run_id='run-1'")  # noqa: SLF001
+    assert len(rows) == 0

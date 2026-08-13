@@ -199,3 +199,24 @@ def test_repository_ref_source_fields():
         RepositoryRef(provider="local")
     RepositoryRef(provider="github", owner="o", name="n")  # ok
     RepositoryRef(provider="local", local_path="C:/repo")  # ok
+
+
+def test_global_budget_can_admit_tokens():
+    """P2（复验）：Token 维度 admission control。"""
+    from reposage.domain.models import GlobalBudget
+
+    b = GlobalBudget(max_total_tokens=100, max_cost_usd=1.0)
+    assert b.can_admit(input_tokens=60, max_output_tokens=30)  # 90 ≤ 100
+    assert not b.can_admit(input_tokens=80, max_output_tokens=30)  # 110 > 100
+
+
+def test_global_budget_can_admit_cost():
+    """P2（复验）：费用估算维度 admission control。"""
+    from reposage.domain.models import GlobalBudget, ModelUsage
+
+    b = GlobalBudget(max_total_tokens=1000, max_cost_usd=1.0)
+    assert b.can_admit(input_tokens=10, max_output_tokens=10, est_cost_usd=0.9)
+    assert not b.can_admit(input_tokens=10, max_output_tokens=10, est_cost_usd=1.1)
+    # 已消费后费用余量收紧
+    b.consume(ModelUsage(model="m", role="r", input_tokens=10, output_tokens=10, cost_usd=0.6))
+    assert not b.can_admit(input_tokens=10, max_output_tokens=10, est_cost_usd=0.5)  # 0.6+0.5 > 1.0

@@ -60,7 +60,9 @@ CREATE TABLE IF NOT EXISTS usages (
     outcome TEXT NOT NULL DEFAULT 'completed',
     latency_ms INTEGER NOT NULL DEFAULT 0,
     retries INTEGER NOT NULL DEFAULT 0,
-    prompt_hash TEXT
+    prompt_hash TEXT,
+    schema_hash TEXT,
+    schema_repairs INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS findings (
@@ -129,10 +131,20 @@ CREATE TABLE IF NOT EXISTS publish_plans (
     watermark TEXT
 );
 
+CREATE TABLE IF NOT EXISTS publish_operations (
+    op_id TEXT PRIMARY KEY,
+    plan_id TEXT NOT NULL REFERENCES publish_plans(plan_id),
+    kind TEXT NOT NULL,
+    status TEXT NOT NULL,
+    detail TEXT
+);
+
 CREATE TABLE IF NOT EXISTS published_comments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     plan_id TEXT NOT NULL REFERENCES publish_plans(plan_id),
-    finding_occurrence_id TEXT,
+    comment_id TEXT NOT NULL,
+    required INTEGER NOT NULL DEFAULT 1,
+    finding_occurrence_id TEXT REFERENCES findings(finding_occurrence_id),
     fingerprint TEXT,
     kind TEXT NOT NULL,
     path TEXT,
@@ -199,103 +211,119 @@ class SqliteStorage:
 
     def _record_run(self, run: ReviewRun) -> None:
         with self._lock:
-            self._conn.execute(
-                """
-                INSERT OR REPLACE INTO runs
-                (run_id, external_ref, base_sha, head_sha, strategy, status,
-                 publish_status, warnings_json, config_hash, started_at, finished_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    run.run_id,
-                    run.external_ref,
-                    run.base_sha,
-                    run.head_sha,
-                    run.strategy.value,
-                    run.status.value,
-                    run.publish_status,
-                    json.dumps(run.warnings, ensure_ascii=False),  # P1-4：只存 warnings，不存整个 run
-                    run.config_snapshot_hash,
-                    run.started_at.isoformat(),
-                    run.finished_at.isoformat() if run.finished_at else None,
-                ),
-            )
-            self._conn.commit()
+            try:
+                self._conn.execute(
+                    """
+                    INSERT OR REPLACE INTO runs
+                    (run_id, external_ref, base_sha, head_sha, strategy, status,
+                     publish_status, warnings_json, config_hash, started_at, finished_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        run.run_id,
+                        run.external_ref,
+                        run.base_sha,
+                        run.head_sha,
+                        run.strategy.value,
+                        run.status.value,
+                        run.publish_status,
+                        json.dumps(run.warnings, ensure_ascii=False),  # P1-4：只存 warnings，不存整个 run
+                        run.config_snapshot_hash,
+                        run.started_at.isoformat(),
+                        run.finished_at.isoformat() if run.finished_at else None,
+                    ),
+                )
+                self._conn.commit()
+            except Exception:
+                self._conn.rollback()
+                raise
 
     def _record_findings(self, findings: list[Finding]) -> None:
         with self._lock:
-            for f in findings:
-                self._conn.execute(
-                    """
-                    INSERT INTO findings
-                    (finding_occurrence_id, run_id, fingerprint, cross_run_match_key, cluster_id,
-                     title, severity, confidence, category, claimed_path, claimed_start, claimed_end,
-                     canonical_path, canonical_start, canonical_end, status, evidence_json, sources_json,
-                     is_outside_diff)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """,
-                    (
-                        f.finding_occurrence_id,
-                        f.run_id,
-                        f.fingerprint,
-                        f.cross_run_match_key,
-                        f.cluster_id,
-                        f.title,
-                        f.severity.value,
-                        f.confidence,
-                        f.category.value,
-                        f.claimed_path,
-                        f.claimed_start_line,
-                        f.claimed_end_line,
-                        f.canonical_path,
-                        f.canonical_start_line,
-                        f.canonical_end_line,
-                        f.status.value,
-                        json.dumps([e.model_dump() for e in f.evidence], ensure_ascii=False),  # P1-5
-                        json.dumps([s.model_dump() for s in f.sources], ensure_ascii=False),  # P1-5
-                        int(f.is_outside_diff),
-                    ),
-                )
-                for v in f.versions:
+            try:
+                for f in findings:
                     self._conn.execute(
                         """
-                        INSERT INTO finding_versions
-                        (finding_occurrence_id, from_status, to_status, actor, at, reason)
-                        VALUES (?, ?, ?, ?, ?, ?)
+                        INSERT INTO findings
+                        (finding_occurrence_id, run_id, fingerprint, cross_run_match_key, cluster_id,
+                         title, severity, confidence, category, claimed_path, claimed_start, claimed_end,
+                         canonical_path, canonical_start, canonical_end, status, evidence_json, sources_json,
+                         is_outside_diff)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """,
                         (
                             f.finding_occurrence_id,
-                            v.from_status.value,
-                            v.to_status.value,
-                            v.actor,
-                            v.at.isoformat(),
-                            v.reason,
+                            f.run_id,
+                            f.fingerprint,
+                            f.cross_run_match_key,
+                            f.cluster_id,
+                            f.title,
+                            f.severity.value,
+                            f.confidence,
+                            f.category.value,
+                            f.claimed_path,
+                            f.claimed_start_line,
+                            f.claimed_end_line,
+                            f.canonical_path,
+                            f.canonical_start_line,
+                            f.canonical_end_line,
+                            f.status.value,
+                            json.dumps([e.model_dump() for e in f.evidence], ensure_ascii=False),  # P1-5
+                            json.dumps([s.model_dump() for s in f.sources], ensure_ascii=False),  # P1-5
+                            int(f.is_outside_diff),
                         ),
                     )
-            self._conn.commit()
+                    for v in f.versions:
+                        self._conn.execute(
+                            """
+                            INSERT INTO finding_versions
+                            (finding_occurrence_id, from_status, to_status, actor, at, reason)
+                            VALUES (?, ?, ?, ?, ?, ?)
+                            """,
+                            (
+                                f.finding_occurrence_id,
+                                v.from_status.value,
+                                v.to_status.value,
+                                v.actor,
+                                v.at.isoformat(),
+                                v.reason,
+                            ),
+                        )
+                self._conn.commit()
+            except Exception:
+                # P1（复验）：批量写入中途失败必须 rollback，防止半批数据在后续操作中意外提交
+                self._conn.rollback()
+                raise
 
     def _record_usage(self, run_id: str, usage: ModelUsage) -> None:
         with self._lock:
-            self._conn.execute(
-                """
-                INSERT INTO usages
-                (run_id, model, role, in_tokens, out_tokens, cost_usd, outcome, latency_ms, retries, prompt_hash)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    run_id,
-                    usage.model,
-                    usage.role,
-                    usage.input_tokens,
-                    usage.output_tokens,
-                    usage.cost_usd,
-                    usage.outcome.value,
-                    usage.latency_ms,
-                    usage.retries,
-                    usage.prompt_hash,
-                ),
-            )
-            self._conn.commit()
+            try:
+                self._conn.execute(
+                    """
+                    INSERT INTO usages
+                    (run_id, model, role, in_tokens, out_tokens, cost_usd, outcome,
+                     latency_ms, retries, prompt_hash, schema_hash, schema_repairs)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        run_id,
+                        usage.model,
+                        usage.role,
+                        usage.input_tokens,
+                        usage.output_tokens,
+                        usage.cost_usd,
+                        usage.outcome.value,
+                        usage.latency_ms,
+                        usage.retries,
+                        usage.prompt_hash,
+                        usage.schema_hash,
+                        usage.schema_repairs,
+                    ),
+                )
+                self._conn.commit()
+            except Exception:
+                self._conn.rollback()
+                raise
 
     # ---- async 公开接口（满足 Storage 协议，P0-1） ----
 
