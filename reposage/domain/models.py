@@ -151,8 +151,18 @@ class ChangedFile(BaseModel):
     @field_validator("path")
     @classmethod
     def _path_safe(cls, v: str) -> str:
-        if v.startswith("/") or ".." in v.split("/"):
-            raise ValueError(f"path 必须是仓库相对路径: {v}")
+        """P3-3：规范化分隔符后拒绝空路径、绝对路径、盘符、UNC、目录穿越。"""
+        if not v:
+            raise ValueError("path 不能为空")
+        if v.startswith(("\\", "/")):
+            raise ValueError(f"path 不能是绝对路径: {v}")
+        if v.startswith("\\\\") or v.startswith("//"):
+            raise ValueError(f"path 不能是 UNC/网络路径: {v}")
+        if len(v) >= 2 and v[1] == ":":
+            raise ValueError(f"path 不能包含盘符: {v}")
+        normalized = v.replace("\\", "/")
+        if ".." in normalized.split("/"):
+            raise ValueError(f"path 不能包含目录穿越: {v}")
         return v
 
 
