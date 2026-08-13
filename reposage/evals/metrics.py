@@ -1,0 +1,74 @@
+"""评测指标（evals/metrics.py）。
+
+口径见 11 §5：Precision / Recall / F1 / 位置准确率 / 无缺陷噪声。
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Any
+
+
+@dataclass
+class Metrics:
+    precision: float = 0.0
+    recall: float = 0.0
+    f1: float = 0.0
+    position_accuracy: float = 0.0
+    negative_noise: int = 0
+    details: dict[str, Any] = field(default_factory=dict)
+
+    def to_report(self) -> str:
+        return (
+            f"Precision={self.precision:.3f} Recall={self.recall:.3f} F1={self.f1:.3f} "
+            f"PositionAcc={self.position_accuracy:.3f} NegativeNoise={self.negative_noise}"
+        )
+
+
+def _is_hit(
+    finding_path: str | None,
+    finding_line: int | None,
+    expected_path: str | None,
+    expected_line: int | None,
+) -> bool:
+    """命中 = 路径一致（期望路径为空则不比较）且行号一致（期望行号为空则只比路径）。"""
+    if expected_path and finding_path != expected_path:
+        return False
+    return not (expected_line is not None and finding_line != expected_line)
+
+
+def compute_metrics(
+    expected: list[Any],
+    findings: list[Any],
+    *,
+    sample_kind: str = "single_defect",
+) -> Metrics:
+    """对单个样本计算指标。
+
+    expected: list[ExpectedFinding]
+    findings: list[Finding]（accepted 状态）
+    """
+    hits = 0
+    for exp in expected:
+        if any(_is_hit(f.canonical_path, f.canonical_start_line, exp.path, exp.line) for f in findings):
+            hits += 1
+
+    recall = hits / len(expected) if expected else 1.0
+    precision = hits / len(findings) if findings else (1.0 if not expected else 0.0)
+    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) else 0.0
+
+    position_ok = 0
+    for f in findings:
+        if f.canonical_path and f.canonical_start_line is not None:
+            position_ok += 1
+    position_accuracy = position_ok / len(findings) if findings else 0.0
+
+    negative_noise = len(findings) if sample_kind == "negative" else 0
+
+    return Metrics(
+        precision=precision,
+        recall=recall,
+        f1=f1,
+        position_accuracy=position_accuracy,
+        negative_noise=negative_noise,
+    )

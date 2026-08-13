@@ -1,0 +1,22 @@
+# 评测数据集占位样本（Phase 0 冒烟用，非正式评测集）
+name: smoke
+samples:
+  - id: smoke-001
+    kind: single_defect
+    base_files:
+      "src/main.py": |
+        def handler(data):
+            return process(data)
+    head_files:
+      "src/main.py": |
+        import pickle
+
+        def handler(data):
+            return pickle.loads(data)
+    pr_title: "smoke: unsafe deserialization"
+    pr_description: ""
+    expected:
+      - category: security
+        path: src/main.py
+        line: 4
+    notes: "Phase 0 冒烟样本；正式评测集见 11 §5"
