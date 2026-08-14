@@ -233,6 +233,13 @@ class ReviewContext(BaseModel):
     budget_tokens: int = 0
     truncated: bool = False
 
+    def assert_within_budget(self) -> None:
+        """硬断言：装配结果不得超预算（唯一例外是 L0 治理文本本身超预算，见装配器）。"""
+        if self.total_tokens > self.budget_tokens:
+            raise ValueError(
+                f"ReviewContext 超预算：{self.total_tokens} > {self.budget_tokens} tokens"
+            )
+
 
 class Evidence(BaseModel):
     """证据（程序标记 verified；模型不能自证）。"""
