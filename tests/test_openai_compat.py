@@ -14,7 +14,7 @@ import json
 
 import httpx
 import pytest
-from pydantic import ValidationError
+from pydantic import BaseModel, ConfigDict, ValidationError
 from reposage.providers.llm import smoke as smoke_mod
 from reposage.providers.llm.openai_compat import (
     LLMRequestError,
@@ -409,7 +409,10 @@ async def test_backoff_no_sleep_after_last_attempt():
     with pytest.raises(LLMRequestError):
         await provider.complete([{"role": "user", "content": "hi"}])
     assert len(sleeps) == 2  # attempt 0、1 等待；attempt 2（最后一次）不再等待
-    assert provider.stats["http_retries"] == 3
+    # P2-3：attempts=3、retryable=3、实际 retries=2（末次失败不再重试）
+    assert provider.stats["http_attempts"] == 3
+    assert provider.stats["http_retryable_failures"] == 3
+    assert provider.stats["http_retries"] == 2
 
 
 # ================= 200 响应结构校验（P2-5） =================
@@ -462,22 +465,100 @@ async def test_complete_returns_text_and_usage():
 
 
 @pytest.mark.asyncio
-async def test_complete_with_schema_sends_and_parses_schema():
-    """complete(schema) 真正发送传入的 schema 并把解析结果写入 data（P2-1）。"""
-    my_schema = {"type": "object", "properties": {"ok": {"type": "boolean"}}, "required": ["ok"]}
+async def test_complete_with_schema_sends_and_validates():
+    """complete(schema=Pydantic 模型) 真正发送模型 schema 并本地校验写入 data（P2-1）。"""
+    class _OkModel(BaseModel):
+        model_config = ConfigDict(extra="forbid")
+
+        ok: bool
+
     calls: list[dict] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
         body = json.loads(request.content)
         calls.append(body)
         assert body["response_format"]["type"] == "json_schema"
-        assert body["response_format"]["json_schema"]["schema"] == my_schema
+        assert body["response_format"]["json_schema"]["schema"] == _OkModel.model_json_schema()
         return _ok_response('{"ok": true}')
 
     provider = _provider(handler)
-    resp = await provider.complete([{"role": "user", "content": "hi"}], schema=my_schema)
-    assert calls[0]["response_format"]["json_schema"]["schema"] == my_schema
-    assert resp.data == {"ok": True}  # 解析后的 JSON 写入 data
+    resp = await provider.complete([{"role": "user", "content": "hi"}], schema=_OkModel)
+    assert calls[0]["response_format"]["json_schema"]["schema"] == _OkModel.model_json_schema()
+    assert resp.data == {"ok": True}  # 本地校验通过后的 model_dump
+
+
+@pytest.mark.asyncio
+async def test_complete_schema_required_missing_rejected():
+    """P2-1：required 缺失被拒绝（不写入 data）。"""
+    class _Req(BaseModel):
+        ok: bool
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return _ok_response('{"wrong": 123}')
+
+    provider = _provider(handler)
+    with pytest.raises(StructuredOutputError):
+        await provider.complete([{"role": "user", "content": "hi"}], schema=_Req)
+
+
+@pytest.mark.asyncio
+async def test_complete_schema_type_error_rejected():
+    """P2-1：属性类型错误被拒绝。"""
+    class _Typed(BaseModel):
+        model_config = ConfigDict(strict=True)  # 字符串不得隐式转 bool
+
+        ok: bool
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return _ok_response('{"ok": "yes"}')
+
+    provider = _provider(handler)
+    with pytest.raises(StructuredOutputError):
+        await provider.complete([{"role": "user", "content": "hi"}], schema=_Typed)
+
+
+@pytest.mark.asyncio
+async def test_complete_schema_additional_properties_rejected():
+    """P2-1：additionalProperties 违规（未知字段）被拒绝。"""
+    class _Forbid(BaseModel):
+        model_config = ConfigDict(extra="forbid")
+
+        ok: bool
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return _ok_response('{"ok": true, "unexpected": 1}')
+
+    provider = _provider(handler)
+    with pytest.raises(StructuredOutputError):
+        await provider.complete([{"role": "user", "content": "hi"}], schema=_Forbid)
+
+
+@pytest.mark.asyncio
+async def test_complete_default_max_tokens():
+    """P2-2：complete 默认调用也带输出上限（max_output_tokens）。"""
+    calls: list[dict] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(json.loads(request.content))
+        return _ok_response("OK")
+
+    provider = _provider(handler)
+    await provider.complete([{"role": "user", "content": "hi"}])  # 不传 max_tokens
+    assert calls[0]["max_tokens"] == provider.max_output_tokens
+
+
+@pytest.mark.asyncio
+async def test_retry_stats_attempts_vs_retries():
+    """P2-3：http_attempts 与 http_retries 语义区分（全 503）。"""
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(503, json={"error": {"message": "unavailable"}})
+
+    provider = _provider(handler)  # max_retries=2
+    with pytest.raises(LLMRequestError):
+        await provider.complete([{"role": "user", "content": "hi"}])
+    assert provider.stats["http_attempts"] == 3
+    assert provider.stats["http_retryable_failures"] == 3
+    assert provider.stats["http_retries"] == 2  # 真正额外尝试只有 2 次
 
 
 @pytest.mark.asyncio
@@ -574,3 +655,164 @@ def test_smoke_report_never_contains_key_field():
     assert '"failures":' in src
     assert '"api_key"' not in src
     assert "authorization" not in src.lower() or "_redact" in src
+# ================= V1-c 第二轮返工：confidence 范围 / 修复边界 / 400 判断 / smoke 控制流 =================
+
+
+@pytest.mark.parametrize("bad_conf", [-0.1, 1.1, 2.5])
+def test_confidence_out_of_range_rejected(bad_conf):
+    """P1-1：confidence 超出 0-1 被严格 Schema 拒绝。"""
+    bad = _copy_envelope()
+    bad["findings"][0]["confidence"] = bad_conf
+    with pytest.raises(ValidationError):
+        parse_envelope(json.dumps(bad))
+
+
+def test_json_schema_confidence_min_max():
+    """P1-1：JSON Schema 中 confidence 有 minimum/maximum。"""
+    schema = envelope_json_schema()
+    items = schema["properties"]["findings"]["items"]
+    if "$ref" in items:  # pydantic 可能用 $defs 引用
+        ref_name = items["$ref"].rsplit("/", 1)[-1]
+        conf = schema["$defs"][ref_name]["properties"]["confidence"]
+    else:
+        conf = items["properties"]["confidence"]
+    assert conf.get("minimum") == 0.0
+    assert conf.get("maximum") == 1.0
+
+
+@pytest.mark.asyncio
+async def test_structured_conversion_error_enters_repair():
+    """P1-1：strict→domain 转换异常进入同一修复边界（首次失败→修复→成功）。"""
+    import reposage.providers.llm.openai_compat as oc
+
+    real_convert = oc.envelope_to_candidates
+    calls = 0
+
+    def flaky_convert(envelope):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            raise ValidationError.from_exception_data("FindingCandidate", [])
+        return real_convert(envelope)
+
+    states = iter([_ok_response(json.dumps(VALID_ENVELOPE))] * 2)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return next(states)
+
+    provider = _provider(handler)
+    oc.envelope_to_candidates = flaky_convert  # type: ignore[assignment]
+    try:
+        findings, _ = await provider.structured([{"role": "user", "content": "review"}])
+    finally:
+        oc.envelope_to_candidates = real_convert
+    assert len(findings) == 2
+    assert calls == 2  # 首次转换失败 → 修复重试 → 第二次成功
+    assert provider.stats["repairs"] == 1
+
+
+@pytest.mark.asyncio
+async def test_400_invalid_schema_not_fallback():
+    """P2-5：schema 内容非法（仅含 response_format 关键词、无“不支持”语义）不得降级。"""
+    calls = 0
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        return httpx.Response(
+            400, json={"error": {"message": "Invalid schema for response_format: confidence missing"}}
+        )
+
+    provider = _provider(handler)
+    with pytest.raises(LLMRequestError):
+        await provider.structured([{"role": "user", "content": "review"}])
+    assert calls == 1  # 未降级
+
+
+# ---- smoke 控制流（P2-4） ----
+
+
+class _FakeSmokeProvider:
+    """可配置假 provider：控制 minimal/concurrency/structured 成功与否。"""
+
+    def __init__(self, *, minimal_ok=True, concurrency_ok=True, structured_ok=True) -> None:
+        self.stats = {
+            "repairs": 0,
+            "http_attempts": 0,
+            "http_retryable_failures": 0,
+            "http_retries": 0,
+            "http_429": 0,
+        }
+        self._minimal_ok = minimal_ok
+        self._concurrency_ok = concurrency_ok
+        self._structured_ok = structured_ok
+        self._complete_calls = 0
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *exc: object) -> None:
+        pass
+
+    async def complete(self, messages, *, temperature=0.0, **kwargs):
+        from reposage.domain.models import ModelUsage
+        from reposage.domain.protocols import ModelResponse
+
+        self._complete_calls += 1
+        if not self._minimal_ok and self._complete_calls == 1:
+            raise LLMRequestError("minimal boom")
+        if not self._concurrency_ok and self._complete_calls > 1:
+            raise LLMRequestError("concurrency boom")
+        return ModelResponse(text="OK", usage=ModelUsage(model="fake", role="smoke"))
+
+    async def structured(self, messages):
+        from reposage.domain.models import ModelUsage
+
+        if not self._structured_ok:
+            raise StructuredOutputError("structure boom", detail="boom")
+        return [], ModelUsage(model="fake", role="smoke")
+
+
+@pytest.mark.asyncio
+async def test_smoke_minimal_failure_still_writes_report(tmp_path, monkeypatch):
+    """P2-4：最小请求失败仍落盘脱敏报告，且整体 passed=False。"""
+    monkeypatch.setenv("MODEL_API_KEY", "k")
+    monkeypatch.setenv("MODEL_BASE_URL", "https://example.invalid/v1")
+    report_path = tmp_path / "smoke.json"
+    factory = lambda cfg: _FakeSmokeProvider(minimal_ok=False)  # noqa: E731
+    code = await smoke_mod._run(rounds=3, report_path=str(report_path), provider_factory=factory)
+    assert code == 1
+    data = json.loads(report_path.read_text(encoding="utf-8"))
+    assert data["passed"] is False
+    assert data["checks"]["minimal_request"]["ok"] is False
+
+
+@pytest.mark.asyncio
+async def test_smoke_concurrency_failure_exit_1(tmp_path, monkeypatch):
+    """P2-4：并发失败（structured 正常）仍整体 exit 1。"""
+    monkeypatch.setenv("MODEL_API_KEY", "k")
+    monkeypatch.setenv("MODEL_BASE_URL", "https://example.invalid/v1")
+    report_path = tmp_path / "smoke.json"
+    factory = lambda cfg: _FakeSmokeProvider(concurrency_ok=False)  # noqa: E731
+    code = await smoke_mod._run(rounds=3, report_path=str(report_path), provider_factory=factory)
+    assert code == 1
+    data = json.loads(report_path.read_text(encoding="utf-8"))
+    assert data["checks"]["concurrency_3"]["ok"] is False
+    assert data["checks"]["structured"]["ok"] is True
+    assert data["passed"] is False
+
+
+@pytest.mark.asyncio
+async def test_smoke_all_pass_passed_true(tmp_path, monkeypatch):
+    """P2-4：全部 mandatory 通过 → exit 0 且报告 passed=True。"""
+    monkeypatch.setenv("MODEL_API_KEY", "k")
+    monkeypatch.setenv("MODEL_BASE_URL", "https://example.invalid/v1")
+    report_path = tmp_path / "smoke.json"
+    factory = lambda cfg: _FakeSmokeProvider()  # noqa: E731
+    code = await smoke_mod._run(rounds=3, report_path=str(report_path), provider_factory=factory)
+    assert code == 0
+    data = json.loads(report_path.read_text(encoding="utf-8"))
+    assert data["passed"] is True
+    assert data["checks"]["minimal_request"]["ok"] is True
+    assert data["checks"]["concurrency_3"]["ok"] is True
+    assert data["checks"]["structured"]["ok"] is True

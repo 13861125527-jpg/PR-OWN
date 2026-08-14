@@ -36,7 +36,7 @@ class StrictFindingCandidateOutput(BaseModel):
 
     title: str
     severity: str
-    confidence: float
+    confidence: float = Field(ge=0.0, le=1.0, description="与 FindingCandidate 一致（09 §3）")
     category: str
     claimed_path: str | None = None
     claimed_start_line: int | None = None

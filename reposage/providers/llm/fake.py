@@ -51,8 +51,9 @@ class FakeLLMProvider:
         self,
         messages: list[dict[str, Any]],
         *,
-        schema: dict[str, Any] | None = None,
+        schema: Any | None = None,
         temperature: float = 0.1,
+        max_tokens: int | None = None,
     ) -> ModelResponse:
         self.calls.append({"kind": "complete", "messages": messages, "schema": schema})
         if self.handler is not None:

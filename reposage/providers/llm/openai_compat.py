@@ -28,6 +28,7 @@ import time
 from typing import Any
 
 import httpx
+from pydantic import BaseModel, ValidationError
 
 from reposage.config.settings import LLMConfig
 from reposage.domain.finding import FindingCandidate
@@ -45,14 +46,9 @@ _SYSTEM_JSON_INSTRUCTION = """\
 "chunk_id": str|null, "evidence_ref": str|null, "trigger_condition": str, "impact": str, "explanation": str, "suggestion": str, "is_outside_diff": bool}], \
 "summary": {}}"""
 
-# 400 错误消息中表示“不支持 json_schema/response_format”的关键词（P2-2 降级判断）
-_SCHEMA_UNSUPPORTED_HINTS = (
-    "json_schema",
-    "response_format",
-    "not support",
-    "unsupported",
-    "unknown parameter",
-)
+# 400 错误消息中表示“不支持 json_schema/response_format”的判断（P2-5）
+# 需同时满足：不支持语义 + 目标字段，避免宽泛子串误降级
+_SCHEMA_UNSUPPORTED_SEMANTICS = ("not support", "unsupported", "unknown parameter")
 
 
 class LLMRequestError(RuntimeError):
@@ -110,8 +106,14 @@ class OpenAICompatProvider:
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
         )
         self._sleep = asyncio.sleep  # 可注入 sleeper（测试退避时序）
-        # 运行时统计（smoke 报告用）：http_retries/429、修复重试次数
-        self.stats: dict[str, int] = {"http_retries": 0, "http_429": 0, "repairs": 0}
+        # 运行时统计（smoke 报告用）：attempts / retryable / 实际 retries / 429 / 修复
+        self.stats: dict[str, int] = {
+            "http_attempts": 0,  # 所有请求尝试次数
+            "http_retryable_failures": 0,  # 可重试失败（429/5xx/网络错误）
+            "http_retries": 0,  # 实际执行的额外尝试（末次失败不再重试不计入）
+            "http_429": 0,
+            "repairs": 0,
+        }
 
     @classmethod
     def from_config(
@@ -157,27 +159,29 @@ class OpenAICompatProvider:
         self,
         messages: list[dict[str, Any]],
         *,
-        schema: dict[str, Any] | None = None,
+        schema: type[BaseModel] | None = None,
         temperature: float = 0.1,
         max_tokens: int | None = None,
     ) -> ModelResponse:
         """通用补全。
 
-        - schema 非空时真正发送 ``response_format=json_schema``（端点不支持则降级
-          json_object），并把解析出的 JSON 写入 ``ModelResponse.data``（P2-1）；
-        - max_tokens 非空时携带输出上限（P1-3）。
+        - schema 为 Pydantic 模型类时：真正发送 ``response_format=json_schema``
+          （端点不支持则降级 json_object），并用 ``model_validate_json`` **本地校验**
+          响应，非法结果抛 StructuredOutputError 且不写入 data（P2-1）；
+        - 输出上限：显式 max_tokens 优先，否则使用 self.max_output_tokens
+          （所有生产调用都有上限，P2-2）。
         """
+        effective_max_tokens = max_tokens if max_tokens is not None else self.max_output_tokens
         body: dict[str, Any] = {
             "model": self.model,
             "messages": messages,
             "temperature": temperature,
+            "max_tokens": effective_max_tokens,
         }
-        if max_tokens is not None:
-            body["max_tokens"] = max_tokens
         if schema is not None:
             body["response_format"] = {
                 "type": "json_schema",
-                "json_schema": {"name": "completion", "schema": schema},
+                "json_schema": {"name": "completion", "schema": schema.model_json_schema()},
             }
         try:
             data, usage = await self._post(body)
@@ -190,10 +194,11 @@ class OpenAICompatProvider:
         parsed: dict[str, Any] | None = None
         if schema is not None:
             try:
-                payload = json.loads(text)
-                parsed = payload if isinstance(payload, dict) else None
-            except json.JSONDecodeError:
-                parsed = None
+                parsed = schema.model_validate_json(text).model_dump()
+            except ValidationError as exc:
+                raise StructuredOutputError(
+                    "complete 输出未通过调用方 Schema 校验", detail=f"{type(exc).__name__}: {exc}"
+                ) from exc
         return ModelResponse(text=text, data=parsed, usage=self._make_usage(usage))
 
     # ---- 结构化输出（V1 reviewer 用，09 §3） ----
@@ -215,7 +220,8 @@ class OpenAICompatProvider:
 
         try:
             envelope = parse_envelope(text)
-        except Exception as exc:  # JSONDecodeError / ValidationError / ValueError
+            candidates = envelope_to_candidates(envelope)
+        except Exception as exc:  # 解析/校验/领域转换全部进入同一修复边界（P1-1）
             detail = f"{type(exc).__name__}: {exc}"
             self.stats["repairs"] += 1
             text2 = await self._chat_structured_plain(
@@ -223,14 +229,15 @@ class OpenAICompatProvider:
                 total_usage,
             )
             try:
-                envelope = parse_envelope(text2)
+                envelope2 = parse_envelope(text2)
+                candidates = envelope_to_candidates(envelope2)
             except Exception as exc2:
                 raise StructuredOutputError(
                     "结构化输出解析失败（修复重试后仍失败）",
                     detail=f"{type(exc2).__name__}: {exc2}",
                 ) from exc2
         latency_ms = int((time.monotonic() - started) * 1000)
-        return envelope_to_candidates(envelope), self._make_usage(total_usage, latency_ms=latency_ms)
+        return candidates, self._make_usage(total_usage, latency_ms=latency_ms)
 
     async def _chat_structured_schema_first(self, messages: list[dict[str, Any]], usage_agg: dict[str, Any]) -> str:
         """schema_first：json_schema → 仅“不支持”时降级 json_object + 内嵌 schema。"""
@@ -284,15 +291,18 @@ class OpenAICompatProvider:
 
         - 网络错误/429/5xx：指数退避重试；**最后一次尝试失败不再等待**（P2-4）；
         - 非 429 的 4xx：不重试（永久错误）；
-        - 200 响应：结构校验（非 JSON / 非对象 → LLMRequestError，P2-5）。
+        - 200 响应：结构校验（非 JSON / 非对象 → LLMRequestError，P2-5）；
+        - stats：http_attempts 计数所有尝试；http_retryable_failures 计数可重试失败；
+          http_retries 只计实际额外尝试（末次失败不再重试不计入，P2-3）。
         """
         last_error: LLMRequestError | None = None
         retry_after: str | None = None
         for attempt in range(self.max_retries + 1):
+            self.stats["http_attempts"] += 1
             try:
                 resp = await self._client.post("/chat/completions", json=body)
             except httpx.HTTPError as exc:
-                self.stats["http_retries"] += 1
+                self.stats["http_retryable_failures"] += 1
                 last_error = LLMRequestError(f"网络错误: {type(exc).__name__}: {exc}")
                 retry_after = None
             else:
@@ -309,7 +319,7 @@ class OpenAICompatProvider:
                 if resp.status_code == 429 or resp.status_code >= 500:
                     if resp.status_code == 429:
                         self.stats["http_429"] += 1
-                    self.stats["http_retries"] += 1
+                    self.stats["http_retryable_failures"] += 1
                     last_error = LLMRequestError(
                         f"HTTP {resp.status_code}", status_code=resp.status_code, error_body=resp.text[:500]
                     )
@@ -321,7 +331,8 @@ class OpenAICompatProvider:
                         error_body=resp.text[:500],
                     )
             if attempt >= self.max_retries:
-                break  # 最后一次尝试失败：不再等待
+                break  # 最后一次尝试失败：不再等待（也不计入 http_retries）
+            self.stats["http_retries"] += 1  # 实际还会再试
             await self._backoff(attempt, retry_after)
         raise LLMRequestError(f"重试耗尽（{self.max_retries} 次）: {last_error}")
 
@@ -369,11 +380,17 @@ def _content_of(data: dict[str, Any]) -> str:
 
 
 def _is_schema_unsupported(exc: LLMRequestError) -> bool:
-    """400 是否明确表示不支持 json_schema/response_format（P2-2 降级判断）。"""
+    """400 是否明确表示不支持 json_schema/response_format（P2-5 双条件）。
+
+    需同时满足：不支持语义（not support/unsupported/unknown parameter）+ 目标字段
+    （json_schema/response_format）；仅出现目标字段（如 schema 内容非法）不降级。
+    """
     if exc.status_code != 400:
         return False
     body = (exc.error_body or "").lower()
-    return any(hint in body for hint in _SCHEMA_UNSUPPORTED_HINTS)
+    has_semantics = any(hint in body for hint in _SCHEMA_UNSUPPORTED_SEMANTICS)
+    has_target = "json_schema" in body or "response_format" in body
+    return has_semantics and has_target
 
 
 def _accumulate_usage(agg: dict[str, Any], usage: dict[str, Any]) -> None:

@@ -1,6 +1,8 @@
 # V1-c DP-V4-PRO 真实 smoke 证据
 
 > 状态：**待执行**（外部阻塞：本环境未配置 `MODEL_API_KEY` / `MODEL_BASE_URL`）
+> **V1-c 里程碑状态：代码实现接近完成 + Mock 验证通过；真实模型验证未完成**
+> （不得标记为最终通过，直至下方实测结果填写真实数据且成功率 ≥ 0.8）
 > 生成方式：配置密钥后运行 `python -m reposage.providers.llm.smoke`（默认 20 轮），
 > 并设 `OQ1_REPORT` 指向本目录以落盘脱敏 JSON。
 

@@ -43,7 +43,18 @@ def _mark(ok: bool) -> str:
     return "PASS" if ok else "FAIL"
 
 
-async def _run(rounds: int, report_path: str | None) -> int:
+async def _run(
+    rounds: int,
+    report_path: str | None,
+    *,
+    provider_factory: Any = None,  # 可注入假 provider（测试）；默认 OpenAICompatProvider.from_config
+) -> int:
+    """OQ-1 实测主流程。
+
+    - try/finally：配置了 report_path 时成功/失败均落盘脱敏报告（P2-4）；
+    - mandatory checks（minimal / concurrency / structured）：任一失败整体 exit 1；
+    - 报告包含 overall ``passed`` 字段。
+    """
     settings = Settings()
     api_key = os.environ.get(settings.llm.api_key_env, "")
     base_url = os.environ.get(settings.llm.base_url_env, "")
@@ -51,6 +62,7 @@ async def _run(rounds: int, report_path: str | None) -> int:
         print(f"缺少配置：请设置 {settings.llm.api_key_env} 与 {settings.llm.base_url_env} 环境变量")
         return 1
 
+    factory = provider_factory or OpenAICompatProvider.from_config
     report: dict[str, Any] = {
         "model": settings.llm.model,
         "base_url": _redact_base_url(base_url),
@@ -58,83 +70,100 @@ async def _run(rounds: int, report_path: str | None) -> int:
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "checks": {},
         "failures": [],
+        "passed": False,
     }
     exit_code = 1
-    async with OpenAICompatProvider.from_config(settings.llm) as provider:  # 自建 client 一定关闭
-        loop = asyncio.get_event_loop()
+    try:
+        async with factory(settings.llm) as provider:  # 自建 client 一定关闭
+            loop = asyncio.get_event_loop()
 
-        # 1. 最小请求（连通性 + 延迟）
-        t0 = loop.time()
-        try:
-            resp = await provider.complete([{"role": "user", "content": "回复 OK 即可"}], temperature=0.0)
-            latency_ms = int((loop.time() - t0) * 1000)
-            ok = bool(resp.text) and resp.usage is not None
-            report["checks"]["minimal_request"] = {
-                "ok": ok, "latency_ms": latency_ms,
-                "usage": None if resp.usage is None else _usage_dict(resp.usage),
-            }
-            print(f"[{_mark(ok)}] 最小请求连通 latency={latency_ms}ms usage={resp.usage}")
-            if not ok:
-                return 1
-        except LLMRequestError as exc:
-            print(f"[FAIL] 最小请求失败: {exc}")
-            report["checks"]["minimal_request"] = {"ok": False, "error": str(exc)[:200]}
-            return 1
-
-        # 2. 并发 3 请求（延迟与 429 观察）
-        t0 = loop.time()
-        try:
-            await asyncio.gather(
-                *(provider.complete([{"role": "user", "content": "并发探针"}]) for _ in range(CONCURRENCY))
-            )
-            concurrency_ms = int((loop.time() - t0) * 1000)
-            report["checks"]["concurrency_3"] = {"ok": True, "total_ms": concurrency_ms}
-            print(f"[{_mark(True)}] 并发 3 请求 total={concurrency_ms}ms")
-        except LLMRequestError as exc:
-            report["checks"]["concurrency_3"] = {"ok": False, "error": str(exc)[:200]}
-            print(f"[FAIL] 并发 3 请求失败: {exc}")
-
-        # 3. 稳定 JSON：重复 rounds 次结构化请求
-        parsed = 0
-        structure_failures = 0
-        request_failures = 0
-        for i in range(rounds):
+            # 1. 最小请求（mandatory）
+            minimal_ok = False
+            t0 = loop.time()
             try:
-                findings, usage = await provider.structured(
-                    [{"role": "user", "content": "这个 PR 没有值得审查的问题，返回空 findings。"}]
+                resp = await provider.complete(
+                    [{"role": "user", "content": "回复 OK 即可"}], temperature=0.0
                 )
-                parsed += 1
-            except StructuredOutputError as exc:
-                structure_failures += 1
-                report["failures"].append({"round": i + 1, "kind": "structure", "detail": exc.detail[:160]})
-                print(f"   round {i + 1} 结构失败: {exc.detail[:120]}")
+                latency_ms = int((loop.time() - t0) * 1000)
+                minimal_ok = bool(resp.text) and resp.usage is not None
+                report["checks"]["minimal_request"] = {
+                    "ok": minimal_ok,
+                    "latency_ms": latency_ms,
+                    "usage": None if resp.usage is None else _usage_dict(resp.usage),
+                }
+                print(f"[{_mark(minimal_ok)}] 最小请求连通 latency={latency_ms}ms usage={resp.usage}")
             except LLMRequestError as exc:
-                request_failures += 1
-                report["failures"].append({"round": i + 1, "kind": "request", "detail": str(exc)[:160]})
-                print(f"   round {i + 1} 请求失败: {exc}")
-        rate = parsed / rounds if rounds else 0.0
-        report["checks"]["structured"] = {
-            "ok": rate >= 0.8,
-            "parsed": parsed, "total": rounds, "rate": round(rate, 4),
-            "structure_failures": structure_failures,
-            "request_failures": request_failures,
-            "repairs": provider.stats["repairs"],
-            "http_retries": provider.stats["http_retries"],
-            "http_429": provider.stats["http_429"],
-        }
-        print(
-            f"[{_mark(rate >= 0.8)}] 结构化解析成功率 {parsed}/{rounds} = {rate:.0%} "
-            f"(修复 {provider.stats['repairs']} 次 / HTTP 重试 {provider.stats['http_retries']} 次 / 429 {provider.stats['http_429']} 次)"
-        )
-        if structure_failures:
-            print(f"   字段漂移/失败 {structure_failures} 次（schema_first 策略，见 09 §3）")
-        exit_code = 0 if rate >= 0.8 else 1
+                report["checks"]["minimal_request"] = {"ok": False, "error": str(exc)[:200]}
+                print(f"[FAIL] 最小请求失败: {exc}")
 
-    # 4. 报告（脱敏）落盘
-    if report_path:
-        with open(report_path, "w", encoding="utf-8") as fh:
-            json.dump(report, fh, ensure_ascii=False, indent=2)
-        print(f"报告已写入: {report_path}")
+            # 2. 并发 3 请求（mandatory）
+            concurrency_ok = False
+            t0 = loop.time()
+            try:
+                await asyncio.gather(
+                    *(provider.complete([{"role": "user", "content": "并发探针"}]) for _ in range(CONCURRENCY))
+                )
+                concurrency_ms = int((loop.time() - t0) * 1000)
+                concurrency_ok = True
+                report["checks"]["concurrency_3"] = {"ok": True, "total_ms": concurrency_ms}
+                print(f"[{_mark(True)}] 并发 3 请求 total={concurrency_ms}ms")
+            except LLMRequestError as exc:
+                report["checks"]["concurrency_3"] = {"ok": False, "error": str(exc)[:200]}
+                print(f"[FAIL] 并发 3 请求失败: {exc}")
+
+            # 3. 稳定 JSON（mandatory，阈值 0.8）
+            parsed = 0
+            structure_failures = 0
+            request_failures = 0
+            for i in range(rounds):
+                try:
+                    findings, usage = await provider.structured(
+                        [{"role": "user", "content": "这个 PR 没有值得审查的问题，返回空 findings。"}]
+                    )
+                    parsed += 1
+                except StructuredOutputError as exc:
+                    structure_failures += 1
+                    report["failures"].append(
+                        {"round": i + 1, "kind": "structure", "detail": exc.detail[:160]}
+                    )
+                    print(f"   round {i + 1} 结构失败: {exc.detail[:120]}")
+                except LLMRequestError as exc:
+                    request_failures += 1
+                    report["failures"].append(
+                        {"round": i + 1, "kind": "request", "detail": str(exc)[:160]}
+                    )
+                    print(f"   round {i + 1} 请求失败: {exc}")
+            rate = parsed / rounds if rounds else 0.0
+            structured_ok = rate >= 0.8
+            report["checks"]["structured"] = {
+                "ok": structured_ok,
+                "parsed": parsed,
+                "total": rounds,
+                "rate": round(rate, 4),
+                "structure_failures": structure_failures,
+                "request_failures": request_failures,
+                "repairs": provider.stats["repairs"],
+                "http_attempts": provider.stats["http_attempts"],
+                "http_retryable_failures": provider.stats["http_retryable_failures"],
+                "http_retries": provider.stats["http_retries"],
+                "http_429": provider.stats["http_429"],
+            }
+            print(
+                f"[{_mark(structured_ok)}] 结构化解析成功率 {parsed}/{rounds} = {rate:.0%} "
+                f"(修复 {provider.stats['repairs']} 次 / 重试 {provider.stats['http_retries']} 次 / 429 {provider.stats['http_429']} 次)"
+            )
+            if structure_failures:
+                print(f"   字段漂移/失败 {structure_failures} 次（schema_first 策略，见 09 §3）")
+
+            # 汇总 mandatory checks
+            exit_code = 0 if (minimal_ok and concurrency_ok and structured_ok) else 1
+            report["passed"] = exit_code == 0
+    finally:
+        # 4. 报告（脱敏）落盘：成功/失败均执行（P2-4）
+        if report_path:
+            with open(report_path, "w", encoding="utf-8") as fh:
+                json.dump(report, fh, ensure_ascii=False, indent=2)
+            print(f"报告已写入: {report_path}  passed={report['passed']}")
     return exit_code
 
 

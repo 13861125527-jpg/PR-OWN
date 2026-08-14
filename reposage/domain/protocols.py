@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import Any, Protocol
 
+from pydantic import BaseModel
+
 from .finding import Finding, FindingCandidate
 from .models import ChangeRequest, GlobalBudget, ModelUsage, ReviewContext
 from .run import PublishCommentResult, PublishPlan, ReviewRun
@@ -52,10 +54,11 @@ class LLMProvider(Protocol):
         self,
         messages: list[dict[str, Any]],
         *,
-        schema: dict[str, Any] | None = None,
+        schema: type[BaseModel] | None = None,
         temperature: float = 0.1,
+        max_tokens: int | None = None,
     ) -> ModelResponse:
-        """通用补全；schema 支持时返回结构化 data。"""
+        """通用补全；schema 为 Pydantic 模型类时本地校验并把 model_dump 写入 data。"""
         ...
 
     async def structured(
