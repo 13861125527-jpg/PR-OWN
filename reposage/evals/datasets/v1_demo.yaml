@@ -1,0 +1,240 @@
+# V1 正式评测集（V1-d DoD：≥20 样本，覆盖 single_defect / multi_defect /
+# negative / 行号漂移 / 幻觉路径 / 重复候选 / 部分失败）。
+# 全部为小型合成缺陷样本，不含敏感源码。
+# 脚本化候选见 evals/scripted.py（按 sample.id 注入确定性候选）。
+
+name: v1-demo
+samples:
+  - id: s01-eval
+    kind: single_defect
+    pr_title: "add eval handler"
+    base_files:
+      src/app.py: "def f(x):\n    return x\n"
+    head_files:
+      src/app.py: "def f(x):\n    return eval(x)\n"
+    expected:
+      - category: security
+        path: src/app.py
+        line: 2
+
+  - id: s02-os-system
+    kind: single_defect
+    pr_title: "run command"
+    base_files:
+      src/runner.py: "import os\n\ndef run(cmd):\n    return cmd\n"
+    head_files:
+      src/runner.py: "import os\n\ndef run(cmd):\n    os.system(cmd)\n"
+    expected:
+      - category: security
+        path: src/runner.py
+        line: 4
+
+  - id: s03-pickle
+    kind: single_defect
+    pr_title: "load data"
+    base_files:
+      src/io_util.py: "import json\n\ndef load(raw):\n    return json.loads(raw)\n"
+    head_files:
+      src/io_util.py: "import pickle\n\ndef load(raw):\n    return pickle.loads(raw)\n"
+    expected:
+      - category: security
+        path: src/io_util.py
+        line: 4
+
+  - id: s04-assert
+    kind: single_defect
+    pr_title: "validate input"
+    base_files:
+      src/validate.py: "def check(v):\n    return v\n"
+    head_files:
+      src/validate.py: "def check(v):\n    assert v > 0\n    return v\n"
+    expected:
+      - category: correctness
+        path: src/validate.py
+        line: 2
+
+  - id: s05-hardcoded-secret
+    kind: single_defect
+    pr_title: "add api key"
+    base_files:
+      src/config.py: "CONFIG = {}\n"
+    head_files:
+      src/config.py: "CONFIG = {}\nAPI_KEY = \"sk-0123456789abcdef\"\n"
+    expected:
+      - category: security
+        path: src/config.py
+        line: 2
+
+  - id: s06-sql-fstring
+    kind: single_defect
+    pr_title: "query users"
+    base_files:
+      src/db.py: "def find(cur, name):\n    return cur.execute(\"SELECT * FROM u WHERE n=?\", (name,))\n"
+    head_files:
+      src/db.py: "def find(cur, name):\n    return cur.execute(f\"SELECT * FROM u WHERE n={name}\")\n"
+    expected:
+      - category: security
+        path: src/db.py
+        line: 2
+
+  - id: s07-subprocess-shell
+    kind: single_defect
+    pr_title: "run external"
+    base_files:
+      src/exec.py: "import subprocess\n\ndef run(cmd):\n    return subprocess.run(cmd)\n"
+    head_files:
+      src/exec.py: "import subprocess\n\ndef run(cmd):\n    return subprocess.run(cmd, shell=True)\n"
+    expected:
+      - category: security
+        path: src/exec.py
+        line: 4
+
+  - id: s08-multi-defect
+    kind: multi_defect
+    pr_title: "handle user input"
+    base_files:
+      src/handler.py: "def handle(d):\n    return d\n"
+    head_files:
+      src/handler.py: "def handle(d):\n    return eval(d)\n    os.system(d)\n"
+    expected:
+      - category: security
+        path: src/handler.py
+        line: 2
+      - category: security
+        path: src/handler.py
+        line: 3
+
+  - id: s09-negative-clean
+    kind: negative
+    pr_title: "rename variable"
+    base_files:
+      src/clean.py: "def total(items):\n    s = 0\n    for i in items:\n        s += i\n    return s\n"
+    head_files:
+      src/clean.py: "def total(items):\n    acc = 0\n    for i in items:\n        acc += i\n    return acc\n"
+    expected: []
+
+  - id: s10-negative-refactor
+    kind: negative
+    pr_title: "add type hints"
+    base_files:
+      src/typed.py: "def add(a, b):\n    return a + b\n"
+    head_files:
+      src/typed.py: "def add(a: int, b: int) -> int:\n    return a + b\n"
+    expected: []
+
+  - id: s11-drift-line
+    kind: robustness
+    pr_title: "fix eval usage"
+    base_files:
+      src/drift.py: "def g():\n    return 1\n\n\ndef h():\n    return 2\n"
+    head_files:
+      src/drift.py: "def g():\n    return 1\n\n\ndef h():\n    return eval(x)\n"
+    expected:
+      - category: security
+        path: src/drift.py
+        line: 6
+
+  - id: s12-hallucinated-path
+    kind: robustness
+    pr_title: "touch auth"
+    base_files:
+      src/auth.py: "def check(t):\n    return t == \"admin\"\n"
+    head_files:
+      src/auth.py: "def check(t):\n    return t == \"admin\" and len(t) > 3\n"
+    expected: []  # 真实无缺陷；脚本化候选注入幻觉路径 src/ghost.py
+
+  - id: s13-duplicate-candidates
+    kind: robustness
+    pr_title: "query with eval"
+    base_files:
+      src/dup.py: "def q(v):\n    return v\n"
+    head_files:
+      src/dup.py: "def q(v):\n    return eval(v)\n"
+    expected:
+      - category: security
+        path: src/dup.py
+        line: 2
+
+  - id: s14-partial-failure
+    kind: robustness
+    pr_title: "multi-file review"
+    base_files:
+      src/a.py: "def a():\n    return 1\n"
+      src/b.py: "def b():\n    return 2\n"
+    head_files:
+      src/a.py: "def a():\n    return eval(1)\n"
+      src/b.py: "def b():\n    return os.system(2)\n"
+    expected:
+      - category: security
+        path: src/a.py
+        line: 2
+    notes: b.py 文件任务失败（部分失败样本），其缺陷不产出来
+
+  - id: s15-yaml-load
+    kind: single_defect
+    pr_title: "parse yaml"
+    base_files:
+      src/loader.py: "import json\n\ndef load(raw):\n    return json.loads(raw)\n"
+    head_files:
+      src/loader.py: "import yaml\n\ndef load(raw):\n    return yaml.load(raw)\n"
+    expected:
+      - category: security
+        path: src/loader.py
+        line: 4
+
+  - id: s16-weak-crypto
+    kind: single_defect
+    pr_title: "hash password"
+    base_files:
+      src/pw.py: "import hashlib\n\ndef digest(p):\n    return hashlib.sha256(p.encode()).hexdigest()\n"
+    head_files:
+      src/pw.py: "import hashlib\n\ndef digest(p):\n    return hashlib.md5(p.encode()).hexdigest()\n"
+    expected:
+      - category: security
+        path: src/pw.py
+        line: 4
+
+  - id: s17-unbound-variable
+    kind: single_defect
+    pr_title: "refactor loop"
+    base_files:
+      src/loop.py: "def total(items):\n    s = 0\n    for i in items:\n        s += i\n    return s\n"
+    head_files:
+      src/loop.py: "def total(items):\n    s = 0\n    for i in items:\n        t = i\n    return t\n"
+    expected:
+      - category: correctness
+        path: src/loop.py
+        line: 4
+
+  - id: s18-invalid-command
+    kind: single_defect
+    pr_title: "build command"
+    base_files:
+      src/cmd.py: "import subprocess\n\ndef run(user):\n    return subprocess.run([\"git\", \"status\"])\n"
+    head_files:
+      src/cmd.py: "import subprocess\n\ndef run(user):\n    return subprocess.run([\"git\", \"status\", user])\n"
+    expected: []
+
+  - id: s19-deadlock-risk
+    kind: single_defect
+    pr_title: "acquire lock"
+    base_files:
+      src/lock.py: "import threading\nlock = threading.Lock()\n\ndef work():\n    with lock:\n        return 1\n"
+    head_files:
+      src/lock.py: "import threading\nlock = threading.Lock()\n\ndef work():\n    lock.acquire()\n    return 1\n"
+    expected:
+      - category: concurrency
+        path: src/lock.py
+        line: 5
+
+  - id: s20-wide-format
+    kind: single_defect
+    pr_title: "print user data"
+    base_files:
+      src/out.py: "def show(u):\n    print(u)\n"
+    head_files:
+      src/out.py: "def show(u):\n    print(f\"{u.name}={u.secret}\")\n"
+    expected:
+      - category: security
+        path: src/out.py
+        line: 2

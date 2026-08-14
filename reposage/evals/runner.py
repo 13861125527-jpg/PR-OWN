@@ -76,20 +76,26 @@ class EvalRunner:
         pipeline = FindingPipeline(
             repo=self.repo, head_sha="head", min_confidence=self.min_confidence
         )
-        return pipeline.process(
+        findings = pipeline.process(
             run_id=run.run_id,
             candidates=result.candidates,
             file_map=file_map,
         )
+        # 评测命中 = 会发表的 finding（accepted；suppressed/body_only 不计入指标）
+        from reposage.domain.enums import FindingStatus
+
+        return [f for f in findings if f.status is FindingStatus.ACCEPTED]
 
     async def run(self) -> dict[str, Metrics]:
         for sample in self.dataset.samples:
             findings = await self._review_sample(sample)
-            self.results[sample.id] = compute_metrics(
+            m = compute_metrics(
                 sample.expected,
                 findings,
                 sample_kind=sample.kind,
             )
+            m.details["sample_kind"] = sample.kind  # 门槛按样本类别归组
+            self.results[sample.id] = m
         return self.results
 
     def report(self) -> str:

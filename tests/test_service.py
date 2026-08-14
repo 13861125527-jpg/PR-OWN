@@ -152,3 +152,52 @@ async def test_review_empty_diff_no_findings():
     run, findings = await service.review("1")
     assert run.status is ReviewRunStatus.COMPLETED
     assert findings == []
+# ================= V1-d 返工：P2-1 阶段错误归因 =================
+
+
+class _FailingLLM:
+    """structured 抛异常 → 应归因 REVIEW 阶段。"""
+
+    async def structured(self, messages, **kwargs):
+        raise RuntimeError("llm boom")
+
+    async def complete(self, *a, **k):
+        raise AssertionError
+
+    async def tool_loop(self, *a, **k):
+        raise AssertionError
+
+
+@pytest.mark.asyncio
+async def test_stage_attribution_llm_failure():
+    """strategy 抛异常 → 失败阶段归因 REVIEW（不是 PREFLIGHT）。"""
+
+    class BoomStrategy:
+        name = "boom"
+
+        def supports(self, run):
+            return True
+
+        async def execute(self, units, run, budget):
+            raise RuntimeError("strategy boom")
+
+    fake = _fake_git()
+    store = SqliteStorage(":memory:")
+    captured: dict = {}
+
+    async def capture(run):
+        captured["run"] = run
+
+    service = _make_service(fake, FakeLLMProvider())
+    service.storage = store
+    service.strategy = BoomStrategy()  # type: ignore[assignment]
+    orig = store.record_run
+    store.record_run = capture  # type: ignore[method-assign]
+    with pytest.raises(RuntimeError):
+        await service.review("1")
+    store.record_run = orig  # type: ignore[method-assign]
+    run = captured["run"]
+    assert run.status is ReviewRunStatus.FAILED
+    failed = [s for s in run.stages if s.status == "failed"]
+    assert failed, "应有 FAILED 阶段"
+    assert failed[0].stage is StageName.REVIEW

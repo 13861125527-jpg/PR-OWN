@@ -83,7 +83,8 @@ def compute_metrics(
     for f in findings:
         if f.canonical_path and f.canonical_start_line is not None:
             position_ok += 1
-    position_accuracy = position_ok / len(findings) if findings else 0.0
+    # 无 finding 则无位置错误（负样本不应因"没有位置"被惩罚）
+    position_accuracy = position_ok / len(findings) if findings else 1.0
 
     negative_noise = len(findings) if sample_kind == "negative" else 0
 

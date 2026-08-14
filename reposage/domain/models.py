@@ -5,11 +5,12 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, field_validator, model_validator
 
 from .enums import (
     ChangedFileStatus,
@@ -370,11 +371,32 @@ class ModelUsage(BaseModel):
     schema_hash: str | None = None
 
 
+class BudgetReservation:
+    """一次发送前最坏预留（P0-1：并发安全原子预留，10 §7 硬预算）。"""
+
+    def __init__(
+        self,
+        *,
+        input_tokens: int,
+        max_output_tokens: int,
+        est_cost_usd: float,
+    ) -> None:
+        self.input_tokens = input_tokens
+        self.max_output_tokens = max_output_tokens
+        self.est_cost_usd = est_cost_usd
+        self.settled = False
+
+
 class GlobalBudget(BaseModel):
     """全局硬预算（P2-2：admission control，见 10 §7 / 08 §5）。
 
     Token 为请求前可控硬上限；费用为保守估算（最坏预留）。
+    P0-1（V1-d 返工）：并发安全的"检查并预留"——reserve() 原子预扣
+    input+max_output token 与最坏费用，请求完成/失败后 settle() 按实际
+    结算并释放未用预留；墙钟到期拒绝新请求。
     """
+
+    model_config = ConfigDict(extra="forbid")
 
     max_total_tokens: int = Field(default=80000, gt=0)
     max_cost_usd: float = Field(default=2.0, gt=0.0)
@@ -384,10 +406,69 @@ class GlobalBudget(BaseModel):
     cost_used: float = 0.0
     started_at: datetime = Field(default_factory=utcnow)
 
+    _lock: asyncio.Lock = PrivateAttr(default_factory=asyncio.Lock)
+    _reserved_tokens: int = PrivateAttr(default=0)
+    _reserved_cost: float = PrivateAttr(default=0.0)
+
     @property
     def exploration_tokens(self) -> int:
         """探索额度 = 总预算 × (1 - 预留比例)。"""
         return int(self.max_total_tokens * (1 - self.reserved_finalize_ratio))
+
+    async def reserve(
+        self,
+        *,
+        input_tokens: int,
+        max_output_tokens: int,
+        est_cost_usd: float,
+    ) -> BudgetReservation | None:
+        """发送前原子预留（admission control，P0-1）。
+
+        - Token：input + max_output 不超（已用 + 已预留）；
+        - 费用：cost_used + 预留 + est 不超 max_cost_usd；
+        - 墙钟：到期后拒绝新请求（10 §7）。
+        任一超限返回 None（调用方不得发请求）。
+        """
+        async with self._lock:
+            if self._wall_clock_expired():
+                return None
+            if (
+                self.tokens_used
+                + self._reserved_tokens
+                + input_tokens
+                + max_output_tokens
+                > self.max_total_tokens
+            ):
+                return None
+            if self.cost_used + self._reserved_cost + est_cost_usd > self.max_cost_usd:
+                return None
+            reservation = BudgetReservation(
+                input_tokens=input_tokens,
+                max_output_tokens=max_output_tokens,
+                est_cost_usd=est_cost_usd,
+            )
+            self._reserved_tokens += input_tokens + max_output_tokens
+            self._reserved_cost += est_cost_usd
+            return reservation
+
+    async def settle(
+        self,
+        reservation: BudgetReservation,
+        *,
+        actual_input: int,
+        actual_output: int,
+        actual_cost: float,
+    ) -> None:
+        """结算：释放预留，按实际 usage 入账（失败/取消同样必须调用，避免泄漏）。"""
+        async with self._lock:
+            self._reserved_tokens = max(0, self._reserved_tokens - reservation.input_tokens - reservation.max_output_tokens)
+            self._reserved_cost = max(0.0, self._reserved_cost - reservation.est_cost_usd)
+            self.tokens_used += actual_input + actual_output
+            self.cost_used += actual_cost
+            reservation.settled = True
+
+    def _wall_clock_expired(self) -> bool:
+        return (utcnow() - self.started_at).total_seconds() >= self.max_runtime_seconds
 
     def can_admit(
         self,
@@ -395,28 +476,23 @@ class GlobalBudget(BaseModel):
         max_output_tokens: int,
         est_cost_usd: float | None = None,
     ) -> bool:
-        """发送前最坏预留（admission control，10 §7 / P0-R2-3）。
-
-        - Token 维度：input + max_output 不超剩余额度；
-        - 费用维度（P2 复验补充）：提供 est_cost_usd 时同时校验 cost_used + est ≤ max_cost_usd。
-        retry 与 finalize reserve 的费用预留为 V1 调用真实模型前的前置任务（见 14 OQ-1）。
-        """
+        """同步检查（非并发场景/测试用；并发路径请用 reserve）。"""
         if self.tokens_used + input_tokens + max_output_tokens > self.max_total_tokens:
             return False
         return not (est_cost_usd is not None and self.cost_used + est_cost_usd > self.max_cost_usd)
 
     def consume(self, usage: ModelUsage) -> None:
-        """调用后入账（含 late_cancelled 的迟到响应）。"""
+        """调用后入账（含 late_cancelled 的迟到响应；并发路径用 settle）。"""
         self.tokens_used += usage.input_tokens + usage.output_tokens
         self.cost_used += usage.cost_usd
 
     @property
     def remaining_tokens(self) -> int:
-        return max(0, self.max_total_tokens - self.tokens_used)
+        return max(0, self.max_total_tokens - self.tokens_used - self._reserved_tokens)
 
     @property
     def remaining_cost(self) -> float:
-        return max(0.0, self.max_cost_usd - self.cost_used)
+        return max(0.0, self.max_cost_usd - self.cost_used - self._reserved_cost)
 
 
 # ChangedFile.hunks 前向引用 DiffHunk（定义于文件后部），类全部定义后重建

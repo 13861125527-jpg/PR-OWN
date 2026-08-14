@@ -7,6 +7,7 @@ from reposage.domain.finding import FindingCandidate
 from reposage.review.location import (
     BODY_ONLY,
     LOCATION_VALID,
+    UNKNOWN_PATH,
     added_line_numbers,
     resolve_location,
 )
@@ -84,10 +85,11 @@ def test_resolve_outside_tolerance_body_only():
     assert "不在新增行" in res.reason
 
 
-def test_resolve_unknown_path_body_only():
+def test_resolve_unknown_path_is_unknown():
+    """P1-3：claimed_path 不在变更文件 → UNKNOWN_PATH（pipeline 转 SUPPRESSED）。"""
     file_map = {"src/a.py": _file(MODIFY_DIFF)}
     res = resolve_location(_cand(path="src/zzz.py"), file_map)
-    assert res.status == BODY_ONLY
+    assert res.status == UNKNOWN_PATH
     assert "不在本次变更文件" in res.reason
 
 

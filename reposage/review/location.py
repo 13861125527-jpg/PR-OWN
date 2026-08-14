@@ -20,6 +20,7 @@ LINE_DRIFT_TOLERANCE = 5
 
 LOCATION_VALID = "location_valid"
 BODY_ONLY = "body_only"
+UNKNOWN_PATH = "unknown_path"
 
 
 @dataclass(frozen=True)
@@ -41,6 +42,18 @@ def added_line_numbers(file: ChangedFile) -> set[int]:
             if line.type is DiffLineType.ADDED and line.new_ln is not None:
                 added.add(line.new_ln)
     return added
+
+
+def added_line_content(file: ChangedFile, line_number: int) -> str | None:
+    """读取新增行的真实源码文本（P1-2：证据内容只能来自程序读取的 diff 行号表）。"""
+    for hunk in file.hunks:
+        for line in hunk.lines:
+            if (
+                line.type is DiffLineType.ADDED
+                and line.new_ln == line_number
+            ):
+                return line.content
+    return None
 
 
 def _nearest(value: int, candidates: set[int], tolerance: int) -> int | None:
@@ -67,7 +80,8 @@ def resolve_location(
         return LocationResolution(None, None, None, BODY_ONLY, "缺少 claimed_path")
     file = file_map.get(path)
     if file is None:
-        return LocationResolution(None, None, None, BODY_ONLY, "claimed_path 不在本次变更文件")
+        # P1-3：路径不在本次变更 → suppressed（模型幻觉路径不作为正文结论）
+        return LocationResolution(None, None, None, UNKNOWN_PATH, "claimed_path 不在本次变更文件")
     added = added_line_numbers(file)
     if not added:
         return LocationResolution(path, None, None, BODY_ONLY, "文件无新增行（纯删除/仅重命名）")

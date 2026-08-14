@@ -40,7 +40,9 @@ class ReviewService:
         self.settings = settings or Settings()
         self.assembler = ContextAssembler()
         self.strategy = strategy or SinglePassReviewer(
-            llm, concurrency=self.settings.concurrency.file_tasks
+            llm,
+            file_tasks=self.settings.concurrency.file_tasks,
+            model_requests=self.settings.concurrency.model_requests,
         )
 
     async def review(
@@ -52,6 +54,7 @@ class ReviewService:
         run = ReviewRun(run_id=f"run-{uuid.uuid4().hex[:12]}")
         _ = dry_run
         file_map: dict[str, ChangedFile] = {}
+        current_stage = StageName.PREFLIGHT
         try:
             # preflight：ChangeRequest 契约校验（head 锁定铁律）
             run.stages.append(StageResult(stage=StageName.PREFLIGHT, status=StageStatus.OK))
@@ -60,6 +63,7 @@ class ReviewService:
             run.external_ref = req.external_id
             run.base_sha = req.base.sha
             run.head_sha = req.head.sha
+            current_stage = StageName.FETCH
             run.stages.append(
                 StageResult(stage=StageName.FETCH, status=StageStatus.OK, detail=f"head={req.head.sha}")
             )
@@ -76,6 +80,7 @@ class ReviewService:
             run.warnings.extend(
                 f"跳过文件 {f.path}: {reason}" for f, _reason, reason in filtered.skipped
             )
+            current_stage = StageName.CONTEXT
             run.stages.append(
                 StageResult(
                     stage=StageName.CONTEXT,
@@ -99,6 +104,7 @@ class ReviewService:
             )
 
             # strategy.execute（版本差异点）
+            current_stage = StageName.REVIEW
             result = await self.strategy.execute(units, run, budget)
             run.warnings.extend(result.source_run.warnings)
             run.stages.append(
@@ -112,6 +118,7 @@ class ReviewService:
             )
 
             # 统一 FindingPipeline（唯一生命周期所有者）
+            current_stage = StageName.PIPELINE
             pipeline = FindingPipeline(
                 repo=self.settings.project.name,
                 head_sha=req.head.sha,
@@ -145,7 +152,7 @@ class ReviewService:
             run.finish(ReviewRunStatus.FAILED)
             run.warnings.append(f"审查中止: {type(exc).__name__}: {exc}")
             run.stages.append(
-                StageResult(stage=StageName.PREFLIGHT, status=StageStatus.FAILED, error=str(exc)[:300])
+                StageResult(stage=current_stage, status=StageStatus.FAILED, error=str(exc)[:300])
             )
             await self.storage.record_run(run)
             raise

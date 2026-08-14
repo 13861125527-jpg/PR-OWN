@@ -132,7 +132,7 @@ class FakeGitProvider:
             diff = unified_diff(old, new, fromfile=f"a/{path}", tofile=f"b/{path}", lineterm="\n")
             text = "".join(diff)
             chunks.append(header + text)
-        return "\n".join(chunks)
+        return "".join(chunks)  # chunk 末尾已带换行，避免块间空行
 
     async def publish_comments(self, plan: PublishPlan) -> dict[str, PublishCommentResult]:
         """Saga 发布（Fake，P1-6）：

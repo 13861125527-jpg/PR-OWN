@@ -2,7 +2,7 @@
 
 
 from reposage.domain.diff import parse_unified_diff
-from reposage.domain.enums import FindingCategory, FindingStatus, Severity
+from reposage.domain.enums import EvidenceKind, FindingCategory, FindingStatus, Severity
 from reposage.domain.finding import FindingCandidate
 from reposage.review.pipeline import FindingPipeline
 
@@ -140,3 +140,57 @@ def test_sort_by_severity_then_confidence():
     )
     assert len(findings) == 2
     assert findings[0].severity is Severity.HIGH
+# ================= V1-d 返工：P1-2 证据信任 / P1-3 unknown path =================
+
+
+def test_unknown_path_suppressed():
+    """P1-3：幻觉路径 → SUPPRESSED（不作为正文结论）。"""
+    f = _pipeline().process(
+        run_id="r1", candidates=[_cand(path="src/ghost.py")], file_map=_file_map()
+    )[0]
+    assert f.status is FindingStatus.SUPPRESSED
+    assert "不在本次变更文件" in f.versions[-1].reason
+
+
+def test_evidence_content_from_real_diff_line():
+    """P1-2：程序补的证据内容来自真实新增行（verified=True），不是模型描述。"""
+    f = _pipeline().process(run_id="r1", candidates=[_cand(start=5)], file_map=_file_map())[0]
+    assert f.evidence
+    ev = f.evidence[0]
+    assert ev.verified is True
+    assert ev.content == "    return eval(x)"  # 真实新增行文本（不含 + 前缀）
+
+
+def test_evidence_forged_by_model_not_verified():
+    """P1-2：模型提交伪造 content + verified=True 不能穿透（程序重判为 False）。"""
+    from reposage.domain.models import Evidence
+
+    cand = _cand()
+    cand.evidence = [
+        Evidence(
+            kind=EvidenceKind.DIFF_LINE,
+            location="src/a.py:4",
+            content="return safe_code()",  # 与真实新增行不一致
+            verified=True,  # 模型伪造
+        )
+    ]
+    f = _pipeline().process(run_id="r1", candidates=[cand], file_map=_file_map())[0]
+    assert f.evidence
+    assert f.evidence[0].verified is False  # 程序重判
+
+
+def test_evidence_matching_real_line_verified():
+    """P1-2：模型提交内容与真实新增行一致 → 程序验证 verified=True。"""
+    from reposage.domain.models import Evidence
+
+    cand = _cand(start=5)
+    cand.evidence = [
+        Evidence(
+            kind=EvidenceKind.DIFF_LINE,
+            location="src/a.py:5",
+            content="    return eval(x)",  # 与真实新增行（行 5）一致
+            verified=False,  # 模型没声称已验证
+        )
+    ]
+    f = _pipeline().process(run_id="r1", candidates=[cand], file_map=_file_map())[0]
+    assert f.evidence[0].verified is True

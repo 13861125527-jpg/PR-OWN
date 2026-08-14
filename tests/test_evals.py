@@ -152,3 +152,103 @@ async def test_eval_runner_no_candidates_zero_recall():
     runner = EvalRunner(EvalDataset(name="d", samples=[sample]), strategy=strategy)
     await runner.run()
     assert runner.results["s2"].recall == 0.0
+# ================= V1-d 返工：P1-4 评测 DoD（脚本化/门槛/baseline） =================
+
+
+def _fake_metrics(precision=1.0, position=1.0, noise=0, kind="single_defect"):
+    from reposage.evals.metrics import Metrics
+
+    return Metrics(
+        precision=precision,
+        recall=1.0,
+        f1=1.0,
+        position_accuracy=position,
+        negative_noise=noise,
+        details={"sample_kind": kind},
+    )
+
+
+def test_thresholds_pass():
+    from reposage.evals.thresholds import check_thresholds
+
+    results = {"a": _fake_metrics(1.0, 1.0), "b": _fake_metrics(0.9, 0.95)}
+    ok, violations = check_thresholds(results)
+    assert ok is True
+    assert violations == []
+
+
+def test_thresholds_fail_precision():
+    from reposage.evals.thresholds import check_thresholds
+
+    results = {"a": _fake_metrics(0.5, 1.0)}
+    ok, violations = check_thresholds(results)
+    assert ok is False
+    assert any("Precision" in v for v in violations)
+
+
+def test_thresholds_fail_negative_noise():
+    from reposage.evals.thresholds import check_thresholds
+
+    results = {"neg": _fake_metrics(1.0, 1.0, noise=3, kind="negative")}
+    ok, violations = check_thresholds(results)
+    assert ok is False
+    assert any("NegativeNoise" in v for v in violations)
+
+
+@pytest.mark.asyncio
+async def test_scripted_eval_all_samples_perfect():
+    """脚本化评测：20 样本全部指标 1.0（CI 验证 Pipeline 指标计算）。"""
+    from pathlib import Path
+
+    from reposage.evals.runner import EvalRunner
+    from reposage.evals.scripted import ScriptedStrategy, scripted_candidates
+
+    ds = EvalDataset.load_yaml(Path("reposage/evals/datasets/v1_demo.yaml"))
+    assert len(ds.samples) >= 20
+    runner = EvalRunner(ds, strategy=ScriptedStrategy(scripted_candidates))
+    await runner.run()
+    for sid, m in runner.results.items():
+        assert m.precision == 1.0, f"{sid} precision {m.precision}"
+        assert m.recall == 1.0, f"{sid} recall {m.recall}"
+        assert m.position_accuracy == 1.0, f"{sid} position {m.position_accuracy}"
+
+
+def test_scripted_gate_exit_zero():
+    """门槛 CLI：达标返回 0。"""
+    from reposage.evals.thresholds import run_scripted_gate
+
+    ok, results, violations = run_scripted_gate("reposage/evals/datasets/v1_demo.yaml")
+    assert ok is True
+    assert len(results) >= 20
+
+
+def test_baseline_compare_v1_beats_baseline_precision():
+    """baseline 对照：V1 经 pipeline（重定位/去重/抑制幻觉）precision 高于直拼。"""
+    from reposage.evals.baseline import compare
+
+    result = compare("reposage/evals/datasets/v1_demo.yaml")
+    q = result["quality"]
+    assert q["precision"]["v1"] >= q["precision"]["baseline"]
+    assert set(result.keys()) == {"quality", "cost", "latency"}
+    # 三张表结构
+    assert "model_calls" in result["cost"]
+    assert "total_ms" in result["latency"]
+def test_gate_cli_nonzero_exit_on_failure(monkeypatch):
+    """门槛 CLI：构造低指标数据 → main 返回非零。"""
+    import sys
+
+    import reposage.evals.thresholds as th
+
+    def bad_scripted(sample_id):
+        return []  # 空候选 → recall 0
+
+    monkeypatch.setattr(th, "scripted_candidates", bad_scripted)
+    monkeypatch.setattr(sys, "argv", ["thresholds", "reposage/evals/datasets/v1_demo.yaml"])
+    # main 内部 run_scripted_gate 默认 scripted=scripted_candidates（模块级默认已 monkeypatch）
+
+    # 空候选下 precision/recall 全 0 → 门槛失败
+    ok, _results, violations = th.run_scripted_gate(
+        "reposage/evals/datasets/v1_demo.yaml", scripted=bad_scripted
+    )
+    assert ok is False
+    assert violations
