@@ -8,15 +8,35 @@
 
 ## 执行步骤（安全）
 
+模型名覆盖：`MODEL_NAME` 环境变量 > 配置 `llm.model` > 内置默认值（不硬编码
+具体服务商模型名；真实服务端契约要求如 DeepSeek 用 `deepseek-v4-pro`）。
+
+**PowerShell：**
+
 ```powershell
-$env:MODEL_BASE_URL = "https://your-endpoint/v1"   # 不含任何凭证
-$env:MODEL_API_KEY  = "sk-..."                      # 仅本地设置，禁止提交
+$env:MODEL_BASE_URL = "https://api.deepseek.com"        # 不含任何凭证
+$env:MODEL_API_KEY  = "sk-..."                           # 仅本地设置，禁止提交
+$env:MODEL_NAME     = "deepseek-v4-pro"                  # 覆盖默认 DP-V4-PRO
 $env:OQ1_ROUNDS     = "20"
 $env:OQ1_REPORT     = "docs/evidence/v1-c-dp-v4-pro-smoke.json"
 python -m reposage.providers.llm.smoke
+Remove-Item Env:MODEL_API_KEY                            # 测试后清除 Key
 ```
 
-验收标准：结构化解析成功率 ≥ 0.8（`14` OQ-1）。
+**CMD：**
+
+```bat
+set "MODEL_BASE_URL=https://api.deepseek.com"
+set "MODEL_API_KEY=sk-..."
+set "MODEL_NAME=deepseek-v4-pro"
+set "OQ1_ROUNDS=20"
+set "OQ1_REPORT=docs/evidence/v1-c-dp-v4-pro-smoke.json"
+python -m reposage.providers.llm.smoke
+set "MODEL_API_KEY="
+```
+
+smoke 启动时打印实际模型名（不打印 API Key）；验收标准：结构化解析成功率
+≥ 0.8 且 minimal/concurrency/structured 三项强制检查全通过（`14` OQ-1）。
 
 ## 脱敏规则
 

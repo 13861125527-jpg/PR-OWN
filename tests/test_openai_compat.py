@@ -816,3 +816,54 @@ async def test_smoke_all_pass_passed_true(tmp_path, monkeypatch):
     assert data["checks"]["minimal_request"]["ok"] is True
     assert data["checks"]["concurrency_3"]["ok"] is True
     assert data["checks"]["structured"]["ok"] is True
+# ================= Round 1 复验：MODEL_NAME 覆盖 =================
+
+
+class _CaptureFactory:
+    """捕获实际传入 factory 的 llm 配置（断言模型名）。"""
+
+    def __init__(self) -> None:
+        self.model: str | None = None
+        self.calls = 0
+
+    def __call__(self, llm):
+        self.calls += 1
+        self.model = llm.model
+        return _FakeSmokeProvider()
+
+
+@pytest.mark.asyncio
+async def test_smoke_default_model_when_no_env(monkeypatch):
+    """未设置 MODEL_NAME → 使用配置 llm.model 默认值。"""
+    monkeypatch.setenv("MODEL_API_KEY", "k")
+    monkeypatch.setenv("MODEL_BASE_URL", "https://example.invalid/v1")
+    monkeypatch.delenv("MODEL_NAME", raising=False)
+    capture = _CaptureFactory()
+    code = await smoke_mod._run(rounds=1, report_path=None, provider_factory=capture)
+    assert code == 0
+    assert capture.model == "DP-V4-PRO"  # settings.llm.model 默认值
+
+
+@pytest.mark.asyncio
+async def test_smoke_model_name_env_overrides(monkeypatch):
+    """设置 MODEL_NAME → 覆盖配置默认值（不硬编码具体服务商）。"""
+    monkeypatch.setenv("MODEL_API_KEY", "k")
+    monkeypatch.setenv("MODEL_BASE_URL", "https://example.invalid/v1")
+    monkeypatch.setenv("MODEL_NAME", "deepseek-v4-pro")
+    capture = _CaptureFactory()
+    code = await smoke_mod._run(rounds=1, report_path=None, provider_factory=capture)
+    assert code == 0
+    assert capture.model == "deepseek-v4-pro"
+
+
+@pytest.mark.asyncio
+async def test_smoke_report_model_matches_request(monkeypatch, tmp_path):
+    """报告顶层 model 与实际请求模型一致。"""
+    monkeypatch.setenv("MODEL_API_KEY", "k")
+    monkeypatch.setenv("MODEL_BASE_URL", "https://example.invalid/v1")
+    monkeypatch.setenv("MODEL_NAME", "deepseek-v4-flash")
+    report_path = tmp_path / "smoke.json"
+    capture = _CaptureFactory()
+    await smoke_mod._run(rounds=1, report_path=str(report_path), provider_factory=capture)
+    data = json.loads(report_path.read_text(encoding="utf-8"))
+    assert data["model"] == capture.model == "deepseek-v4-flash"

@@ -51,9 +51,12 @@ async def _run(
 ) -> int:
     """OQ-1 实测主流程。
 
+    - 模型名优先级：``MODEL_NAME`` 环境变量 > ``llm.model`` 配置 > 内置默认值
+      （验收 Round 1：真实服务端契约要求可覆盖模型名，如 deepseek-v4-pro）；
+    - 启动时打印实际模型名，但绝不打印 API key；
     - try/finally：配置了 report_path 时成功/失败均落盘脱敏报告（P2-4）；
     - mandatory checks（minimal / concurrency / structured）：任一失败整体 exit 1；
-    - 报告包含 overall ``passed`` 字段。
+    - 报告包含 overall ``passed`` 字段，顶层 ``model`` 与实际请求模型一致。
     """
     settings = Settings()
     api_key = os.environ.get(settings.llm.api_key_env, "")
@@ -62,9 +65,14 @@ async def _run(
         print(f"缺少配置：请设置 {settings.llm.api_key_env} 与 {settings.llm.base_url_env} 环境变量")
         return 1
 
+    # MODEL_NAME 覆盖（不硬编码具体服务商模型名，保留 OpenAI-compatible 可配置性）
+    model_name = os.environ.get("MODEL_NAME") or settings.llm.model
+    llm = settings.llm.model_copy(update={"model": model_name})
+    print(f"模型: {llm.model}（未设置 MODEL_NAME 时使用配置 llm.model 默认值）")
+
     factory = provider_factory or OpenAICompatProvider.from_config
     report: dict[str, Any] = {
-        "model": settings.llm.model,
+        "model": llm.model,  # 顶层 model = 实际请求模型（Round 1 要求一致）
         "base_url": _redact_base_url(base_url),
         "rounds": rounds,
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
@@ -74,7 +82,7 @@ async def _run(
     }
     exit_code = 1
     try:
-        async with factory(settings.llm) as provider:  # 自建 client 一定关闭
+        async with factory(llm) as provider:  # 自建 client 一定关闭；llm.model 已被 MODEL_NAME 覆盖
             loop = asyncio.get_event_loop()
 
             # 1. 最小请求（mandatory）

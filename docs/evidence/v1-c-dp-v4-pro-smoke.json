@@ -1,0 +1,132 @@
+{
+  "model": "DP-V4-PRO",
+  "base_url": "https://api.deepseek.com",
+  "rounds": 20,
+  "timestamp": "2026-08-14T14:28:41+0800",
+  "checks": {
+    "minimal_request": {
+      "ok": false,
+      "error": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_er"
+    },
+    "concurrency_3": {
+      "ok": false,
+      "error": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_er"
+    },
+    "structured": {
+      "ok": false,
+      "parsed": 0,
+      "total": 20,
+      "rate": 0.0,
+      "structure_failures": 0,
+      "request_failures": 20,
+      "repairs": 0,
+      "http_attempts": 24,
+      "http_retryable_failures": 0,
+      "http_retries": 0,
+      "http_429": 0
+    }
+  },
+  "failures": [
+    {
+      "round": 1,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 2,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 3,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 4,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 5,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 6,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 7,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 8,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 9,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 10,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 11,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 12,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 13,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 14,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 15,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 16,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 17,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 18,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 19,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    },
+    {
+      "round": 20,
+      "kind": "request",
+      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+    }
+  ],
+  "passed": false
+}
