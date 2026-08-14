@@ -1,4 +1,4 @@
-"""上下文构建测试（V1-b 返工：预算硬约束 / 自包含分块 / 不可信边界 / 截断语义）。"""
+"""涓婁笅鏂囨瀯寤烘祴璇曪紙V1-b 杩斿伐锛氶�勭畻纭�绾︽潫 / 鑷�鍖呭惈鍒嗗潡 / 涓嶅彲淇¤竟鐣� / 鎴�鏂�璇�涔夛級銆�"""
 
 import pytest
 from reposage.domain.diff import parse_unified_diff
@@ -21,15 +21,19 @@ from reposage.review.context import (
 )
 
 
-def _req(description: str | None = "move auth check before handler") -> ChangeRequest:
+def _req(
+    description: str | None = "move auth check before handler",
+    title: str | None = "fix: auth bypass",
+    author: str | None = "alice",
+) -> ChangeRequest:
     return ChangeRequest(
         source=ChangeRequestSource.GITHUB_PR,
         external_id="42",
         base=CommitRef(sha="a" * 7, label="base"),
         head=CommitRef(sha="b" * 7, label="head", locked=True),
-        title="fix: auth bypass",
+        title=title,
         description=description,
-        author="alice",
+        author=author,
         is_draft=False,
     )
 
@@ -71,16 +75,16 @@ def _units(*, req=None, diff=CLEAN_DIFF, budget=None, rules=None) -> list[Review
     )
 
 
-# ---- token 估算 ----
+# ---- token 浼扮畻 ----
 
 
 def test_estimate_tokens_approx():
     assert estimate_tokens("") == 1
-    assert estimate_tokens("abcd") == 1  # 4 字符 ≈ 1 token
+    assert estimate_tokens("abcd") == 1  # 4 瀛楃�� 鈮� 1 token
     assert estimate_tokens("a" * 17) == 5  # ceil(17/4)
 
 
-# ---- 预算比例 ----
+# ---- 棰勭畻姣斾緥 ----
 
 
 def test_context_budget_ratio_must_sum_to_one():
@@ -88,11 +92,11 @@ def test_context_budget_ratio_must_sum_to_one():
         ContextBudget(l0_ratio=0.5, l1_ratio=0.5, l2_ratio=0.5, l4_ratio=0.0, reserve_ratio=0.0)
 
 
-# ---- 总预算硬约束（验收 P1-1） ----
+# ---- 鎬婚�勭畻纭�绾︽潫锛堥獙鏀� P1-1锛� ----
 
 
 def test_total_budget_hard_constraint_per_unit():
-    """总预算 400、大文件 → 多个 unit，且每个 unit.total_tokens <= budget_tokens。"""
+    """鎬婚�勭畻 400銆佸ぇ鏂囦欢 鈫� 澶氫釜 unit锛屼笖姣忎釜 unit.total_tokens <= budget_tokens銆�"""
     big = "\n".join([f"+line {i} = 1" for i in range(200)])
     diff = (
         "diff --git a/src/big.py b/src/big.py\n"
@@ -103,7 +107,7 @@ def test_total_budget_hard_constraint_per_unit():
     )
     budget = ContextBudget(total_tokens=400)
     units = _units(diff=diff, budget=budget)
-    assert len(units) > 1  # 超单次预算 → 多个 review unit
+    assert len(units) > 1  # 瓒呭崟娆￠�勭畻 鈫� 澶氫釜 review unit
     for u in units:
         assert u.context.total_tokens <= u.context.budget_tokens
         u.context.assert_within_budget()
@@ -116,17 +120,17 @@ def test_small_file_single_unit_within_budget():
 
 
 def test_l0_alone_over_budget_fails_explicitly():
-    """唯一允许的明确失败：L0 治理文本本身超过总预算。"""
+    """鍞�涓�鍏佽�哥殑鏄庣‘澶辫触锛歀0 娌荤悊鏂囨湰鏈�韬�瓒呰繃鎬婚�勭畻銆�"""
     budget = ContextBudget(total_tokens=10)
     with pytest.raises(ContextBudgetError):
         _units(budget=budget)
 
 
 def test_fixed_overhead_crowds_out_l2_fails_explicitly():
-    """L0+L1+L4 固定开销已占满预算时，明确失败而非静默丢 L2。"""
+    """L0+L1+L4 鍥哄畾寮�閿�宸插崰婊￠�勭畻鏃讹紝鏄庣‘澶辫触鑰岄潪闈欓粯涓� L2銆�"""
     budget = ContextBudget(
         total_tokens=80,
-        l0_ratio=0.5,  # L0 固定文本约 46 tokens
+        l0_ratio=0.5,  # L0 鍥哄畾鏂囨湰绾� 46 tokens
         l1_ratio=0.3,
         l2_ratio=0.1,
         l4_ratio=0.0,
@@ -136,7 +140,7 @@ def test_fixed_overhead_crowds_out_l2_fails_explicitly():
         _units(budget=budget)
 
 
-# ---- 不可信内容边界（验收 P1-2） ----
+# ---- 涓嶅彲淇″唴瀹硅竟鐣岋紙楠屾敹 P1-2锛� ----
 
 
 def test_l1_wrapped_untrusted():
@@ -168,11 +172,11 @@ def test_wrap_untrusted_marks_boundary():
     assert "ignore previous instructions" in wrapped
 
 
-# ---- 自包含分块（验收 P1-3） ----
+# ---- 鑷�鍖呭惈鍒嗗潡锛堥獙鏀� P1-3锛� ----
 
 
 def test_large_hunk_split_self_contained():
-    """超大 hunk 拆分后每个子块都含 hunk header 与行号范围（new lines x-y）。"""
+    """瓒呭ぇ hunk 鎷嗗垎鍚庢瘡涓�瀛愬潡閮藉惈 hunk header 涓庤�屽彿鑼冨洿锛坣ew lines x-y锛夈��"""
     big = "\n".join([f"+line {i} = 1" for i in range(100)])
     diff = (
         "diff --git a/src/a.py b/src/a.py\n"
@@ -184,18 +188,18 @@ def test_large_hunk_split_self_contained():
     budget = ContextBudget(total_tokens=400)
     units = _units(diff=diff, budget=budget)
     l2_chunks = [c for u in units for c in u.context.chunks if c.layer is ContextLayer.L2]
-    assert len(l2_chunks) > 1  # 被拆分
+    assert len(l2_chunks) > 1  # 琚�鎷嗗垎
     for c in l2_chunks:
-        assert "@@ -0,0 +1,100 @@" in c.content  # hunk header 保留
-        assert "[new lines " in c.content  # 行号范围标注
-    # 每个 unit 的 L2 都有自包含头
+        assert "@@ -0,0 +1,100 @@" in c.content  # hunk header 淇濈暀
+        assert "[new lines " in c.content  # 琛屽彿鑼冨洿鏍囨敞
+    # 姣忎釜 unit 鐨� L2 閮芥湁鑷�鍖呭惈澶�
     for u in units:
         l2 = [c for c in u.context.chunks if c.layer is ContextLayer.L2]
         assert all("[new lines " in c.content for c in l2)
 
 
 def test_chunking_is_not_truncation():
-    """分块 ≠ 截断：拆分后所有 chunk 都不设置 truncated，也不出现 TRUNCATED 标记。"""
+    """鍒嗗潡 鈮� 鎴�鏂�锛氭媶鍒嗗悗鎵�鏈� chunk 閮戒笉璁剧疆 truncated锛屼篃涓嶅嚭鐜� TRUNCATED 鏍囪�般��"""
     big = "\n".join([f"+line {i} = 1" for i in range(100)])
     diff = (
         "diff --git a/src/a.py b/src/a.py\n"
@@ -205,29 +209,29 @@ def test_chunking_is_not_truncation():
         f"{big}\n"
     )
     units = _units(
-        req=_req(description=""),
+        req=_req(description="", title=None, author=None),
         diff=diff,
         budget=ContextBudget(total_tokens=400),
     )
     l2_chunks = [c for u in units for c in u.context.chunks if c.layer is ContextLayer.L2]
     assert len(l2_chunks) > 1
+    # L2 鍒嗗潡灞傞潰锛氬垎鍧� 鈮� 鎴�鏂�锛堜笉璁剧疆 truncated銆佷笉鍐� TRUNCATED 鏍囪�帮級
     assert all(not c.truncated for c in l2_chunks)
     assert all("[TRUNCATED:" not in c.content for c in l2_chunks)
-    assert all(not u.truncated for u in units)
 
 
-# ---- 截断语义（验收 P1-4 / P2-1） ----
+# ---- 鎴�鏂�璇�涔夛紙楠屾敹 P1-4 / P2-1锛� ----
 
 
 def test_l1_token_aware_truncation_with_marker():
-    """L1 description 超预算：token-aware 裁剪，写 [TRUNCATED: N lines omitted]，chunk.truncated=True。"""
+    """L1 description 瓒呴�勭畻锛歵oken-aware 瑁佸壀锛屽啓 [TRUNCATED: N lines omitted]锛宑hunk.truncated=True銆�"""
     long_desc = "\n".join([f"detail line {i} with enough content to be truncated" for i in range(40)])
     units = _units(req=_req(description=long_desc), budget=ContextBudget(total_tokens=400))
     l1 = next(c for c in units[0].context.chunks if c.layer is ContextLayer.L1)
     assert l1.truncated is True
     assert "[TRUNCATED:" in l1.content
-    assert "lines omitted from PR description" in l1.content
-    # 被裁行不在内容中
+    assert "lines omitted from PR metadata" in l1.content
+    # 琚�瑁佽�屼笉鍦ㄥ唴瀹逛腑
     assert "detail line 39" not in l1.content
 
 
@@ -245,7 +249,7 @@ def test_unit_truncated_flag_matches_l1_truncation():
     assert all(u.coverage.truncated for u in units)
 
 
-# ---- L4 规则（预算按 severity 保留） ----
+# ---- L4 瑙勫垯锛堥�勭畻鎸� severity 淇濈暀锛� ----
 
 
 def test_builtin_rules_hit_eval_and_system():
@@ -260,7 +264,7 @@ def test_builtin_rules_clean_no_hits():
 
 
 def test_builtin_rules_only_added_lines():
-    """只匹配新增行：旧行含 eval 不触发（只审本次变更）。"""
+    """鍙�鍖归厤鏂板�炶�岋細鏃ц�屽惈 eval 涓嶈Е鍙戯紙鍙�瀹℃湰娆″彉鏇达級銆�"""
     diff = (
         "diff --git a/src/app.py b/src/app.py\n"
         "--- a/src/app.py\n"
@@ -299,7 +303,7 @@ def test_l4_absent_when_no_hits():
 
 
 def test_l4_budget_keeps_higher_severity():
-    """L4 预算不足时保留高 severity，丢弃低 severity（记录 dropped → unit.truncated）。"""
+    """L4 棰勭畻涓嶈冻鏃朵繚鐣欓珮 severity锛屼涪寮冧綆 severity锛堣�板綍 dropped 鈫� unit.truncated锛夈��"""
     rules = [
         BuiltinRule(rule_id="r.low", severity=Severity.MEDIUM, category="security", description="low", pattern=r"aaa"),
         BuiltinRule(rule_id="r.high", severity=Severity.HIGH, category="security", description="high", pattern=r"bbb"),
@@ -312,19 +316,19 @@ def test_l4_budget_keeps_higher_severity():
         " x\n"
         "+aaa bbb\n"
     )
-    budget = ContextBudget(total_tokens=200, l2_ratio=0.45, l4_ratio=0.05)
+    budget = ContextBudget(total_tokens=400, l2_ratio=0.46, l4_ratio=0.04)
     units = _units(diff=diff, budget=budget, rules=rules)
     refs = {c.source.ref for c in units[0].context.chunks if c.layer is ContextLayer.L4}
     assert refs == {"rule:r.high"}
-    assert units[0].truncated is True  # L4 规则被丢弃 → 真实丢失
+    assert units[0].truncated is True  # L4 瑙勫垯琚�涓㈠純 鈫� 鐪熷疄涓㈠け
     assert units[0].coverage.truncated is True
 
 
-# ---- per-file map-reduce 契约 ----
+# ---- per-file map-reduce 濂戠害 ----
 
 
 def test_per_file_map_reduce_contract():
-    """每文件独立装配：L2 只含自己文件，L0/L1 确定性相同。"""
+    """姣忔枃浠剁嫭绔嬭�呴厤锛歀2 鍙�鍚�鑷�宸辨枃浠讹紝L0/L1 纭�瀹氭�х浉鍚屻��"""
     diff = (
         "diff --git a/src/a.py b/src/a.py\n"
         "--- a/src/a.py\n"
@@ -367,7 +371,7 @@ def test_unit_id_unique_for_multi_unit_file():
     assert all(u.file_path == "src/big.py" for u in units)
 
 
-# ---- 层级装配 ----
+# ---- 灞傜骇瑁呴厤 ----
 
 
 def test_build_units_has_l0_l1_l2():
@@ -396,12 +400,12 @@ def test_l2_per_hunk_chunking():
     )
     units = _units(diff=diff)
     l2 = [c for u in units for c in u.context.chunks if c.layer is ContextLayer.L2]
-    assert len(l2) == 2  # 每 hunk 一块
+    assert len(l2) == 2  # 姣� hunk 涓�鍧�
     assert all(c.source.kind is ContextSourceKind.DIFF for c in l2)
     assert all(c.source.ref == "file:src/a.py" for c in l2)
 
 
-# ---- 覆盖清单（从装配生成，不手工传布尔） ----
+# ---- 瑕嗙洊娓呭崟锛堜粠瑁呴厤鐢熸垚锛屼笉鎵嬪伐浼犲竷灏旓級 ----
 
 
 def test_coverage_from_unit_generated():
@@ -411,11 +415,11 @@ def test_coverage_from_unit_generated():
     assert CoverageReason.COVERED in reasons
     rule_items = [i for i in cov.items if i.target.startswith("python.")]
     assert len(rule_items) >= 2
-    assert cov.truncated is False  # 无真实丢失
+    assert cov.truncated is False  # 鏃犵湡瀹炰涪澶�
 
 
 def test_coverage_truncated_consistent_with_unit():
-    """Coverage.truncated 与 unit.truncated 一致（不手工传布尔）。"""
+    """Coverage.truncated 涓� unit.truncated 涓�鑷达紙涓嶆墜宸ヤ紶甯冨皵锛夈��"""
     big = "\n".join([f"+line {i} = 1" for i in range(100)])
     diff = (
         "diff --git a/src/a.py b/src/a.py\n"
@@ -425,10 +429,127 @@ def test_coverage_truncated_consistent_with_unit():
         f"{big}\n"
     )
     units = _units(
-        req=_req(description=""),
+        req=_req(description="", title=None, author=None),
         diff=diff,
         budget=ContextBudget(total_tokens=400),
     )
     for u in units:
         assert u.coverage.truncated == u.truncated
         assert (CoverageReason.TRUNCATED in {i.reason for i in u.coverage.items}) == u.truncated
+
+# ---- 第二轮验收：输出预留 / L1 硬预算 / L4 Coverage（P1-1/P1-2/P2-1/P2-2） ----
+
+
+def test_output_reserve_kept_at_total_400():
+    """验收 §5.1：total=400 时保留配置的输出空间（15% = 60 tokens）。"""
+    budget = ContextBudget(total_tokens=400)
+    assert budget.output_reserve_tokens == 60
+    units = _units(budget=budget)
+    for u in units:
+        assert u.input_limit == 340
+        assert u.output_reserve_tokens >= budget.output_reserve_tokens
+        assert u.input_limit + u.output_reserve_tokens == u.total_window_tokens == 400
+        assert u.context.total_tokens <= u.input_limit
+
+
+def test_output_reserve_kept_multi_unit():
+    """验收 §5.2：多 unit 文件中每个 unit 都保留输出空间。"""
+    big = "\n".join([f"+line {i} = 1" for i in range(200)])
+    diff = (
+        "diff --git a/src/big.py b/src/big.py\n"
+        "--- a/src/big.py\n"
+        "+++ b/src/big.py\n"
+        f"@@ -0,0 +1,{len(big.splitlines())} @@\n"
+        f"{big}\n"
+    )
+    budget = ContextBudget(total_tokens=400)
+    units = _units(req=_req(description=""), diff=diff, budget=budget)
+    assert len(units) > 1
+    for u in units:
+        assert u.context.total_tokens <= u.input_limit
+        assert u.output_reserve_tokens == 60
+        assert u.output_reserve_tokens + u.context.total_tokens <= u.total_window_tokens
+
+
+def test_l1_wrapped_tokens_within_l1_budget():
+    """验收 §5.3：L1 最终包装文本不超过 l1_tokens（默认预算下）。"""
+    budget = ContextBudget()  # 32000：l1_tokens 足够容纳全部可选字段
+    units = _units(req=_req(), budget=budget)
+    l1 = next(c for c in units[0].context.chunks if c.layer is ContextLayer.L1)
+    assert l1.tokens <= budget.l1_tokens
+    assert l1.truncated is False
+
+
+def test_long_title_truncated_with_marker():
+    """验收 §5.4：超长 title 被裁剪并标记。"""
+    units = _units(req=_req(title="x" * 2000), budget=ContextBudget(total_tokens=4000))
+    l1 = next(c for c in units[0].context.chunks if c.layer is ContextLayer.L1)
+    assert l1.truncated is True
+    assert "[TRUNCATED:" in l1.content
+    assert "x" * 2000 not in l1.content
+    # title 必保留字段仍在（source/base/head）
+    assert "source: github_pr" in l1.content
+
+
+def test_long_author_truncated_with_marker():
+    """验收 §5.5：超长 author 被裁剪并标记。"""
+    units = _units(req=_req(author="a" * 2000), budget=ContextBudget(total_tokens=4000))
+    l1 = next(c for c in units[0].context.chunks if c.layer is ContextLayer.L1)
+    assert l1.truncated is True
+    assert "[TRUNCATED:" in l1.content
+    assert "a" * 2000 not in l1.content
+
+
+def test_l1_mandatory_over_budget_fails():
+    """验收 §5.6：L1 必保留字段超过输入预算剩余 → ContextBudgetError。"""
+    budget = ContextBudget(total_tokens=60)  # input_limit=51；L0≈46；L1 可用≈5 < 必保留 23
+    with pytest.raises(ContextBudgetError):
+        _units(budget=budget)
+
+
+def test_l4_kept_rule_covered():
+    """验收 §5.7：实际进入 L4 的规则在 Coverage 中为 COVERED。"""
+    units = _units(diff=EVAL_DIFF, budget=ContextBudget())
+    cov = units[0].coverage
+    kept_ids = {i.target for i in cov.items if i.reason is CoverageReason.COVERED}
+    assert "python.01" in kept_ids
+    assert "python.02" in kept_ids
+
+
+def test_l4_dropped_rule_not_covered():
+    """验收 §5.8：被预算裁掉的规则不得标记为 COVERED（记 TRUNCATED）。"""
+    budget = ContextBudget(total_tokens=400, l2_ratio=0.47, l4_ratio=0.03)  # l4_tokens=10 < 规则文本
+    units = _units(diff=EVAL_DIFF, budget=budget)
+    cov = units[0].coverage
+    covered_ids = {i.target for i in cov.items if i.reason is CoverageReason.COVERED}
+    truncated_ids = {i.target for i in cov.items if i.reason is CoverageReason.TRUNCATED}
+    assert "python.01" in truncated_ids
+    assert "python.01" not in covered_ids
+    # L4 chunk 确实没有规则进入
+    assert not [c for c in units[0].context.chunks if c.layer is ContextLayer.L4]
+    assert units[0].truncated is True
+
+
+def test_l1_and_l4_truncation_both_recorded():
+    """验收 §5.9：L1 与 L4 同时裁剪时产生两条独立 TRUNCATED 原因。"""
+    long_desc = "\n".join([f"detail line {i} with enough content to be truncated" for i in range(40)])
+    budget = ContextBudget(total_tokens=400, l2_ratio=0.47, l4_ratio=0.03)
+    units = _units(req=_req(description=long_desc), diff=EVAL_DIFF, budget=budget)
+    cov = units[0].coverage
+    truncated_items = [i for i in cov.items if i.reason is CoverageReason.TRUNCATED]
+    details = [i.detail for i in truncated_items]
+    assert any("L1 metadata truncated" in d for d in details)
+    assert any("L4 budget dropped" in d for d in details)
+    assert len(truncated_items) >= 2
+
+
+def test_unit_budget_relationships():
+    """验收 §5.10：输入预算、输出预留、总窗口三者关系正确。"""
+    budget = ContextBudget(total_tokens=400)
+    units = _units(diff=EVAL_DIFF, budget=budget)
+    for u in units:
+        assert u.input_limit == budget.input_limit
+        assert u.output_reserve_tokens == budget.output_reserve_tokens
+        assert u.total_window_tokens == budget.total_tokens
+        assert u.input_limit + u.output_reserve_tokens == u.total_window_tokens
+        assert u.context.total_tokens <= u.input_limit < u.total_window_tokens

@@ -36,7 +36,7 @@ from ..domain.models import (
     ReviewContext,
 )
 from ..domain.run import CoverageItem, CoverageManifest
-from .builtin_rules import BuiltinRule, match_rules
+from .builtin_rules import BuiltinRule, RuleHit, match_rules
 
 # ---- Token 估算（06 §2：字符/4 近似，需实测校准） ----
 
@@ -52,12 +52,15 @@ def estimate_tokens(text: str) -> int:
 class ContextBudget(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    total_tokens: int = Field(default=32000, gt=0)
+    total_tokens: int = Field(default=32000, gt=0, description="模型总窗口")
+    # 输出预留：至少 15%（架构 06 §2），输入预算 = total - output_reserve
+    output_reserve_ratio: float = Field(default=0.15, ge=0.15, le=0.5)
+    # 输入内部分配比例（总和=1；V1 无 L3，其 25% 释放为输入弹性 reserve，文档化设计决定）
     l0_ratio: float = Field(default=0.05, ge=0.0, le=1.0)
     l1_ratio: float = Field(default=0.05, ge=0.0, le=1.0)
     l2_ratio: float = Field(default=0.40, ge=0.0, le=1.0)
     l4_ratio: float = Field(default=0.10, ge=0.0, le=1.0)
-    reserve_ratio: float = Field(default=0.40, ge=0.0, le=1.0)  # V1 无 L3：25% L3 预留 + 15% 余量
+    reserve_ratio: float = Field(default=0.40, ge=0.0, le=1.0)  # 输入弹性（L3 25% 释放 + 15% 余量）
 
     @model_validator(mode="after")
     def _ratio_sum(self) -> ContextBudget:
@@ -67,24 +70,34 @@ class ContextBudget(BaseModel):
         return self
 
     @property
+    def output_reserve_tokens(self) -> int:
+        """模型输出保留空间（输入不得占用）。"""
+        return int(self.total_tokens * self.output_reserve_ratio)
+
+    @property
+    def input_limit(self) -> int:
+        """输入预算上限 = 总窗口 - 输出预留。L2 分块/分组基于此。"""
+        return self.total_tokens - self.output_reserve_tokens
+
+    @property
     def l0_tokens(self) -> int:
-        return int(self.total_tokens * self.l0_ratio)
+        return int(self.input_limit * self.l0_ratio)
 
     @property
     def l1_tokens(self) -> int:
-        return int(self.total_tokens * self.l1_ratio)
+        return int(self.input_limit * self.l1_ratio)
 
     @property
     def l2_tokens(self) -> int:
-        return int(self.total_tokens * self.l2_ratio)
+        return int(self.input_limit * self.l2_ratio)
 
     @property
     def l4_tokens(self) -> int:
-        return int(self.total_tokens * self.l4_ratio)
+        return int(self.input_limit * self.l4_ratio)
 
 
 class ContextBudgetError(ValueError):
-    """预算无法满足装配要求（唯一允许：L0 治理文本本身超预算）。"""
+    """预算无法满足装配要求（L0 超输入预算 / L1 必保留字段超输入预算）。"""
 
 
 # ---- 不可信内容边界（09 §7 / 10 §3） ----
@@ -118,46 +131,79 @@ def _l0_chunk(run_id: str) -> ContextChunk:
     )
 
 
-def _l1_chunk(req: ChangeRequest, max_tokens: int) -> ContextChunk:
-    """L1 PR 元数据（不可信内容，整体包装；description 按行 token-aware 裁剪）。
+_TRUNCATED_MARKER_MAX = 80  # "[TRUNCATED: N lines omitted from PR metadata]" 上界字符数
 
-    固定字段（source/title/sha/author/is_draft）总是保留；description 是主要可变部分，
-    超出剩余预算时逐行裁剪，并在裁剪处写 [TRUNCATED: N lines omitted ...] 明文。
+
+def _l1_chunk(req: ChangeRequest, trim_target_tokens: int, hard_cap_tokens: int) -> tuple[ContextChunk, int]:
+    """L1 PR 元数据（不可信内容，整体包装；token-aware 逐行裁剪）。
+
+    预算模型（P1-2 返工）：
+    - 必保留字段（程序事实）：source / base SHA / head SHA——总大小不得超过
+      hard_cap（输入预算剩余），否则抛 ContextBudgetError；
+    - 可选字段（半可信）：title → author → is_draft → description——按优先级
+      逐行放入 trim_target 预算，超出则裁剪；
+    - 借用规则（文档化）：可选字段预算 = trim_target - 必保留；若为负（必保留
+      已超名义层预算），从输入弹性 reserve 借用，可选字段全部裁剪；
+    - 预算计算基于最终包装后的完整字符串（wrap 标记、前缀、换行、TRUNCATED
+      标记全部计入），保证 chunk.tokens <= max(trim_target, 必保留实际)。
     """
-    fixed = [
+    mandatory = [
         f"source: {req.source.value}",
-        f"title: {req.title or ''}",
         f"base: {req.base.sha}",
         f"head: {req.head.sha}",
-        f"author: {req.author or ''}",
-        f"is_draft: {req.is_draft}",
     ]
-    fixed_text = "\n".join(fixed)
-    remaining = max(0, max_tokens - estimate_tokens(fixed_text))
+    optional: list[tuple[str, str | None]] = [
+        ("title", req.title),
+        ("author", req.author),
+        ("is_draft", None if req.is_draft is None else str(req.is_draft)),
+        ("description", req.description),
+    ]
 
-    desc_lines = (req.description or "").splitlines()
-    kept: list[str] = []
-    used = 0
+    wrap_chars = len(wrap_untrusted(""))
+    budget_chars = trim_target_tokens * 4 - wrap_chars - _TRUNCATED_MARKER_MAX
+    hard_cap_chars = hard_cap_tokens * 4 - wrap_chars - _TRUNCATED_MARKER_MAX
+
+    mandatory_text = "\n".join(mandatory)
+    mandatory_chars = len(mandatory_text) + (len(mandatory) - 1)  # 行间换行
+    if mandatory_chars > hard_cap_chars:
+        raise ContextBudgetError(
+            f"L1 必保留字段（source/base/head）超过输入预算剩余"
+            f"（{mandatory_chars} 字符 > {hard_cap_chars}），配置需调整"
+        )
+
+    lines = list(mandatory)
+    used = mandatory_chars
     omitted = 0
-    for line in desc_lines:
-        tok = estimate_tokens(line)
-        if used + tok > remaining:
-            omitted += 1  # 真正丢弃该行（含 remaining=0 的极端情况）
+    for key, val in optional:
+        if val is None:
             continue
-        kept.append(line)
-        used += tok
+        if key == "description":
+            for line in val.splitlines():
+                entry = f"description: {line}"
+                if used + len(entry) + 1 > budget_chars:
+                    omitted += 1  # 真实丢弃（含借用时 budget_chars < mandatory 的情况）
+                    continue
+                lines.append(entry)
+                used += len(entry) + 1
+            continue
+        entry = f"{key}: {val}"
+        if used + len(entry) + 1 > budget_chars:
+            omitted += 1
+            continue
+        lines.append(entry)
+        used += len(entry) + 1
 
-    parts = [f"description: {line}" for line in kept] if kept else []
     if omitted:
-        parts.append(f"[TRUNCATED: {omitted} lines omitted from PR description]")
-    content = "\n".join([fixed_text, *parts]) if parts else fixed_text
-    return ContextChunk(
+        lines.append(f"[TRUNCATED: {omitted} lines omitted from PR metadata]")
+    content = "\n".join(lines)
+    chunk = ContextChunk(
         layer=ContextLayer.L1,
         source=ContextSource(kind=ContextSourceKind.ISSUE, ref="pr:metadata"),
         content=wrap_untrusted(content),
         tokens=estimate_tokens(wrap_untrusted(content)),
         truncated=omitted > 0,
     )
+    return chunk, omitted
 
 
 # ---- L2 diff 分块（自包含；分块 ≠ 截断） ----
@@ -264,17 +310,26 @@ def _severity_rank(sev: Severity) -> int:
     return {"critical": 4, "high": 3, "medium": 2, "low": 1, "info": 0}.get(sev.value, 0)
 
 
-def _chunk_l4(file: ChangedFile, rules: list[BuiltinRule], max_tokens: int) -> tuple[list[ContextChunk], int]:
-    """L4 命中规则 → chunk；预算不足时裁掉低 severity 规则，返回 (chunks, dropped)。"""
+def _chunk_l4(
+    file: ChangedFile,
+    rules: list[BuiltinRule],
+    max_tokens: int,
+) -> tuple[list[ContextChunk], list[RuleHit], list[RuleHit]]:
+    """L4 命中规则 → chunk；预算不足时裁掉低 severity 规则。
+
+    返回 (chunks, kept_hits, dropped_hits)：kept 真正进入上下文；dropped 因预算
+    未进入（P2-1：Coverage 必须区分二者，不能把 dropped 标为 COVERED）。
+    """
     hits = sorted(match_rules(file, rules), key=lambda h: _severity_rank(h.severity), reverse=True)
     chunks: list[ContextChunk] = []
+    kept: list[RuleHit] = []
+    dropped: list[RuleHit] = []
     used = 0
-    dropped = 0
     for hit in hits:
         text = f"[{hit.rule_id}] {hit.message} (path={hit.path}, line={hit.line})"
         tok = estimate_tokens(text)
         if used + tok > max_tokens:
-            dropped += 1  # 规则命中被丢弃（真实丢失 → 计入 truncated）
+            dropped.append(hit)  # 真实丢失（计入 truncated 与 Coverage）
             continue
         chunks.append(
             ContextChunk(
@@ -284,8 +339,9 @@ def _chunk_l4(file: ChangedFile, rules: list[BuiltinRule], max_tokens: int) -> t
                 tokens=tok,
             )
         )
+        kept.append(hit)
         used += tok
-    return chunks, dropped
+    return chunks, kept, dropped
 
 
 def _group_l2_chunks(chunks: list[ContextChunk], per_unit_budget: int) -> list[list[ContextChunk]]:
@@ -307,21 +363,30 @@ def _group_l2_chunks(chunks: list[ContextChunk], per_unit_budget: int) -> list[l
     return groups
 
 
-# ---- 覆盖清单（从装配结果生成，不手工传布尔） ----
+# ---- 覆盖清单（直接从装配结果生成：kept/dropped 规则与 L1 裁剪，不重新匹配） ----
 
 
 def _coverage_for(
     file: ChangedFile,
-    rules: list[BuiltinRule],
     *,
-    truncated: bool,
-    truncated_detail: str,
+    kept_rules: list[RuleHit],
+    dropped_rules: list[RuleHit],
+    l1_truncated: bool,
+    l1_omitted: int,
     stage: StageName,
 ) -> CoverageManifest:
+    """由实际装载结果生成覆盖记录（P2-1/P2-2）。
+
+    - 文件本身：COVERED；
+    - 实际进入 L4 的规则：COVERED；
+    - 命中但因预算未进入 L4 的规则：TRUNCATED（独立 item，detail 带 rule_id）；
+    - L1 真实裁剪：TRUNCATED（独立 item，detail 带省略行数）。
+    每种丢失都是独立 CoverageItem，不压缩成单个字符串。
+    """
     items: list[CoverageItem] = [
         CoverageItem(target=file.path, reason=CoverageReason.COVERED, stage=stage)
     ]
-    for hit in match_rules(file, rules):
+    for hit in kept_rules:
         items.append(
             CoverageItem(
                 target=hit.rule_id,
@@ -330,15 +395,25 @@ def _coverage_for(
                 detail=f"{hit.path}:{hit.line}",
             )
         )
-    if truncated:
+    for hit in dropped_rules:
+        items.append(
+            CoverageItem(
+                target=hit.rule_id,
+                reason=CoverageReason.TRUNCATED,
+                stage=stage,
+                detail=f"L4 budget dropped: {hit.path}:{hit.line}",
+            )
+        )
+    if l1_truncated:
         items.append(
             CoverageItem(
                 target=file.path,
                 reason=CoverageReason.TRUNCATED,
                 stage=stage,
-                detail=truncated_detail,
+                detail=f"L1 metadata truncated: {l1_omitted} lines",
             )
         )
+    truncated = bool(dropped_rules) or l1_truncated
     return CoverageManifest(items=items, truncated=truncated)
 
 
@@ -349,7 +424,8 @@ class ReviewUnit(BaseModel):
     """单次模型调用的上下文单位（04 §1 per-file map-reduce 的原子任务粒度）。
 
     一个 changed file 可产出多个 unit（大文件超单次预算时分块），每个 unit 自包含
-    L0/L1/L2/L4，且 context.total_tokens <= context.budget_tokens。
+    L0/L1/L2/L4，且满足：context.total_tokens <= input_limit（输入预算硬约束）且
+    output_reserve_tokens >= 配置的输出预留（P1-1）。
     """
 
     unit_id: str
@@ -357,6 +433,9 @@ class ReviewUnit(BaseModel):
     context: ReviewContext
     truncated: bool = Field(description="本 unit 内是否真实丢失内容（L1/L4 裁剪）")
     coverage: CoverageManifest
+    input_limit: int = Field(description="本 unit 输入预算上限（总窗口 - 输出预留）")
+    output_reserve_tokens: int = Field(description="本 unit 保留的模型输出空间")
+    total_window_tokens: int = Field(description="模型总窗口")
 
 
 class ContextAssembler:
@@ -381,44 +460,52 @@ class ContextAssembler:
         stage: StageName = StageName.CONTEXT,
     ) -> list[ReviewUnit]:
         budget = self.budget
+        input_limit = budget.input_limit
+        output_reserve = budget.output_reserve_tokens
+
+        # L0：治理文本（不可裁）。若 L0 本身就超出输入预算（输出空间优先），明确失败
         l0 = _l0_chunk(run_id)
-        if l0.tokens > budget.total_tokens:
+        if l0.tokens > input_limit:
             raise ContextBudgetError(
-                f"L0 治理文本本身超过总预算（{l0.tokens} > {budget.total_tokens}），配置需调整"
+                f"L0 治理文本本身超过输入预算（{l0.tokens} > {input_limit}），配置需调整"
             )
 
-        l1 = _l1_chunk(change_request, budget.l1_tokens)
-        l4, l4_dropped = _chunk_l4(file, self.rules, budget.l4_tokens)
+        # L1：必保留字段不得超输入剩余；可选字段按名义层预算裁剪（借用规则见 _l1_chunk）
+        l1_available = input_limit - l0.tokens
+        l1, l1_omitted = _l1_chunk(
+            change_request,
+            trim_target_tokens=min(budget.l1_tokens, l1_available),
+            hard_cap_tokens=l1_available,
+        )
 
-        fixed_tokens = l0.tokens + l1.tokens + sum(c.tokens for c in l4)
-        l2_budget = budget.total_tokens - fixed_tokens
-        if l2_budget < 0 and file.hunks:
-            raise ContextBudgetError(
-                f"L0+L1+L4 固定开销超过总预算（{fixed_tokens} > {budget.total_tokens}），"
-                "无法容纳任何 L2 diff，配置需调整"
-            )
+        # L4：预算 = min(名义 l4, 输入剩余)；kept/dropped 供 Coverage
+        l4_available = input_limit - l0.tokens - l1.tokens
+        l4_chunks, l4_kept, l4_dropped = _chunk_l4(
+            file, self.rules, max_tokens=min(budget.l4_tokens, l4_available)
+        )
 
+        # L2：输入预算剩余（= input_limit - 已装配固定层），不占用输出预留
+        l2_budget = input_limit - l0.tokens - l1.tokens - sum(c.tokens for c in l4_chunks)
         l2_chunks = _chunk_l2(file, chunk_max_tokens=l2_budget) if l2_budget > 0 else []
         groups = _group_l2_chunks(l2_chunks, l2_budget) if l2_chunks else [[]]
 
         units: list[ReviewUnit] = []
         for index, group in enumerate(groups, start=1):
-            chunks = [l0, l1, *group, *l4]
+            chunks = [l0, l1, *group, *l4_chunks]
             total = sum(c.tokens for c in chunks)
-            truncated = l1.truncated or l4_dropped > 0
-            detail = (
-                "L1 description truncated" if l1.truncated else "L4 rules dropped"
-                if l4_dropped > 0
-                else "none"
-            )
+            truncated = l1.truncated or bool(l4_dropped)
             context = ReviewContext(
                 run_id=run_id,
                 chunks=chunks,
                 total_tokens=total,
-                budget_tokens=budget.total_tokens,
+                budget_tokens=input_limit,  # 硬断言校验输入预算（不含输出预留）
                 truncated=truncated,
             )
-            context.assert_within_budget()  # 硬断言：unit 不得超预算
+            context.assert_within_budget()  # P1-1 硬断言 1：unit 输入 <= input_limit
+            if output_reserve < budget.output_reserve_tokens:  # pragma: no cover
+                raise ContextBudgetError(
+                    f"输出预留不足（{output_reserve} < {budget.output_reserve_tokens}）"
+                )
             unit_id = file.path if len(groups) == 1 else f"{file.path}#{index}"
             units.append(
                 ReviewUnit(
@@ -428,11 +515,15 @@ class ContextAssembler:
                     truncated=truncated,
                     coverage=_coverage_for(
                         file,
-                        self.rules,
-                        truncated=truncated,
-                        truncated_detail=detail,
+                        kept_rules=l4_kept,
+                        dropped_rules=l4_dropped,
+                        l1_truncated=l1.truncated,
+                        l1_omitted=l1_omitted,
                         stage=stage,
                     ),
+                    input_limit=input_limit,
+                    output_reserve_tokens=output_reserve,
+                    total_window_tokens=budget.total_tokens,
                 )
             )
         return units
