@@ -1,0 +1,17 @@
+# 编码与格式约定（验收建议：避免 mojibake）
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+
+[*.py]
+indent_style = space
+indent_size = 4
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.{yml,yaml,toml}]
+indent_style = space
+indent_size = 2

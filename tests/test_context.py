@@ -1,4 +1,4 @@
-"""涓婁笅鏂囨瀯寤烘祴璇曪紙V1-b 杩斿伐锛氶�勭畻纭�绾︽潫 / 鑷�鍖呭惈鍒嗗潡 / 涓嶅彲淇¤竟鐣� / 鎴�鏂�璇�涔夛級銆�"""
+"""上下文构建测试（V1-b 返工：预算硬约束 / 自包含分块 / 不可信边界 / 截断语义）。"""
 
 import pytest
 from reposage.domain.diff import parse_unified_diff
@@ -75,16 +75,16 @@ def _units(*, req=None, diff=CLEAN_DIFF, budget=None, rules=None) -> list[Review
     )
 
 
-# ---- token 浼扮畻 ----
+# ---- token 估算 ----
 
 
 def test_estimate_tokens_approx():
     assert estimate_tokens("") == 1
-    assert estimate_tokens("abcd") == 1  # 4 瀛楃�� 鈮� 1 token
+    assert estimate_tokens("abcd") == 1  # 4 字符 ≈ 1 token
     assert estimate_tokens("a" * 17) == 5  # ceil(17/4)
 
 
-# ---- 棰勭畻姣斾緥 ----
+# ---- 预算比例 ----
 
 
 def test_context_budget_ratio_must_sum_to_one():
@@ -92,11 +92,11 @@ def test_context_budget_ratio_must_sum_to_one():
         ContextBudget(l0_ratio=0.5, l1_ratio=0.5, l2_ratio=0.5, l4_ratio=0.0, reserve_ratio=0.0)
 
 
-# ---- 鎬婚�勭畻纭�绾︽潫锛堥獙鏀� P1-1锛� ----
+# ---- 总预算硬约束（验收 P1-1） ----
 
 
 def test_total_budget_hard_constraint_per_unit():
-    """鎬婚�勭畻 400銆佸ぇ鏂囦欢 鈫� 澶氫釜 unit锛屼笖姣忎釜 unit.total_tokens <= budget_tokens銆�"""
+    """总预算 400、大文件 → 多个 unit，且每个 unit.total_tokens <= budget_tokens。"""
     big = "\n".join([f"+line {i} = 1" for i in range(200)])
     diff = (
         "diff --git a/src/big.py b/src/big.py\n"
@@ -107,7 +107,7 @@ def test_total_budget_hard_constraint_per_unit():
     )
     budget = ContextBudget(total_tokens=400)
     units = _units(diff=diff, budget=budget)
-    assert len(units) > 1  # 瓒呭崟娆￠�勭畻 鈫� 澶氫釜 review unit
+    assert len(units) > 1  # 超单次预算 → 多个 review unit
     for u in units:
         assert u.context.total_tokens <= u.context.budget_tokens
         u.context.assert_within_budget()
@@ -120,17 +120,17 @@ def test_small_file_single_unit_within_budget():
 
 
 def test_l0_alone_over_budget_fails_explicitly():
-    """鍞�涓�鍏佽�哥殑鏄庣‘澶辫触锛歀0 娌荤悊鏂囨湰鏈�韬�瓒呰繃鎬婚�勭畻銆�"""
+    """唯一允许的明确失败：L0 治理文本本身超过总预算。"""
     budget = ContextBudget(total_tokens=10)
     with pytest.raises(ContextBudgetError):
         _units(budget=budget)
 
 
 def test_fixed_overhead_crowds_out_l2_fails_explicitly():
-    """L0+L1+L4 鍥哄畾寮�閿�宸插崰婊￠�勭畻鏃讹紝鏄庣‘澶辫触鑰岄潪闈欓粯涓� L2銆�"""
+    """L0+L1+L4 固定开销已占满预算时，明确失败而非静默丢 L2。"""
     budget = ContextBudget(
         total_tokens=80,
-        l0_ratio=0.5,  # L0 鍥哄畾鏂囨湰绾� 46 tokens
+        l0_ratio=0.5,  # L0 固定文本约 46 tokens
         l1_ratio=0.3,
         l2_ratio=0.1,
         l4_ratio=0.0,
@@ -140,7 +140,7 @@ def test_fixed_overhead_crowds_out_l2_fails_explicitly():
         _units(budget=budget)
 
 
-# ---- 涓嶅彲淇″唴瀹硅竟鐣岋紙楠屾敹 P1-2锛� ----
+# ---- 不可信内容边界（验收 P1-2） ----
 
 
 def test_l1_wrapped_untrusted():
@@ -172,11 +172,11 @@ def test_wrap_untrusted_marks_boundary():
     assert "ignore previous instructions" in wrapped
 
 
-# ---- 鑷�鍖呭惈鍒嗗潡锛堥獙鏀� P1-3锛� ----
+# ---- 自包含分块（验收 P1-3） ----
 
 
 def test_large_hunk_split_self_contained():
-    """瓒呭ぇ hunk 鎷嗗垎鍚庢瘡涓�瀛愬潡閮藉惈 hunk header 涓庤�屽彿鑼冨洿锛坣ew lines x-y锛夈��"""
+    """超大 hunk 拆分后每个子块都含 hunk header 与行号范围（new lines x-y）。"""
     big = "\n".join([f"+line {i} = 1" for i in range(100)])
     diff = (
         "diff --git a/src/a.py b/src/a.py\n"
@@ -188,18 +188,18 @@ def test_large_hunk_split_self_contained():
     budget = ContextBudget(total_tokens=400)
     units = _units(diff=diff, budget=budget)
     l2_chunks = [c for u in units for c in u.context.chunks if c.layer is ContextLayer.L2]
-    assert len(l2_chunks) > 1  # 琚�鎷嗗垎
+    assert len(l2_chunks) > 1  # 被拆分
     for c in l2_chunks:
-        assert "@@ -0,0 +1,100 @@" in c.content  # hunk header 淇濈暀
-        assert "[new lines " in c.content  # 琛屽彿鑼冨洿鏍囨敞
-    # 姣忎釜 unit 鐨� L2 閮芥湁鑷�鍖呭惈澶�
+        assert "@@ -0,0 +1,100 @@" in c.content  # hunk header 保留
+        assert "[new lines " in c.content  # 行号范围标注
+    # 每个 unit 的 L2 都有自包含头
     for u in units:
         l2 = [c for c in u.context.chunks if c.layer is ContextLayer.L2]
         assert all("[new lines " in c.content for c in l2)
 
 
 def test_chunking_is_not_truncation():
-    """鍒嗗潡 鈮� 鎴�鏂�锛氭媶鍒嗗悗鎵�鏈� chunk 閮戒笉璁剧疆 truncated锛屼篃涓嶅嚭鐜� TRUNCATED 鏍囪�般��"""
+    """分块 ≠ 截断：拆分后所有 chunk 都不设置 truncated，也不出现 TRUNCATED 标记。"""
     big = "\n".join([f"+line {i} = 1" for i in range(100)])
     diff = (
         "diff --git a/src/a.py b/src/a.py\n"
@@ -215,23 +215,23 @@ def test_chunking_is_not_truncation():
     )
     l2_chunks = [c for u in units for c in u.context.chunks if c.layer is ContextLayer.L2]
     assert len(l2_chunks) > 1
-    # L2 鍒嗗潡灞傞潰锛氬垎鍧� 鈮� 鎴�鏂�锛堜笉璁剧疆 truncated銆佷笉鍐� TRUNCATED 鏍囪�帮級
+    # L2 分块层面：分块 ≠ 截断（不设置 truncated、不写 TRUNCATED 标记）
     assert all(not c.truncated for c in l2_chunks)
     assert all("[TRUNCATED:" not in c.content for c in l2_chunks)
 
 
-# ---- 鎴�鏂�璇�涔夛紙楠屾敹 P1-4 / P2-1锛� ----
+# ---- 截断语义（验收 P1-4 / P2-1） ----
 
 
 def test_l1_token_aware_truncation_with_marker():
-    """L1 description 瓒呴�勭畻锛歵oken-aware 瑁佸壀锛屽啓 [TRUNCATED: N lines omitted]锛宑hunk.truncated=True銆�"""
+    """L1 description 超预算：token-aware 裁剪，写 [TRUNCATED: N lines omitted]，chunk.truncated=True。"""
     long_desc = "\n".join([f"detail line {i} with enough content to be truncated" for i in range(40)])
     units = _units(req=_req(description=long_desc), budget=ContextBudget(total_tokens=400))
     l1 = next(c for c in units[0].context.chunks if c.layer is ContextLayer.L1)
     assert l1.truncated is True
     assert "[TRUNCATED:" in l1.content
     assert "lines omitted from PR metadata" in l1.content
-    # 琚�瑁佽�屼笉鍦ㄥ唴瀹逛腑
+    # 被裁行不在内容中
     assert "detail line 39" not in l1.content
 
 
@@ -249,7 +249,7 @@ def test_unit_truncated_flag_matches_l1_truncation():
     assert all(u.coverage.truncated for u in units)
 
 
-# ---- L4 瑙勫垯锛堥�勭畻鎸� severity 淇濈暀锛� ----
+# ---- L4 规则（预算按 severity 保留） ----
 
 
 def test_builtin_rules_hit_eval_and_system():
@@ -264,7 +264,7 @@ def test_builtin_rules_clean_no_hits():
 
 
 def test_builtin_rules_only_added_lines():
-    """鍙�鍖归厤鏂板�炶�岋細鏃ц�屽惈 eval 涓嶈Е鍙戯紙鍙�瀹℃湰娆″彉鏇达級銆�"""
+    """只匹配新增行：旧行含 eval 不触发（只审本次变更）。"""
     diff = (
         "diff --git a/src/app.py b/src/app.py\n"
         "--- a/src/app.py\n"
@@ -303,7 +303,7 @@ def test_l4_absent_when_no_hits():
 
 
 def test_l4_budget_keeps_higher_severity():
-    """L4 棰勭畻涓嶈冻鏃朵繚鐣欓珮 severity锛屼涪寮冧綆 severity锛堣�板綍 dropped 鈫� unit.truncated锛夈��"""
+    """L4 预算不足时保留高 severity，丢弃低 severity（记录 dropped → unit.truncated）。"""
     rules = [
         BuiltinRule(rule_id="r.low", severity=Severity.MEDIUM, category="security", description="low", pattern=r"aaa"),
         BuiltinRule(rule_id="r.high", severity=Severity.HIGH, category="security", description="high", pattern=r"bbb"),
@@ -320,15 +320,15 @@ def test_l4_budget_keeps_higher_severity():
     units = _units(diff=diff, budget=budget, rules=rules)
     refs = {c.source.ref for c in units[0].context.chunks if c.layer is ContextLayer.L4}
     assert refs == {"rule:r.high"}
-    assert units[0].truncated is True  # L4 瑙勫垯琚�涓㈠純 鈫� 鐪熷疄涓㈠け
+    assert units[0].truncated is True  # L4 规则被丢弃 → 真实丢失
     assert units[0].coverage.truncated is True
 
 
-# ---- per-file map-reduce 濂戠害 ----
+# ---- per-file map-reduce 契约 ----
 
 
 def test_per_file_map_reduce_contract():
-    """姣忔枃浠剁嫭绔嬭�呴厤锛歀2 鍙�鍚�鑷�宸辨枃浠讹紝L0/L1 纭�瀹氭�х浉鍚屻��"""
+    """每文件独立装配：L2 只含自己文件，L0/L1 确定性相同。"""
     diff = (
         "diff --git a/src/a.py b/src/a.py\n"
         "--- a/src/a.py\n"
@@ -371,7 +371,7 @@ def test_unit_id_unique_for_multi_unit_file():
     assert all(u.file_path == "src/big.py" for u in units)
 
 
-# ---- 灞傜骇瑁呴厤 ----
+# ---- 层级装配 ----
 
 
 def test_build_units_has_l0_l1_l2():
@@ -400,12 +400,12 @@ def test_l2_per_hunk_chunking():
     )
     units = _units(diff=diff)
     l2 = [c for u in units for c in u.context.chunks if c.layer is ContextLayer.L2]
-    assert len(l2) == 2  # 姣� hunk 涓�鍧�
+    assert len(l2) == 2  # 每 hunk 一块
     assert all(c.source.kind is ContextSourceKind.DIFF for c in l2)
     assert all(c.source.ref == "file:src/a.py" for c in l2)
 
 
-# ---- 瑕嗙洊娓呭崟锛堜粠瑁呴厤鐢熸垚锛屼笉鎵嬪伐浼犲竷灏旓級 ----
+# ---- 覆盖清单（从装配生成，不手工传布尔） ----
 
 
 def test_coverage_from_unit_generated():
@@ -415,11 +415,11 @@ def test_coverage_from_unit_generated():
     assert CoverageReason.COVERED in reasons
     rule_items = [i for i in cov.items if i.target.startswith("python.")]
     assert len(rule_items) >= 2
-    assert cov.truncated is False  # 鏃犵湡瀹炰涪澶�
+    assert cov.truncated is False  # 无真实丢失
 
 
 def test_coverage_truncated_consistent_with_unit():
-    """Coverage.truncated 涓� unit.truncated 涓�鑷达紙涓嶆墜宸ヤ紶甯冨皵锛夈��"""
+    """Coverage.truncated 与 unit.truncated 一致（不手工传布尔）。"""
     big = "\n".join([f"+line {i} = 1" for i in range(100)])
     diff = (
         "diff --git a/src/a.py b/src/a.py\n"
