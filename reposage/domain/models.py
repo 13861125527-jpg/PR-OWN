@@ -16,10 +16,12 @@ from .enums import (
     ChangeRequestSource,
     ContextLayer,
     ContextSourceKind,
+    CoverageReason,
     DiffLineType,
     EvidenceKind,
     FindingSourceKind,
     ModelUsageOutcome,
+    StageName,
     ToolCallStatus,
     ToolPermission,
 )
@@ -239,6 +241,40 @@ class ReviewContext(BaseModel):
             raise ValueError(
                 f"ReviewContext 超预算：{self.total_tokens} > {self.budget_tokens} tokens"
             )
+
+
+class CoverageItem(BaseModel):
+    """覆盖条目（统一结构，P1-9；自 models 供 run/context 共用，避免分层环依赖）。"""
+
+    target: str = Field(description="文件路径 / 角色 id / agent task id")
+    reason: CoverageReason = CoverageReason.COVERED
+    stage: StageName = StageName.REVIEW
+    detail: str | None = None
+
+
+class CoverageManifest(BaseModel):
+    """覆盖清单（强制输出项，07 §8）。"""
+
+    items: list[CoverageItem] = Field(default_factory=list)
+    truncated: bool = False
+
+
+class ReviewUnit(BaseModel):
+    """单次模型调用的上下文单位（04 §1 per-file map-reduce 的原子任务粒度）。
+
+    一个 changed file 可产出多个 unit（大文件超单次预算时分块），每个 unit 自包含
+    L0/L1/L2/L4，且满足：context.total_tokens <= input_limit（输入预算硬约束）且
+    output_reserve_tokens >= 配置的输出预留。
+    """
+
+    unit_id: str
+    file_path: str
+    context: ReviewContext
+    truncated: bool = Field(description="本 unit 内是否真实丢失内容（L1/L4 裁剪）")
+    coverage: CoverageManifest
+    input_limit: int = Field(description="本 unit 输入预算上限（总窗口 - 输出预留）")
+    output_reserve_tokens: int = Field(description="本 unit 保留的模型输出空间")
+    total_window_tokens: int = Field(description="模型总窗口")
 
 
 class Evidence(BaseModel):

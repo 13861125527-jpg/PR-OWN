@@ -31,11 +31,13 @@ from ..domain.models import (
     ChangeRequest,
     ContextChunk,
     ContextSource,
+    CoverageItem,
+    CoverageManifest,
     DiffHunk,
     DiffLine,
     ReviewContext,
+    ReviewUnit,
 )
-from ..domain.run import CoverageItem, CoverageManifest
 from .builtin_rules import BuiltinRule, RuleHit, match_rules
 
 # ---- Token 估算（06 §2：字符/4 近似，需实测校准） ----
@@ -417,29 +419,11 @@ def _coverage_for(
     return CoverageManifest(items=items, truncated=truncated)
 
 
-# ---- 装配器（per-file map-reduce，产出多个独立 ReviewUnit） ----
-
-
-class ReviewUnit(BaseModel):
-    """单次模型调用的上下文单位（04 §1 per-file map-reduce 的原子任务粒度）。
-
-    一个 changed file 可产出多个 unit（大文件超单次预算时分块），每个 unit 自包含
-    L0/L1/L2/L4，且满足：context.total_tokens <= input_limit（输入预算硬约束）且
-    output_reserve_tokens >= 配置的输出预留（P1-1）。
-    """
-
-    unit_id: str
-    file_path: str
-    context: ReviewContext
-    truncated: bool = Field(description="本 unit 内是否真实丢失内容（L1/L4 裁剪）")
-    coverage: CoverageManifest
-    input_limit: int = Field(description="本 unit 输入预算上限（总窗口 - 输出预留）")
-    output_reserve_tokens: int = Field(description="本 unit 保留的模型输出空间")
-    total_window_tokens: int = Field(description="模型总窗口")
+# ---- 装配器（per-file map-reduce，产出多个独立 ReviewUnit；ReviewUnit 定义在 domain/models） ----
 
 
 class ContextAssembler:
-    """为单个 changed file 装配 1..N 个自包含、不超预算的 ReviewUnit。"""
+    """为单个 changed file 装配 1..N 个自包含、不超预算的 ReviewUnit（models 定义）。"""
 
     def __init__(
         self,
@@ -527,3 +511,20 @@ class ContextAssembler:
                 )
             )
         return units
+
+
+# ---- 消息组装（V1-d：ReviewUnit → LLM 消息） ----
+
+
+def unit_to_messages(unit: ReviewUnit) -> list[dict[str, str]]:
+    """把 unit 的 L0/L4（可信：治理+规则）与 L1/L2（不可信内容，已 UNTRUSTED 包装）组装为 system/user 消息。
+
+    L0/L4 由程序生成（可信）；L1/L2 为不可信内容（已带 [UNTRUSTED_CONTENT] 边界），
+    统一放入 user 侧，避免与治理指令混合。
+    """
+    system = [c.content for c in unit.context.chunks if c.layer in (ContextLayer.L0, ContextLayer.L4)]
+    user = [c.content for c in unit.context.chunks if c.layer in (ContextLayer.L1, ContextLayer.L2)]
+    return [
+        {"role": "system", "content": "\n\n".join(system)},
+        {"role": "user", "content": "\n\n".join(user)},
+    ]

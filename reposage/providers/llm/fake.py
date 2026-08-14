@@ -77,7 +77,7 @@ class FakeLLMProvider:
         session: object,
         tools: list[dict[str, Any]],
         *,
-        budget: dict[str, Any],
+        budget: Any,
     ) -> ModelResponse:
         self.calls.append({"kind": "tool_loop", "tools": tools, "budget": budget})
         return ModelResponse(text="", action="finish_review", usage=self._usage())

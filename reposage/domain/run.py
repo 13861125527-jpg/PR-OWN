@@ -12,7 +12,6 @@ from pydantic import BaseModel, Field
 from .enums import (
     CommentKind,
     CommentStatus,
-    CoverageReason,
     FeedbackKind,
     PublishOperationKind,
     PublishOperationStatus,
@@ -24,7 +23,7 @@ from .enums import (
     StageName,
     StageStatus,
 )
-from .models import ModelUsage, utcnow
+from .models import CoverageManifest, ModelUsage, utcnow
 
 
 class StageResult(BaseModel):
@@ -38,22 +37,6 @@ class StageResult(BaseModel):
     cost_usd: float = 0.0
     error: str | None = None
     detail: str | None = None
-
-
-class CoverageItem(BaseModel):
-    """覆盖条目（统一结构，P1-9）。"""
-
-    target: str = Field(description="文件路径 / 角色 id / agent task id")
-    reason: CoverageReason = CoverageReason.COVERED
-    stage: StageName = StageName.REVIEW
-    detail: str | None = None
-
-
-class CoverageManifest(BaseModel):
-    """覆盖清单（强制输出项，07 §8）。"""
-
-    items: list[CoverageItem] = Field(default_factory=list)
-    truncated: bool = False
 
 
 class ReviewTask(BaseModel):

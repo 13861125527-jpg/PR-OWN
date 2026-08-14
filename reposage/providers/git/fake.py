@@ -125,10 +125,13 @@ class FakeGitProvider:
         for path in all_paths:
             old = base_files.get(path, "").splitlines(keepends=True)
             new = head_files.get(path, "").splitlines(keepends=True)
-            diff = unified_diff(old, new, fromfile=f"a/{path}", tofile=f"b/{path}", lineterm="")
+            if old == new:
+                continue
+            # 标准 unified diff：diff --git 头 + ---/+++ + @@ hunk（parse_unified_diff 契约）
+            header = f"diff --git a/{path} b/{path}\n"
+            diff = unified_diff(old, new, fromfile=f"a/{path}", tofile=f"b/{path}", lineterm="\n")
             text = "".join(diff)
-            if text:
-                chunks.append(text)
+            chunks.append(header + text)
         return "\n".join(chunks)
 
     async def publish_comments(self, plan: PublishPlan) -> dict[str, PublishCommentResult]:

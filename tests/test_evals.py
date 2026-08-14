@@ -1,8 +1,9 @@
 """评测指标测试（P1-1：一对一匹配、category 必须一致、precision ≤ 1）。"""
 
+import pytest
 from reposage.domain.enums import FindingCategory, Severity
 from reposage.domain.finding import Finding
-from reposage.evals.dataset import EvalDataset, ExpectedFinding
+from reposage.evals.dataset import EvalDataset, EvalSample, ExpectedFinding
 from reposage.evals.metrics import compute_metrics
 
 
@@ -98,3 +99,56 @@ samples:
     assert ds.name == "demo"
     assert ds.samples[0].id == "s1"
     assert ds.samples[0].expected[0].line == 1
+
+
+# ---- V1-d：真实链路集成（EvalRunner → SinglePassReviewer → FindingPipeline → metrics） ----
+
+
+@pytest.mark.asyncio
+async def test_eval_runner_real_pipeline_hits_expected():
+    """注入脚本化候选 → 真实链路（FakeGit+装配+SinglePass+Pipeline）→ recall=1.0。"""
+    from reposage.domain.finding import FindingCandidate
+    from reposage.evals.runner import EvalRunner
+    from reposage.providers.llm.fake import FakeLLMProvider
+    from reposage.review.single_pass import SinglePassReviewer
+
+    sample = EvalSample(
+        id="s1",
+        kind="single_defect",
+        base_files={"src/a.py": "def f():\n    return 1\n"},
+        head_files={"src/a.py": "def f():\n    return eval(x)\n"},
+        pr_title="fix eval",
+        expected=[ExpectedFinding(category="security", path="src/a.py", line=2)],
+    )
+    cand = FindingCandidate(
+        title="eval", severity=Severity.HIGH, confidence=0.9,
+        category=FindingCategory.SECURITY,
+        claimed_path="src/a.py", claimed_start_line=2,
+        trigger_condition="eval(x)", explanation="x", impact="y", suggestion="z",
+    )
+    strategy = SinglePassReviewer(FakeLLMProvider(default_findings=[cand]))
+    runner = EvalRunner(EvalDataset(name="d", samples=[sample]), strategy=strategy)
+    await runner.run()
+    m = runner.results["s1"]
+    assert m.recall == 1.0
+    assert m.precision == 1.0
+    assert m.position_accuracy == 1.0
+
+
+@pytest.mark.asyncio
+async def test_eval_runner_no_candidates_zero_recall():
+    """无候选 → recall 0（真实链路空跑）。"""
+    from reposage.evals.runner import EvalRunner
+    from reposage.providers.llm.fake import FakeLLMProvider
+    from reposage.review.single_pass import SinglePassReviewer
+
+    sample = EvalSample(
+        id="s2", kind="single_defect",
+        base_files={"src/a.py": "x = 1\n"},
+        head_files={"src/a.py": "x = eval(1)\n"},
+        expected=[ExpectedFinding(category="security", path="src/a.py", line=1)],
+    )
+    strategy = SinglePassReviewer(FakeLLMProvider())  # 空候选
+    runner = EvalRunner(EvalDataset(name="d", samples=[sample]), strategy=strategy)
+    await runner.run()
+    assert runner.results["s2"].recall == 0.0
