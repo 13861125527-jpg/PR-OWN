@@ -55,6 +55,9 @@ class LLMConfig(BaseModel):
     timeout_seconds: int = Field(default=60, gt=0)
     max_retries: int = Field(default=2, ge=0)
     structured_strategy: _STRUCTURED = "schema_first"
+    max_output_tokens: int = Field(
+        default=3000, gt=0, description="结构化审查输出上限（09 §5：findings ~2k + summary ~1k）"
+    )
 
 
 class ReviewConfig(BaseModel):

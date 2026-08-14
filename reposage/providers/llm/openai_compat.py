@@ -4,18 +4,25 @@
 （LLMConfig.api_key_env / base_url_env）。
 
 结构化输出策略（09 §3）：
-- schema_first：优先 ``response_format={"type": "json_schema"}``；若端点返回 400
-  （不支持 json_schema），降级 ``{"type": "json_object"}`` + 提示内嵌 schema；
+- schema_first：优先 ``response_format={"type": "json_schema"}``；**仅当错误明确表示
+  不支持 json_schema/response_format** 时降级 ``{"type": "json_object"}``（其他 400
+  直接失败，不掩盖配置错误，P2-2）；
 - json_repair：不依赖 response_format，普通输出 + 解析；
-- 两种策略统一走：解析 → Pydantic 严格校验 → 单次修复重试（把校验错误回喂）→
-  仍失败抛 StructuredOutputError（由调用方 fail-soft 并记 Coverage）。
+- 两种策略统一走：解析 → Pydantic 严格校验（strict + extra=forbid）→ 单次修复
+  重试（把校验错误回喂）→ 仍失败抛 StructuredOutputError（调用方 fail-soft 记 Coverage）。
 
-可靠性：网络错误/429/5xx 指数退避重试（max_retries）；4xx 非 429 视为永久错误。
+输出预算（P1-3）：structured 首次与修复请求均携带 ``max_tokens``（09 §5：
+findings ~2k + summary ~1k）；complete 允许调用方传入输出上限。
+
+可靠性：网络错误/429/5xx 指数退避重试（max_retries，最后一次失败不等待）；
+非 429 的 4xx 不重试；200 响应做结构校验（非 JSON / 缺 choices → LLMRequestError）。
 成本：usage token 精确记账；cost_usd 未定价标 0（V1-f 成本监控补价格）。
 """
 
 from __future__ import annotations
 
+import asyncio
+import json
 import os
 import time
 from typing import Any
@@ -27,7 +34,7 @@ from reposage.domain.finding import FindingCandidate
 from reposage.domain.models import ModelUsage
 from reposage.domain.protocols import ModelResponse
 
-from .schema import envelope_json_schema, parse_envelope
+from .schema import envelope_json_schema, envelope_to_candidates, parse_envelope
 
 # 结构化系统指令：要求只输出 JSON 信封（json_repair / 降级路径用）
 _SYSTEM_JSON_INSTRUCTION = """\
@@ -38,13 +45,29 @@ _SYSTEM_JSON_INSTRUCTION = """\
 "chunk_id": str|null, "evidence_ref": str|null, "trigger_condition": str, "impact": str, "explanation": str, "suggestion": str, "is_outside_diff": bool}], \
 "summary": {}}"""
 
+# 400 错误消息中表示“不支持 json_schema/response_format”的关键词（P2-2 降级判断）
+_SCHEMA_UNSUPPORTED_HINTS = (
+    "json_schema",
+    "response_format",
+    "not support",
+    "unsupported",
+    "unknown parameter",
+)
+
 
 class LLMRequestError(RuntimeError):
-    """网络/HTTP 层失败（重试耗尽或 4xx 永久错误）。"""
+    """网络/HTTP 层失败（重试耗尽、4xx 永久错误或 200 响应结构异常）。"""
 
-    def __init__(self, message: str, *, status_code: int | None = None) -> None:
+    def __init__(
+        self,
+        message: str,
+        *,
+        status_code: int | None = None,
+        error_body: str = "",
+    ) -> None:
         super().__init__(message)
         self.status_code = status_code
+        self.error_body = error_body  # 脱敏：仅错误片段（不含请求内容）
 
 
 class StructuredOutputError(RuntimeError):
@@ -56,7 +79,7 @@ class StructuredOutputError(RuntimeError):
 
 
 class OpenAICompatProvider:
-    """OpenAI-compatible 提供者（httpx 异步客户端，可注入 MockTransport 测试）。"""
+    """OpenAI-compatible 提供者（httpx 异步客户端；自建 client 支持 aclose/async with）。"""
 
     def __init__(
         self,
@@ -68,6 +91,7 @@ class OpenAICompatProvider:
         timeout_seconds: int = 60,
         max_retries: int = 2,
         structured_strategy: str = "schema_first",
+        max_output_tokens: int = 3000,
         http_client: httpx.AsyncClient | None = None,
     ) -> None:
         if not api_key:
@@ -78,11 +102,16 @@ class OpenAICompatProvider:
         self.temperature = temperature
         self.max_retries = max_retries
         self.structured_strategy = structured_strategy
+        self.max_output_tokens = max_output_tokens
+        self._owns_client = http_client is None
         self._client = http_client or httpx.AsyncClient(
             base_url=base_url.rstrip("/"),
             timeout=httpx.Timeout(timeout_seconds),
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
         )
+        self._sleep = asyncio.sleep  # 可注入 sleeper（测试退避时序）
+        # 运行时统计（smoke 报告用）：http_retries/429、修复重试次数
+        self.stats: dict[str, int] = {"http_retries": 0, "http_429": 0, "repairs": 0}
 
     @classmethod
     def from_config(
@@ -95,13 +124,9 @@ class OpenAICompatProvider:
         api_key = os.environ.get(llm.api_key_env, "")
         base_url = os.environ.get(llm.base_url_env, "")
         if not api_key:
-            raise ValueError(
-                f"缺少 API key：环境变量 {llm.api_key_env} 未设置"
-            )
+            raise ValueError(f"缺少 API key：环境变量 {llm.api_key_env} 未设置")
         if not base_url:
-            raise ValueError(
-                f"缺少 base_url：环境变量 {llm.base_url_env} 未设置"
-            )
+            raise ValueError(f"缺少 base_url：环境变量 {llm.base_url_env} 未设置")
         return cls(
             model=llm.model,
             api_key=api_key,
@@ -110,8 +135,21 @@ class OpenAICompatProvider:
             timeout_seconds=llm.timeout_seconds,
             max_retries=llm.max_retries,
             structured_strategy=llm.structured_strategy,
+            max_output_tokens=llm.max_output_tokens,
             http_client=http_client,
         )
+
+    # ---- client 生命周期（P2-3：只关闭自建 client） ----
+
+    async def aclose(self) -> None:
+        if self._owns_client:
+            await self._client.aclose()
+
+    async def __aenter__(self) -> OpenAICompatProvider:
+        return self
+
+    async def __aexit__(self, *exc: object) -> None:
+        await self.aclose()
 
     # ---- 通用补全 ----
 
@@ -121,17 +159,42 @@ class OpenAICompatProvider:
         *,
         schema: dict[str, Any] | None = None,
         temperature: float = 0.1,
+        max_tokens: int | None = None,
     ) -> ModelResponse:
+        """通用补全。
+
+        - schema 非空时真正发送 ``response_format=json_schema``（端点不支持则降级
+          json_object），并把解析出的 JSON 写入 ``ModelResponse.data``（P2-1）；
+        - max_tokens 非空时携带输出上限（P1-3）。
+        """
         body: dict[str, Any] = {
             "model": self.model,
             "messages": messages,
             "temperature": temperature,
         }
+        if max_tokens is not None:
+            body["max_tokens"] = max_tokens
         if schema is not None:
+            body["response_format"] = {
+                "type": "json_schema",
+                "json_schema": {"name": "completion", "schema": schema},
+            }
+        try:
+            data, usage = await self._post(body)
+        except LLMRequestError as exc:
+            if not _is_schema_unsupported(exc):
+                raise
             body["response_format"] = {"type": "json_object"}
-        data, usage = await self._post(body)
-        text = (data.get("choices") or [{}])[0].get("message", {}).get("content") or ""
-        return ModelResponse(text=text, usage=self._make_usage(usage))
+            data, usage = await self._post(body)
+        text = _content_of(data)
+        parsed: dict[str, Any] | None = None
+        if schema is not None:
+            try:
+                payload = json.loads(text)
+                parsed = payload if isinstance(payload, dict) else None
+            except json.JSONDecodeError:
+                parsed = None
+        return ModelResponse(text=text, data=parsed, usage=self._make_usage(usage))
 
     # ---- 结构化输出（V1 reviewer 用，09 §3） ----
 
@@ -153,8 +216,8 @@ class OpenAICompatProvider:
         try:
             envelope = parse_envelope(text)
         except Exception as exc:  # JSONDecodeError / ValidationError / ValueError
-            # 单次修复重试：把错误回喂
             detail = f"{type(exc).__name__}: {exc}"
+            self.stats["repairs"] += 1
             text2 = await self._chat_structured_plain(
                 [*messages, {"role": "user", "content": _REPAIR_INSTRUCTION.format(detail=detail)}],
                 total_usage,
@@ -167,14 +230,15 @@ class OpenAICompatProvider:
                     detail=f"{type(exc2).__name__}: {exc2}",
                 ) from exc2
         latency_ms = int((time.monotonic() - started) * 1000)
-        return envelope.findings, self._make_usage(total_usage, latency_ms=latency_ms)
+        return envelope_to_candidates(envelope), self._make_usage(total_usage, latency_ms=latency_ms)
 
     async def _chat_structured_schema_first(self, messages: list[dict[str, Any]], usage_agg: dict[str, Any]) -> str:
-        """schema_first：json_schema → 400 降级 json_object + 内嵌 schema。"""
+        """schema_first：json_schema → 仅“不支持”时降级 json_object + 内嵌 schema。"""
         body: dict[str, Any] = {
             "model": self.model,
             "messages": [*messages, {"role": "system", "content": _SYSTEM_JSON_INSTRUCTION}],
             "temperature": self.temperature,
+            "max_tokens": self.max_output_tokens,
             "response_format": {
                 "type": "json_schema",
                 "json_schema": {"name": "findings_envelope", "schema": envelope_json_schema()},
@@ -183,20 +247,20 @@ class OpenAICompatProvider:
         try:
             data, usage = await self._post(body)
         except LLMRequestError as exc:
-            if exc.status_code == 400:  # 端点不支持 json_schema → 降级 json_object
-                body["response_format"] = {"type": "json_object"}
-                data, usage = await self._post(body)
-            else:
-                raise
+            if not _is_schema_unsupported(exc):
+                raise  # 其他 400：直接失败，不掩盖配置错误
+            body["response_format"] = {"type": "json_object"}
+            data, usage = await self._post(body)
         _accumulate_usage(usage_agg, usage)
         return _content_of(data)
 
     async def _chat_structured_plain(self, messages: list[dict[str, Any]], usage_agg: dict[str, Any]) -> str:
-        """json_repair / 修复重试：普通输出 + 提示内嵌 schema。"""
+        """json_repair / 修复重试：普通输出 + 提示内嵌 schema；同样带输出上限。"""
         body: dict[str, Any] = {
             "model": self.model,
             "messages": [*messages, {"role": "system", "content": _SYSTEM_JSON_INSTRUCTION}],
             "temperature": self.temperature,
+            "max_tokens": self.max_output_tokens,
         }
         data, usage = await self._post(body)
         _accumulate_usage(usage_agg, usage)
@@ -216,27 +280,62 @@ class OpenAICompatProvider:
     # ---- 内部 ----
 
     async def _post(self, body: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
-        """POST /chat/completions；网络错误/429/5xx 指数退避重试，4xx 非 429 不重试。"""
-        last_error: Exception | None = None
+        """POST /chat/completions。
+
+        - 网络错误/429/5xx：指数退避重试；**最后一次尝试失败不再等待**（P2-4）；
+        - 非 429 的 4xx：不重试（永久错误）；
+        - 200 响应：结构校验（非 JSON / 非对象 → LLMRequestError，P2-5）。
+        """
+        last_error: LLMRequestError | None = None
+        retry_after: str | None = None
         for attempt in range(self.max_retries + 1):
             try:
                 resp = await self._client.post("/chat/completions", json=body)
             except httpx.HTTPError as exc:
-                last_error = exc
-                await _backoff(attempt)
-                continue
-            if resp.status_code == 200:
-                data = resp.json()
-                return data, data.get("usage", {})
-            if resp.status_code == 429 or resp.status_code >= 500:
-                last_error = LLMRequestError(f"HTTP {resp.status_code}", status_code=resp.status_code)
-                retry_after = resp.headers.get("retry-after")
-                await _backoff(attempt, retry_after=retry_after)
-                continue
-            raise LLMRequestError(
-                f"HTTP {resp.status_code}: {resp.text[:200]}", status_code=resp.status_code
-            )
+                self.stats["http_retries"] += 1
+                last_error = LLMRequestError(f"网络错误: {type(exc).__name__}: {exc}")
+                retry_after = None
+            else:
+                if resp.status_code == 200:
+                    try:
+                        data = resp.json()
+                    except json.JSONDecodeError as exc:
+                        raise LLMRequestError(
+                            f"200 响应不是合法 JSON（前 120 字符: {resp.text[:120]!r}）"
+                        ) from exc
+                    if not isinstance(data, dict):
+                        raise LLMRequestError(f"200 响应不是 JSON 对象: {type(data).__name__}")
+                    return data, data.get("usage", {})
+                if resp.status_code == 429 or resp.status_code >= 500:
+                    if resp.status_code == 429:
+                        self.stats["http_429"] += 1
+                    self.stats["http_retries"] += 1
+                    last_error = LLMRequestError(
+                        f"HTTP {resp.status_code}", status_code=resp.status_code, error_body=resp.text[:500]
+                    )
+                    retry_after = resp.headers.get("retry-after")
+                else:
+                    raise LLMRequestError(
+                        f"HTTP {resp.status_code}: {resp.text[:200]}",
+                        status_code=resp.status_code,
+                        error_body=resp.text[:500],
+                    )
+            if attempt >= self.max_retries:
+                break  # 最后一次尝试失败：不再等待
+            await self._backoff(attempt, retry_after)
         raise LLMRequestError(f"重试耗尽（{self.max_retries} 次）: {last_error}")
+
+    async def _backoff(self, attempt: int, retry_after: str | None) -> None:
+        """指数退避：0.5s * 2^attempt（Retry-After 可覆盖，封顶 4s）。"""
+        if retry_after:
+            try:
+                delay = min(float(retry_after), 4.0)
+            except ValueError:
+                delay = min(0.5 * (2**attempt), 4.0)
+        else:
+            delay = min(0.5 * (2**attempt), 4.0)
+        if delay > 0:
+            await self._sleep(delay)
 
     def _make_usage(self, usage: dict[str, Any], *, latency_ms: int = 0) -> ModelUsage:
         return ModelUsage(
@@ -256,7 +355,25 @@ _REPAIR_INSTRUCTION = (
 
 
 def _content_of(data: dict[str, Any]) -> str:
-    return (data.get("choices") or [{}])[0].get("message", {}).get("content") or ""
+    """提取 choices[0].message.content；结构异常抛 LLMRequestError（P2-5）。"""
+    choices = data.get("choices")
+    if not isinstance(choices, list) or not choices:
+        raise LLMRequestError("200 响应缺少 choices")
+    message = choices[0].get("message")
+    if not isinstance(message, dict):
+        raise LLMRequestError("choices[0] 缺少 message 对象")
+    content = message.get("content")
+    if not isinstance(content, str):
+        raise LLMRequestError(f"message.content 不是字符串: {type(content).__name__}")
+    return content
+
+
+def _is_schema_unsupported(exc: LLMRequestError) -> bool:
+    """400 是否明确表示不支持 json_schema/response_format（P2-2 降级判断）。"""
+    if exc.status_code != 400:
+        return False
+    body = (exc.error_body or "").lower()
+    return any(hint in body for hint in _SCHEMA_UNSUPPORTED_HINTS)
 
 
 def _accumulate_usage(agg: dict[str, Any], usage: dict[str, Any]) -> None:
@@ -264,21 +381,6 @@ def _accumulate_usage(agg: dict[str, Any], usage: dict[str, Any]) -> None:
     agg["completion_tokens"] = int(agg.get("completion_tokens", 0)) + int(
         usage.get("completion_tokens", 0) or 0
     )
-
-
-async def _backoff(attempt: int, *, retry_after: str | None = None) -> None:
-    """指数退避：0.5s * 2^attempt（可被 Retry-After 覆盖，封顶 4s）。"""
-    import asyncio
-
-    if retry_after:
-        try:
-            delay = min(float(retry_after), 4.0)
-        except ValueError:
-            delay = min(0.5 * (2**attempt), 4.0)
-    else:
-        delay = min(0.5 * (2**attempt), 4.0)
-    if attempt > 0:
-        await asyncio.sleep(delay)
 
 
 __all__ = [
