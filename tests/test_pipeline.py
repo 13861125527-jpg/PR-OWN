@@ -118,14 +118,16 @@ def test_versions_audit_trail():
     assert statuses[-1] is FindingStatus.ACCEPTED
 
 
-def test_missing_evidence_downgrades_confidence():
+def test_missing_evidence_auto_filled_from_real_line():
+    """P1-1 验收 6：无证据但位置可定位 → 程序补真实行证据 → 正常通过（置信度不降）。"""
     cand = _cand()
     cand.trigger_condition = ""
     cand.explanation = ""
     f = _pipeline().process(run_id="r1", candidates=[cand], file_map=_file_map())[0]
-    # 0.9 → 0.72 < 0.75 → suppressed（程序可下调不可上调）
-    assert f.confidence < 0.9
-    assert f.status is FindingStatus.SUPPRESSED
+    assert f.confidence == 0.9  # 无降级
+    assert f.status is FindingStatus.ACCEPTED
+    assert f.evidence and f.evidence[0].verified is True
+    assert f.evidence[0].content == "def g():"  # 真实新增行（canonical 行 4）
 
 
 def test_sort_by_severity_then_confidence():
@@ -162,14 +164,14 @@ def test_evidence_content_from_real_diff_line():
 
 
 def test_evidence_forged_by_model_not_verified():
-    """P1-2：模型提交伪造 content + verified=True 不能穿透（程序重判为 False）。"""
+    """P1-2：模型提交伪造 content + verified=True 不能穿透（程序重判为 False → 降级）。"""
     from reposage.domain.models import Evidence
 
     cand = _cand()
     cand.evidence = [
         Evidence(
             kind=EvidenceKind.DIFF_LINE,
-            location="src/a.py:4",
+            location="src/a.py:5",
             content="return safe_code()",  # 与真实新增行不一致
             verified=True,  # 模型伪造
         )
@@ -177,6 +179,9 @@ def test_evidence_forged_by_model_not_verified():
     f = _pipeline().process(run_id="r1", candidates=[cand], file_map=_file_map())[0]
     assert f.evidence
     assert f.evidence[0].verified is False  # 程序重判
+    # P1-1：有证据但无法验证（伪造）→ 不自动补 → 置信度下调（0.9→0.72 < 0.75 → suppressed）
+    assert f.confidence < 0.9
+    assert f.status is FindingStatus.SUPPRESSED
 
 
 def test_evidence_matching_real_line_verified():

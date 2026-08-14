@@ -235,6 +235,9 @@ async def test_structured_repair_usage_accumulated():
     # 修复请求也带输出上限（P1-3 测试 7）
     assert requests[1]["max_tokens"] == provider.max_output_tokens
     assert provider.stats["repairs"] == 1
+    # V1-d 八轮 P1：schema repair 独立于 transport retries 记账
+    assert usage.schema_repairs == 1
+    assert usage.retries == 0  # 无 HTTP 重试，只有一次解析修复
 
 
 # ================= structured：修复重试与 fail-soft =================
@@ -270,8 +273,8 @@ async def test_structured_repair_fails_raises():
     """修复重试仍失败 → StructuredOutputError（调用方 fail-soft）。"""
     states = iter(
         [
-            _ok_response("garbage"),
-            _ok_response("garbage again"),
+            _ok_response("garbage", {"prompt_tokens": 10, "completion_tokens": 5}),
+            _ok_response("garbage again", {"prompt_tokens": 20, "completion_tokens": 8}),
         ]
     )
 
@@ -279,8 +282,14 @@ async def test_structured_repair_fails_raises():
         return next(states)
 
     provider = _provider(handler)
-    with pytest.raises(StructuredOutputError):
+    with pytest.raises(StructuredOutputError) as exc_info:
         await provider.structured([{"role": "user", "content": "review"}])
+    # V1-d 十二轮 P1：失败也携带 usage（含初次 + repair 调用的 token 与 schema_repairs）
+    usage = exc_info.value.usage
+    assert usage is not None
+    assert usage.input_tokens == 30  # 10 + 20
+    assert usage.output_tokens == 13  # 5 + 8
+    assert usage.schema_repairs == 1  # 失败调用也计入 schema repair
 
 
 # ================= structured：schema_first 降级 =================
@@ -362,6 +371,37 @@ async def test_http_retry_on_429_then_success():
     assert len(findings) == 2
     assert provider.stats["http_429"] == 1
     assert provider.stats["http_retries"] == 1
+
+
+@pytest.mark.asyncio
+async def test_concurrent_retries_not_double_counted():
+    """V1-d 八轮审查（blocking）：并发调用下 usage.retries 不交叉重叠重复计数。
+
+    两个并发 structured 各触发一次 429 重试；若用 provider 级 stats 差值，交错窗口
+    会把对方的 retry 也算进自己。修复后各自 usage.retries == 1。
+    """
+    # 按消息内容区分两个调用，各自独立"首次 429、第二次成功"
+    per_call = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content)
+        tag = body["messages"][0]["content"]
+        per_call[tag] = per_call.get(tag, 0) + 1
+        if per_call[tag] == 1:
+            return httpx.Response(429, json={"error": {"message": "rate limited"}})
+        return _ok_response(json.dumps(VALID_ENVELOPE))
+
+    provider = _provider(handler)
+    provider._sleep = lambda *a, **k: asyncio.sleep(0)  # 消除退避等待
+    r1, r2 = await asyncio.gather(
+        provider.structured([{"role": "user", "content": "a"}]),
+        provider.structured([{"role": "user", "content": "b"}]),
+    )
+    # 每个调用 2 次请求（1 失败 + 1 成功），各自 1 次 retry
+    assert per_call["a"] == 2 and per_call["b"] == 2
+    u1, u2 = r1[1], r2[1]
+    assert u1.retries == 1
+    assert u2.retries == 1
 
 
 @pytest.mark.asyncio

@@ -43,6 +43,8 @@ class ReviewService:
             llm,
             file_tasks=self.settings.concurrency.file_tasks,
             model_requests=self.settings.concurrency.model_requests,
+            input_price_per_1k=self.settings.llm.input_price_per_1k,
+            output_price_per_1k=self.settings.llm.output_price_per_1k,
         )
 
     async def review(
@@ -58,12 +60,12 @@ class ReviewService:
         try:
             # preflight：ChangeRequest 契约校验（head 锁定铁律）
             run.stages.append(StageResult(stage=StageName.PREFLIGHT, status=StageStatus.OK))
+            current_stage = StageName.FETCH  # P2-2：进入获取操作前设置，失败归因 FETCH
             req = await self.git.get_changes(ref)
             req.require_head_locked()
             run.external_ref = req.external_id
             run.base_sha = req.base.sha
             run.head_sha = req.head.sha
-            current_stage = StageName.FETCH
             run.stages.append(
                 StageResult(stage=StageName.FETCH, status=StageStatus.OK, detail=f"head={req.head.sha}")
             )

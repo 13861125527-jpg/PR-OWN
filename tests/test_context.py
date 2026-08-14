@@ -316,7 +316,7 @@ def test_l4_budget_keeps_higher_severity():
         " x\n"
         "+aaa bbb\n"
     )
-    budget = ContextBudget(total_tokens=400, l2_ratio=0.46, l4_ratio=0.04)
+    budget = ContextBudget(total_tokens=400, l2_ratio=0.48, l4_ratio=0.02)
     units = _units(diff=diff, budget=budget, rules=rules)
     refs = {c.source.ref for c in units[0].context.chunks if c.layer is ContextLayer.L4}
     assert refs == {"rule:r.high"}

@@ -79,12 +79,44 @@ def compute_metrics(
     precision = hits / len(findings) if findings else (1.0 if not expected else 0.0)
     f1 = 2 * precision * recall / (precision + recall) if (precision + recall) else 0.0
 
+    # 位置准确率（P1-2 修正）：基于 expected 与 finding 的一对一匹配，比较 path+line。
+    # 匹配顺序：category+path 一致的候选里选行号距离最近者（贪婪首个会系统性低估，
+    # 如 expected=[(a,5),(a,6)] + findings=[(a,6),(a,5)]）；错误行号 → 0。
+    position_matched = 0
     position_ok = 0
-    for f in findings:
-        if f.canonical_path and f.canonical_start_line is not None:
+    used_pos = [False] * len(findings)
+    for exp in expected:
+        exp_cat = _normalize_category(getattr(exp, "category", None))
+        best_idx = -1
+        best_dist = -1
+        for i, f in enumerate(findings):
+            if used_pos[i]:
+                continue
+            if exp_cat is not None and _normalize_category(f.category) != exp_cat:
+                continue
+            if exp.path and f.canonical_path != exp.path:
+                continue
+            if exp.line is None:
+                dist = 0
+            elif f.canonical_start_line is None:
+                dist = 10**9  # 无行号视为最远
+            else:
+                dist = abs(f.canonical_start_line - exp.line)
+            if best_idx == -1 or dist < best_dist:
+                best_idx, best_dist = i, dist
+        if best_idx == -1:
+            continue  # 该 expected 无 category+path 匹配的 finding（不计入分母）
+        used_pos[best_idx] = True
+        position_matched += 1
+        if exp.line is None or findings[best_idx].canonical_start_line == exp.line:
             position_ok += 1
-    # 无 finding 则无位置错误（负样本不应因"没有位置"被惩罚）
-    position_accuracy = position_ok / len(findings) if findings else 1.0
+    # 无 expected 无位置要求；有 expected 却一条都没匹配到路径 → 位置准确率 0
+    # （不因分母为 0 返回 1.0 拉高 macro，P1-2）
+    position_accuracy = (
+        position_ok / position_matched
+        if position_matched
+        else (1.0 if not expected else 0.0)
+    )
 
     negative_noise = len(findings) if sample_kind == "negative" else 0
 

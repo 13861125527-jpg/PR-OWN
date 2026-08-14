@@ -44,7 +44,17 @@ _SYSTEM_JSON_INSTRUCTION = """\
 "confidence": float(0-1), "category": "correctness|security|silent_failure|concurrency|edge_case|test_gap|performance|maintainability", \
 "claimed_path": str|null, "claimed_start_line": int|null, "claimed_end_line": int|null, \
 "chunk_id": str|null, "evidence_ref": str|null, "trigger_condition": str, "impact": str, "explanation": str, "suggestion": str, "is_outside_diff": bool}], \
-"summary": {}}"""
+"summary": {}}
+category 选择规则（互斥，按优先级）：
+- correctness：代码行为、状态或返回值错误（如 assert 用于业务校验、错误分支、未定义变量）；
+- security：可被攻击者利用，造成越权、注入、泄密、危险执行（如 eval/exec、硬编码密钥、反序列化、弱加密、子进程 shell）；
+- concurrency：竞态、死锁、锁顺序与并发一致性；
+- edge_case：边界输入或异常条件缺陷；
+- silent_failure：吞异常、错误被忽略；
+- test_gap：测试缺失或断言不足；
+- performance：低效算法或资源泄漏；
+- maintainability：结构、可读性、重复代码。
+若同时命中多个类别，优先选择更具体、危害更高的类别（security > correctness > 其余）。"""
 
 # 400 错误消息中表示“不支持 json_schema/response_format”的判断（P1-1/P2-5）
 # 需同时满足：不支持语义 + 目标字段，避免宽泛子串误降级；unavailable 为真实
@@ -68,11 +78,23 @@ class LLMRequestError(RuntimeError):
 
 
 class StructuredOutputError(RuntimeError):
-    """结构化输出解析/校验失败（修复重试后仍失败；调用方 fail-soft）。"""
+    """结构化输出解析/校验失败（修复重试后仍失败；调用方 fail-soft）。
 
-    def __init__(self, message: str, *, detail: str = "") -> None:
+    携带 usage：即使失败，本次调用（含初次生成 + schema repair）已产生的
+    token/retries/schema_repairs/latency 也要能被调用方计入真实成本
+    （V1-d 十二轮 P1：失败调用 usage 不得丢失）。
+    """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        detail: str = "",
+        usage: ModelUsage | None = None,
+    ) -> None:
         super().__init__(message)
         self.detail = detail
+        self.usage = usage
 
 
 class OpenAICompatProvider:
@@ -187,13 +209,13 @@ class OpenAICompatProvider:
                 "json_schema": {"name": "completion", "schema": schema.model_json_schema()},
             }
         try:
-            data, usage = await self._post(body)
+            data, usage, retries = await self._post(body)
         except LLMRequestError as exc:
             if not _is_response_format_unsupported(exc):
                 raise
             self.stats["schema_fallbacks"] += 1  # complete 降级同样计数（review 建议）
             body["response_format"] = {"type": "json_object"}
-            data, usage = await self._post(body)
+            data, usage, retries = await self._post(body)
         text = _content_of(data)
         parsed: dict[str, Any] | None = None
         if schema is not None:
@@ -203,7 +225,11 @@ class OpenAICompatProvider:
                 raise StructuredOutputError(
                     "complete 输出未通过调用方 Schema 校验", detail=f"{type(exc).__name__}: {exc}"
                 ) from exc
-        return ModelResponse(text=text, data=parsed, usage=self._make_usage(usage))
+        return ModelResponse(
+            text=text,
+            data=parsed,
+            usage=self._make_usage(usage, retries=retries),
+        )
 
     # ---- 结构化输出（V1 reviewer 用，09 §3） ----
 
@@ -216,11 +242,14 @@ class OpenAICompatProvider:
     ) -> tuple[list[FindingCandidate], ModelUsage]:
         """结构化审查输出：schema_first/json_repair + 单次修复重试 → fail-soft 抛错。"""
         started = time.monotonic()
+        total_retries = 0
+        schema_repairs = 0
         total_usage: dict[str, Any] = {"prompt_tokens": 0, "completion_tokens": 0}
         if self.structured_strategy == "schema_first":
-            text = await self._chat_structured_schema_first(messages, total_usage)
+            text, retries = await self._chat_structured_schema_first(messages, total_usage)
         else:
-            text = await self._chat_structured_plain(messages, total_usage)
+            text, retries = await self._chat_structured_plain(messages, total_usage)
+        total_retries += retries
 
         try:
             envelope = parse_envelope(text)
@@ -228,26 +257,44 @@ class OpenAICompatProvider:
         except Exception as exc:  # 解析/校验/领域转换全部进入同一修复边界（P1-1）
             detail = f"{type(exc).__name__}: {exc}"
             self.stats["repairs"] += 1
-            text2 = await self._chat_structured_plain(
+            schema_repairs += 1
+            text2, retries2 = await self._chat_structured_plain(
                 [*messages, {"role": "user", "content": _REPAIR_INSTRUCTION.format(detail=detail)}],
                 total_usage,
             )
+            total_retries += retries2
             try:
                 envelope2 = parse_envelope(text2)
                 candidates = envelope_to_candidates(envelope2)
             except Exception as exc2:
+                # 失败也携带完整 usage（含 repair 调用），供调用方计入真实成本（V1-d 十二轮 P1）
+                failed_usage = self._make_usage(
+                    total_usage,
+                    latency_ms=int((time.monotonic() - started) * 1000),
+                    retries=total_retries,
+                    schema_repairs=schema_repairs,
+                )
                 raise StructuredOutputError(
                     "结构化输出解析失败（修复重试后仍失败）",
                     detail=f"{type(exc2).__name__}: {exc2}",
+                    usage=failed_usage,
                 ) from exc2
         latency_ms = int((time.monotonic() - started) * 1000)
-        return candidates, self._make_usage(total_usage, latency_ms=latency_ms)
+        return candidates, self._make_usage(
+            total_usage,
+            latency_ms=latency_ms,
+            retries=total_retries,
+            schema_repairs=schema_repairs,
+        )
 
-    async def _chat_structured_schema_first(self, messages: list[dict[str, Any]], usage_agg: dict[str, Any]) -> str:
+    async def _chat_structured_schema_first(
+        self, messages: list[dict[str, Any]], usage_agg: dict[str, Any]
+    ) -> tuple[str, int]:
         """schema_first 三级降级（Round 2 验收）：json_schema → json_object → 移除 response_format。
 
         仅“明确不支持 response_format”的错误允许进入下一级（unavailable/unsupported…）；
         模型名错误、认证错误、Schema 内容非法等其他 400 直接失败。
+        返回 (content, retries)：retries 为本次调用内局部 transport 重试数。
         """
         body: dict[str, Any] = {
             "model": self.model,
@@ -259,9 +306,10 @@ class OpenAICompatProvider:
                 "json_schema": {"name": "findings_envelope", "schema": envelope_json_schema()},
             },
         }
+        retries = 0
         # 第一级：json_schema
         try:
-            data, usage = await self._post(body)
+            data, usage, retries = await self._post(body)
         except LLMRequestError as exc:
             if not _is_response_format_unsupported(exc):
                 raise
@@ -269,28 +317,35 @@ class OpenAICompatProvider:
             # 第二级：json_object
             body["response_format"] = {"type": "json_object"}
             try:
-                data, usage = await self._post(body)
+                data, usage, retries2 = await self._post(body)
+                retries += retries2
             except LLMRequestError as exc2:
                 if not _is_response_format_unsupported(exc2):
                     raise
                 self.stats["response_format_fallbacks"] += 1
                 # 第三级：移除 response_format（系统提示词 + 本地严格校验/修复兜底）
                 del body["response_format"]
-                data, usage = await self._post(body)
+                data, usage, retries3 = await self._post(body)
+                retries += retries3
         _accumulate_usage(usage_agg, usage)
-        return _content_of(data)
+        return _content_of(data), retries
 
-    async def _chat_structured_plain(self, messages: list[dict[str, Any]], usage_agg: dict[str, Any]) -> str:
-        """json_repair / 修复重试：普通输出 + 提示内嵌 schema；同样带输出上限。"""
+    async def _chat_structured_plain(
+        self, messages: list[dict[str, Any]], usage_agg: dict[str, Any]
+    ) -> tuple[str, int]:
+        """json_repair / 修复重试：普通输出 + 提示内嵌 schema；同样带输出上限。
+
+        返回 (content, retries)：retries 为本次调用内局部 transport 重试数。
+        """
         body: dict[str, Any] = {
             "model": self.model,
             "messages": [*messages, {"role": "system", "content": _SYSTEM_JSON_INSTRUCTION}],
             "temperature": self.temperature,
             "max_tokens": self.max_output_tokens,
         }
-        data, usage = await self._post(body)
+        data, usage, retries = await self._post(body)
         _accumulate_usage(usage_agg, usage)
-        return _content_of(data)
+        return _content_of(data), retries
 
     # ---- V3 占位 ----
 
@@ -305,7 +360,9 @@ class OpenAICompatProvider:
 
     # ---- 内部 ----
 
-    async def _post(self, body: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    async def _post(
+        self, body: dict[str, Any]
+    ) -> tuple[dict[str, Any], dict[str, Any], int]:
         """POST /chat/completions。
 
         - 网络错误/429/5xx：指数退避重试；**最后一次尝试失败不再等待**（P2-4）；
@@ -313,9 +370,13 @@ class OpenAICompatProvider:
         - 200 响应：结构校验（非 JSON / 非对象 → LLMRequestError，P2-5）；
         - stats：http_attempts 计数所有尝试；http_retryable_failures 计数可重试失败；
           http_retries 只计实际额外尝试（末次失败不再重试不计入，P2-3）。
+
+        返回 (data, usage, retries)：retries 为**本次调用**的局部重试数（并发安全，
+        V1-d 八轮审查：provider 级 stats 差值在并发下会交错重叠、重复计数）。
         """
         last_error: LLMRequestError | None = None
         retry_after: str | None = None
+        local_retries = 0
         for attempt in range(self.max_retries + 1):
             self.stats["http_attempts"] += 1
             try:
@@ -334,7 +395,7 @@ class OpenAICompatProvider:
                         ) from exc
                     if not isinstance(data, dict):
                         raise LLMRequestError(f"200 响应不是 JSON 对象: {type(data).__name__}")
-                    return data, data.get("usage", {})
+                    return data, data.get("usage", {}), local_retries
                 if resp.status_code == 429 or resp.status_code >= 500:
                     if resp.status_code == 429:
                         self.stats["http_429"] += 1
@@ -352,6 +413,7 @@ class OpenAICompatProvider:
             if attempt >= self.max_retries:
                 break  # 最后一次尝试失败：不再等待（也不计入 http_retries）
             self.stats["http_retries"] += 1  # 实际还会再试
+            local_retries += 1  # noqa: SIM113 — 计数器非循环索引，与 http_retries 同步
             await self._backoff(attempt, retry_after)
         raise LLMRequestError(f"重试耗尽（{self.max_retries} 次）: {last_error}")
 
@@ -367,7 +429,14 @@ class OpenAICompatProvider:
         if delay > 0:
             await self._sleep(delay)
 
-    def _make_usage(self, usage: dict[str, Any], *, latency_ms: int = 0) -> ModelUsage:
+    def _make_usage(
+        self,
+        usage: dict[str, Any],
+        *,
+        latency_ms: int = 0,
+        retries: int = 0,
+        schema_repairs: int = 0,
+    ) -> ModelUsage:
         return ModelUsage(
             model=self.model,
             role="general",
@@ -375,6 +444,8 @@ class OpenAICompatProvider:
             output_tokens=int(usage.get("completion_tokens", 0) or 0),
             cost_usd=0.0,  # 未定价（V1-f 成本监控补价格）
             latency_ms=latency_ms,
+            retries=retries,  # transport 重试（本次调用内 http_retries 增量）
+            schema_repairs=schema_repairs,  # schema 修复重试（本次调用内 repairs 增量）
         )
 
 

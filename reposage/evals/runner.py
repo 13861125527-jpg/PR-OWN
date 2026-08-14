@@ -95,6 +95,7 @@ class EvalRunner:
                 sample_kind=sample.kind,
             )
             m.details["sample_kind"] = sample.kind  # 门槛按样本类别归组
+            m.details["n_expected"] = len(sample.expected)  # P1-2：位置聚合只算有 expected 的样本
             self.results[sample.id] = m
         return self.results
 

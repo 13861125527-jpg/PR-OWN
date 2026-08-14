@@ -1,12 +1,11 @@
 """V1 vs 直拼 Prompt baseline 对照（evals/baseline.py，11 §6 / V1-d DoD）。
 
-- V1：完整链路——脚本化候选 → FindingPipeline（claimed→canonical 重定位、
-  聚类/fingerprint 去重、门槛）；
-- baseline：直拼 Prompt——裸候选按 claimed 位置直接匹配（无重定位/去重/门槛）。
-
-脚本化评测下模型调用次数相同（单遍、成本占位 0），质量对照真实反映 Pipeline
-的确定性收益（重定位修正行号、去重降噪、幻觉路径抑制）；成本/延迟为 V1 单遍
-调用的占位（真实模型对照需配置 key 后执行，见 docs/evidence）。
+> **命名（P1-3 返工）**：本文件是 **Pipeline 确定性回归**（scripted candidates →
+> 同一份输入跑两种后处理：V1 完整链路 vs 直拼 Prompt），用于验证 Pipeline 的
+> 确定性收益（重定位修正行号、去重降噪、幻觉路径抑制），**不代表真实模型质量
+> 验收**。真实模型 V1 vs baseline 对照（两边各跑 Prompt/Provider 链路）需配置
+> key 后执行，见 docs/evidence 的 V1-D 状态说明；未执行前 V1-D 真实质量 DoD
+> 视为"未完成"。
 """
 
 from __future__ import annotations
@@ -51,6 +50,7 @@ def baseline_findings(candidates: list[FindingCandidate], sample: EvalSample) ->
 def _evaluate(findings: list[Finding], sample: EvalSample) -> Metrics:
     m = compute_metrics(sample.expected, findings, sample_kind=sample.kind)
     m.details["sample_kind"] = sample.kind
+    m.details["n_expected"] = len(sample.expected)
     return m
 
 
@@ -68,7 +68,6 @@ def compare(
     base_metrics: list[Metrics] = []
     v1_latency_ms = 0.0
     base_latency_ms = 0.0
-    samples_n = len(ds.samples)
 
     for sample in ds.samples:
         cands = scripted(sample.id)
@@ -88,17 +87,22 @@ def compare(
     def _avg(ms: list[Metrics], attr: str) -> float:
         return sum(getattr(m, attr) for m in ms) / len(ms) if ms else 0.0
 
+    def _avg_position(ms: list[Metrics]) -> float:
+        """位置准确率只对有 expected 的样本聚合（无位置要求者不参与，P1-2）。"""
+        pos = [m.position_accuracy for m in ms if m.details.get("n_expected", 0) > 0]
+        return sum(pos) / len(pos) if pos else 0.0
+
     quality: dict[str, object] = {
         "precision": {"v1": round(_avg(v1_metrics, "precision"), 3), "baseline": round(_avg(base_metrics, "precision"), 3)},
         "recall": {"v1": round(_avg(v1_metrics, "recall"), 3), "baseline": round(_avg(base_metrics, "recall"), 3)},
-        "position_accuracy": {"v1": round(_avg(v1_metrics, "position_accuracy"), 3), "baseline": round(_avg(base_metrics, "position_accuracy"), 3)},
+        "position_accuracy": {"v1": round(_avg_position(v1_metrics), 3), "baseline": round(_avg_position(base_metrics), 3)},
         "negative_noise": {"v1": float(sum(m.negative_noise for m in v1_metrics)), "baseline": float(sum(m.negative_noise for m in base_metrics))},
     }
-    # 成本：脚本化单遍调用，cost 未定价标 0（真实对照待 key）
+    # 成本（P1-3）：脚本化评测未调用真实模型、未定价 → 标记 unknown，不伪造 0 成本
     cost: dict[str, object] = {
-        "model_calls": {"v1": samples_n, "baseline": samples_n},
-        "cost_usd": {"v1": 0.0, "baseline": 0.0},
-        "note": "脚本化评测未定价；真实模型对照见 docs/evidence/v1-d-*.md",
+        "model_calls": {"v1": 0, "baseline": 0},
+        "cost_usd": {"v1": "unknown", "baseline": "unknown"},
+        "note": "Pipeline 确定性回归未调用真实模型；费用未定价标记 unknown，真实对照见 docs/evidence V1-D 状态说明",
     }
     latency: dict[str, object] = {
         "total_ms": {"v1": round(v1_latency_ms, 2), "baseline": round(base_latency_ms, 2)},
@@ -125,7 +129,7 @@ def _file_map_of(sample: EvalSample) -> dict[str, ChangedFile]:
 
 
 def render_tables(result: dict[str, dict[str, object]]) -> str:
-    lines = ["# V1 vs 直拼 Prompt baseline 对照（脚本化评测）", ""]
+    lines = ["# Pipeline 确定性回归：V1 vs 直拼 Prompt baseline（脚本化，非真实模型对照）", ""]
     lines.append("## 质量（macro 平均）")
     lines.append("| 指标 | V1 | baseline |")
     lines.append("|------|----|----------|")
@@ -153,6 +157,8 @@ def render_tables(result: dict[str, dict[str, object]]) -> str:
             if isinstance(pair, dict):
                 lines.append(f"| {k} | {pair['v1']} | {pair['baseline']} |")
     lines.append("")
+    lines.append("> 说明：本对照为 Pipeline 确定性回归（同一份脚本化候选跑两种后处理），")
+    lines.append("> 只证明 Pipeline 重定位/去重/抑制的确定性收益，不构成真实模型质量验收。")
     for section, label in ((cost, "成本"), (latency, "延迟")):
         if isinstance(section, dict):
             note = section.get("note")

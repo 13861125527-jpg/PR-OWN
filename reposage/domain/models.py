@@ -379,11 +379,11 @@ class BudgetReservation:
         *,
         input_tokens: int,
         max_output_tokens: int,
-        est_cost_usd: float,
+        est_cost_usd: float | None,
     ) -> None:
         self.input_tokens = input_tokens
         self.max_output_tokens = max_output_tokens
-        self.est_cost_usd = est_cost_usd
+        self.est_cost_usd = est_cost_usd  # None = 未定价（费用门控标记 unknown）
         self.settled = False
 
 
@@ -405,6 +405,12 @@ class GlobalBudget(BaseModel):
     tokens_used: int = 0
     cost_used: float = 0.0
     started_at: datetime = Field(default_factory=utcnow)
+    # 定价状态（V1-d P0-1 / 三轮/四轮）：known=按实际 token 结算；estimated=无 token 数据按预留入账；
+    # unknown=未配置价格（费用门控无法验证）；overrun=实际费用超预留（熔断，停止后续调用）
+    pricing_status: str = Field(default="known", description="known | estimated | unknown | overrun")
+    # overrun 熔断（V1-d 四轮）：真实费用超过预留估算时置 True，reserve() 拒绝所有新请求。
+    # 请求一旦发出费用无法撤销，硬预算只能做"请求前保守预留 + 意外超估立即熔断"。
+    overrun: bool = False
 
     _lock: asyncio.Lock = PrivateAttr(default_factory=asyncio.Lock)
     _reserved_tokens: int = PrivateAttr(default=0)
@@ -415,21 +421,29 @@ class GlobalBudget(BaseModel):
         """探索额度 = 总预算 × (1 - 预留比例)。"""
         return int(self.max_total_tokens * (1 - self.reserved_finalize_ratio))
 
+    @property
+    def remaining_runtime_seconds(self) -> float:
+        """剩余墙钟（用于 in-flight 调用超时）。"""
+        return max(0.0, self.max_runtime_seconds - (utcnow() - self.started_at).total_seconds())
+
     async def reserve(
         self,
         *,
         input_tokens: int,
         max_output_tokens: int,
-        est_cost_usd: float,
+        est_cost_usd: float | None,
     ) -> BudgetReservation | None:
         """发送前原子预留（admission control，P0-1）。
 
         - Token：input + max_output 不超（已用 + 已预留）；
-        - 费用：cost_used + 预留 + est 不超 max_cost_usd；
+        - 费用：est_cost_usd 提供时校验 cost_used + 预留 + est ≤ max_cost_usd；
+          未提供（未定价）→ 跳过费用门控并标记 pricing_status=unknown（不伪造零成本）；
         - 墙钟：到期后拒绝新请求（10 §7）。
         任一超限返回 None（调用方不得发请求）。
         """
         async with self._lock:
+            if self.overrun:
+                return None  # V1-d 四轮：费用超预留后熔断，停止所有新请求
             if self._wall_clock_expired():
                 return None
             if (
@@ -440,15 +454,19 @@ class GlobalBudget(BaseModel):
                 > self.max_total_tokens
             ):
                 return None
-            if self.cost_used + self._reserved_cost + est_cost_usd > self.max_cost_usd:
-                return None
+            if est_cost_usd is not None:
+                if self.cost_used + self._reserved_cost + est_cost_usd > self.max_cost_usd:
+                    return None
+            else:
+                self.pricing_status = "unknown"  # 未定价：费用门控无法验证
             reservation = BudgetReservation(
                 input_tokens=input_tokens,
                 max_output_tokens=max_output_tokens,
                 est_cost_usd=est_cost_usd,
             )
+            if est_cost_usd is not None:
+                self._reserved_cost += est_cost_usd
             self._reserved_tokens += input_tokens + max_output_tokens
-            self._reserved_cost += est_cost_usd
             return reservation
 
     async def settle(
@@ -461,8 +479,11 @@ class GlobalBudget(BaseModel):
     ) -> None:
         """结算：释放预留，按实际 usage 入账（失败/取消同样必须调用，避免泄漏）。"""
         async with self._lock:
-            self._reserved_tokens = max(0, self._reserved_tokens - reservation.input_tokens - reservation.max_output_tokens)
-            self._reserved_cost = max(0.0, self._reserved_cost - reservation.est_cost_usd)
+            self._reserved_tokens = max(
+                0, self._reserved_tokens - reservation.input_tokens - reservation.max_output_tokens
+            )
+            if reservation.est_cost_usd is not None:
+                self._reserved_cost = max(0.0, self._reserved_cost - reservation.est_cost_usd)
             self.tokens_used += actual_input + actual_output
             self.cost_used += actual_cost
             reservation.settled = True

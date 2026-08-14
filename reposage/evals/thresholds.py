@@ -34,7 +34,12 @@ def check_thresholds(results: dict[str, Metrics], config: ThresholdConfig | None
         return False, ["无评测结果"]
 
     precisions = [m.precision for m in results.values()]
-    positions = [m.position_accuracy for m in results.values()]
+    # 位置准确率只对有 expected 的样本聚合（无位置要求者 1.0 会拉高 macro，P1-2）
+    positions = [
+        m.position_accuracy
+        for m in results.values()
+        if m.details.get("n_expected", 0) > 0
+    ]
     negatives = [
         m.negative_noise
         for m in results.values()
@@ -42,7 +47,7 @@ def check_thresholds(results: dict[str, Metrics], config: ThresholdConfig | None
     ]
 
     avg_precision = sum(precisions) / len(precisions)
-    avg_position = sum(positions) / len(positions)
+    avg_position = sum(positions) / len(positions) if positions else 1.0  # 无 positive 样本则无位置要求
     max_noise = max(negatives) if negatives else 0
 
     violations: list[str] = []

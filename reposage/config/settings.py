@@ -58,6 +58,9 @@ class LLMConfig(BaseModel):
     max_output_tokens: int = Field(
         default=3000, gt=0, description="结构化审查输出上限（09 §5：findings ~2k + summary ~1k）"
     )
+    # 模型价格（美元 / 1k tokens；None = 未定价 → 费用门控标记 unknown，V1-d P0-1）
+    input_price_per_1k: float | None = Field(default=None, ge=0.0)
+    output_price_per_1k: float | None = Field(default=None, ge=0.0)
 
 
 class ReviewConfig(BaseModel):

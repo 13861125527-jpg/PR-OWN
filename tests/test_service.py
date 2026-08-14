@@ -169,6 +169,43 @@ class _FailingLLM:
 
 
 @pytest.mark.asyncio
+async def test_stage_attribution_get_changes_failure_is_fetch():
+    """P2-2：get_changes 失败 → 失败阶段归因 FETCH（不是 PREFLIGHT 重复失败）。"""
+
+    class BoomGit:
+        async def get_changes(self, ref):
+            raise RuntimeError("git boom")
+
+        async def get_diff(self, base_sha, head_sha, paths=None):
+            raise AssertionError
+
+        async def publish_comments(self, plan):
+            raise AssertionError
+
+    fake = BoomGit()
+    store = SqliteStorage(":memory:")
+    captured: dict = {}
+
+    async def capture(run):
+        captured["run"] = run
+
+    service = ReviewService(fake, FakeLLMProvider(), store)
+    orig = store.record_run
+    store.record_run = capture  # type: ignore[method-assign]
+    with pytest.raises(RuntimeError, match="git boom"):
+        await service.review("1")
+    store.record_run = orig  # type: ignore[method-assign]
+    run = captured["run"]
+    assert run.status is ReviewRunStatus.FAILED
+    failed = [s for s in run.stages if s.status == "failed"]
+    assert failed, "应有 FAILED 阶段"
+    assert failed[0].stage is StageName.FETCH  # 归因 FETCH，不是第二个 PREFLIGHT
+    assert failed[0].error and "git boom" in failed[0].error
+    preflight = [s for s in run.stages if s.stage is StageName.PREFLIGHT]
+    assert len(preflight) == 1 and preflight[0].status == "ok"  # PREFLIGHT 只记一次 OK
+
+
+@pytest.mark.asyncio
 async def test_stage_attribution_llm_failure():
     """strategy 抛异常 → 失败阶段归因 REVIEW（不是 PREFLIGHT）。"""
 

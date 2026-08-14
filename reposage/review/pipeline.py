@@ -137,15 +137,30 @@ class FindingPipeline:
             f.record_transition(FindingStatus.BODY_ONLY, actor="program", reason=res.reason)
             return f  # body_only：不进 evidence/聚类（正文结论，V1-e 归入正文评论）
 
-        # evidence 校验（P1-2：verified 仅由程序重判；模型声称的 verified 一律忽略）
+        # evidence 校验（P1-1/P1-2：verified 仅由程序重判；模型声称的 verified 一律忽略）
         self._verify_evidence(f, file_map)
-        if self._evidence_valid(cand):
-            f.record_transition(FindingStatus.EVIDENCE_VALID, actor="program", reason="证据线索存在")
+        if not f.evidence and f.canonical_path and f.canonical_start_line is not None:
+            # 候选完全无证据但 canonical 已定位 → 程序从真实 diff 行补 verified 证据
+            # （验收 6）；候选提供过证据但全部无法验证（伪造）→ 不补，走降级（验收 5）
+            file = file_map.get(f.canonical_path)
+            real = added_line_content(file, f.canonical_start_line) if file is not None else None
+            if real is not None:
+                f.evidence.append(
+                    Evidence(
+                        kind=EvidenceKind.DIFF_LINE,
+                        location=f"{f.canonical_path}:{f.canonical_start_line}",
+                        content=real,
+                        verified=True,  # 程序读取的真实新增行
+                    )
+                )
+        if _has_verified_evidence(f):
+            f.record_transition(FindingStatus.EVIDENCE_VALID, actor="program", reason="存在已验证证据")
         else:
-            # 无法验证 → 置信度下调（程序只可下调不可上调，05 §3）
+            # 无已验证证据（trigger/explanation 只是线索，不能等价验证通过）→ 置信度下调
             f.confidence = round(f.confidence * 0.8, 4)
             f.record_transition(
-                FindingStatus.EVIDENCE_VALID, actor="program", reason="证据不足，置信度下调"
+                FindingStatus.EVIDENCE_VALID, actor="program",
+                reason="无已验证证据，置信度下调",
             )
         return f
 
@@ -153,11 +168,6 @@ class FindingPipeline:
     def _schema_valid(cand: FindingCandidate) -> bool:
         """防御性 schema 校验（provider 已严格校验；此处仅再验数值范围）。"""
         return 0.0 <= cand.confidence <= 1.0
-
-    @staticmethod
-    def _evidence_valid(cand: FindingCandidate) -> bool:
-        """证据线索：触发条件/解释/显式证据；位置线索（claimed_path）不算证据。"""
-        return bool(cand.trigger_condition or cand.explanation or cand.evidence)
 
     @staticmethod
     def _verify_evidence(f: Finding, file_map: dict[str, ChangedFile]) -> None:
@@ -290,6 +300,11 @@ def _parse_evidence_location(location: str) -> tuple[str | None, int | None]:
         return path, int(line_str)
     except ValueError:
         return None, None
+
+
+def _has_verified_evidence(f: Finding) -> bool:
+    """证据校验（P1-1）：至少一条程序验证通过（verified=True）的可追溯证据。"""
+    return any(ev.verified for ev in f.evidence)
 
 
 def _merge_sources(cluster: list[Finding]) -> list[FindingSource]:
