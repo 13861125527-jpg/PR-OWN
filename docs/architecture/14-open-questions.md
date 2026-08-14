@@ -71,7 +71,7 @@
 
 | 问题 | 决策 | 影响文档 |
 |------|------|----------|
-| OQ-1 | **V1-c 部分落地**：OpenAICompatProvider + 严格结构化（schema_first/json_repair + 修复重试）已实现并有 MockTransport 边界测试；smoke 入口就绪（默认 20 轮/并发 3/漂移率/脱敏报告）。**真实 DP-V4-PRO 实测待配置 `MODEL_API_KEY`/`MODEL_BASE_URL` 后执行**（当前阻塞，见 `docs/evidence/v1-c-dp-v4-pro-smoke.md`）；tool calling 留 V3 方案 A/B 同集对比（OQ-11） | 09 §3 / 08 §9 / 12 V1-c |
+| OQ-1 | **已验证**（Round 3 真实 DeepSeek smoke，2026-08-14）：OpenAI-compatible API 可用、并发 3 无 429、结构化 JSON 20/20 解析成功（schema_first 三级降级生效：json_schema→json_object→移除 response_format）、`max_tokens` 与模型名（`MODEL_NAME`）可配置。未验证：tool calling（留 V3 方案 A/B，OQ-11）、真实上下文长度、单价（cost 未定价）。证据见 `docs/evidence/v1-c-dp-v4-pro-smoke.md/.json` | 09 §3 / 08 §9 / 12 V1-c |
 | OQ-3 | 默认值待确认（当前按附录 B：dry_run=true、request_changes=false） | 07 §7 / 09 §6 |
 | OQ-4 | 待定 | 07 §7 / 02 §3 |
 | OQ-6 | 默认拒绝+提示（未确认前） | 10 §7 |

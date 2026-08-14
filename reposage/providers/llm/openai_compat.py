@@ -191,6 +191,7 @@ class OpenAICompatProvider:
         except LLMRequestError as exc:
             if not _is_response_format_unsupported(exc):
                 raise
+            self.stats["schema_fallbacks"] += 1  # complete 降级同样计数（review 建议）
             body["response_format"] = {"type": "json_object"}
             data, usage = await self._post(body)
         text = _content_of(data)

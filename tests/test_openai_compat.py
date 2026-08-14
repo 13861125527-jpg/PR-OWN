@@ -1001,3 +1001,24 @@ async def test_non_400_and_auth_errors_no_fallback():
         assert calls == expected, f"{status}: 期望 {expected} 次请求，实际 {calls}"
         assert provider.stats["schema_fallbacks"] == 0
         assert provider.stats["response_format_fallbacks"] == 0
+@pytest.mark.asyncio
+async def test_complete_schema_fallback_counts_and_succeeds():
+    """review 建议：complete(schema) json_schema unavailable → 降级 json_object 并计入 schema_fallbacks。"""
+    class _OkModel(BaseModel):
+        ok: bool
+
+    calls: list[dict] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content)
+        calls.append(body)
+        if body.get("response_format", {}).get("type") == "json_schema":
+            return httpx.Response(400, json=_UNAVAILABLE)
+        assert body["response_format"] == {"type": "json_object"}
+        return _ok_response('{"ok": true}')
+
+    provider = _provider(handler)
+    resp = await provider.complete([{"role": "user", "content": "hi"}], schema=_OkModel)
+    assert resp.data == {"ok": True}
+    assert len(calls) == 2
+    assert provider.stats["schema_fallbacks"] == 1

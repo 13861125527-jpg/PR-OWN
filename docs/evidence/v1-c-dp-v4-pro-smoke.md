@@ -1,10 +1,39 @@
 # V1-c DP-V4-PRO 真实 smoke 证据
 
-> 状态：**待执行**（外部阻塞：本环境未配置 `MODEL_API_KEY` / `MODEL_BASE_URL`）
-> **V1-c 里程碑状态：代码实现接近完成 + Mock 验证通过；真实模型验证未完成**
-> （不得标记为最终通过，直至下方实测结果填写真实数据且成功率 ≥ 0.8）
-> 生成方式：配置密钥后运行 `python -m reposage.providers.llm.smoke`（默认 20 轮），
-> 并设 `OQ1_REPORT` 指向本目录以落盘脱敏 JSON。
+> 状态：**通过**（Round 3 复验，2026-08-14）
+> 实际模型：`deepseek-v4-pro`（MODEL_NAME 覆盖，`MODEL_BASE_URL=https://api.deepseek.com`）
+> **V1-c 里程碑状态：代码实现完成 + Mock 验证通过 + 真实模型验证通过（20/20）**
+> 原始脱敏数据：`docs/evidence/v1-c-dp-v4-pro-smoke.json`
+
+## 实测结果（Round 3）
+
+| 项 | 结果 |
+|---|---|
+| 最小请求连通（延迟） | 通过（1880 ms） |
+| 并发 3 请求（总延迟 / 429） | 通过（39393 ms / 0 次 429） |
+| 结构化解析成功率（/20） | **20/20 = 100%**（0 结构失败、0 请求失败、0 修复） |
+| 能力协商降级 | `schema_fallbacks = 20`（每轮 json_schema 不可用 → 降级 json_object 成功）；`response_format_fallbacks = 0` |
+| HTTP 统计 | `http_attempts = 44`（minimal 1 + concurrency 3 + structured 20×2）、`http_retries = 0`、`http_429 = 0` |
+| usage | input/output tokens 已记录，`cost_usd = 0`（未定价，V1-f 补价格） |
+| 总体 | `passed = true` |
+| 脱敏 | 通过（报告与日志无 API Key / Authorization） |
+
+## OQ-1 能力结论
+
+- OpenAI-compatible API 可用性：**已验证**（DeepSeek `/chat/completions`）
+- 异步并发表现（429 频率）：**已验证**（并发 3 无 429）
+- 稳定 JSON / 字段漂移率：**已验证**（20/20 解析成功、0 漂移失败；schema_first 降级 json_object 生效）
+- 输出上限参数兼容性：**已验证**（`max_tokens` 被真实端点接受）
+- 模型名可配置性：**已验证**（`MODEL_NAME` 覆盖，服务端契约 `deepseek-v4-pro`）
+- tool calling（native）可用性：**留待 V3 方案 A/B 实测**（`08` §9 / OQ-11）
+- 真实可用上下文长度：待实测（预算 32k 校准，`06` §2）
+- 单价 / 成本：未定价（cost_usd=0，V1-f 成本监控补价格）
+
+## 历史记录
+
+- Round 1（`43fd85f` 前）：模型名 `DP-V4-PRO` 与 DeepSeek 契约不符 → 全部 400；修复 MODEL_NAME 覆盖
+- Round 2（`bfb6820` 前）：`response_format=json_schema` 返回 `unavailable` 未识别 → 20 轮 400；修复 unavailable 识别 + 三级降级
+- Round 3（`bfb6820` 后）：三级降级生效，20/20 通过
 
 ## 执行步骤（安全）
 
