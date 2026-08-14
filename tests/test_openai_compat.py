@@ -742,6 +742,8 @@ class _FakeSmokeProvider:
             "http_retryable_failures": 0,
             "http_retries": 0,
             "http_429": 0,
+            "schema_fallbacks": 0,
+            "response_format_fallbacks": 0,
         }
         self._minimal_ok = minimal_ok
         self._concurrency_ok = concurrency_ok
@@ -867,3 +869,135 @@ async def test_smoke_report_model_matches_request(monkeypatch, tmp_path):
     await smoke_mod._run(rounds=1, report_path=str(report_path), provider_factory=capture)
     data = json.loads(report_path.read_text(encoding="utf-8"))
     assert data["model"] == capture.model == "deepseek-v4-flash"
+# ================= Round 2 复验：三级降级（unavailable） =================
+
+_UNAVAILABLE = {"error": {"message": "This response_format type is unavailable now"}}
+
+
+@pytest.mark.asyncio
+async def test_structured_unavailable_jsonschema_fallback_to_json_object():
+    """P1-测试 1/2：真实服务 "unavailable" 语义 → json_schema 降级 json_object 后成功（2 次请求）。"""
+    calls: list[dict] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content)
+        calls.append(body)
+        if body.get("response_format", {}).get("type") == "json_schema":
+            return httpx.Response(400, json=_UNAVAILABLE)
+        assert body["response_format"] == {"type": "json_object"}
+        return _ok_response(json.dumps(VALID_ENVELOPE))
+
+    provider = _provider(handler)
+    findings, _ = await provider.structured([{"role": "user", "content": "review"}])
+    assert len(findings) == 2
+    assert len(calls) == 2
+    assert provider.stats["schema_fallbacks"] == 1
+    assert provider.stats["response_format_fallbacks"] == 0
+
+
+@pytest.mark.asyncio
+async def test_structured_full_three_level_fallback():
+    """P1-测试 3：json_schema 与 json_object 均 unavailable → 第三次不携带 response_format 成功。"""
+    calls: list[dict] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content)
+        calls.append(body)
+        fmt = body.get("response_format")
+        if fmt is not None:
+            return httpx.Response(400, json=_UNAVAILABLE)  # 两种 response_format 都不可用
+        assert "response_format" not in body
+        return _ok_response(json.dumps(VALID_ENVELOPE))
+
+    provider = _provider(handler)
+    findings, _ = await provider.structured([{"role": "user", "content": "review"}])
+    assert len(findings) == 2
+    assert len(calls) == 3
+    assert "response_format" not in calls[2]
+    assert provider.stats["schema_fallbacks"] == 1
+    assert provider.stats["response_format_fallbacks"] == 1
+
+
+@pytest.mark.asyncio
+async def test_structured_fallback_then_repair_strict_validation():
+    """P1-测试 6：降级成功后输出坏 JSON → 修复重试（plain）仍走严格校验并成功。"""
+    states = iter(
+        [
+            httpx.Response(400, json=_UNAVAILABLE),  # json_schema 不支持
+            _ok_response("not json at all"),  # json_object 输出坏内容
+            _ok_response(json.dumps(VALID_ENVELOPE)),  # 修复请求（plain）成功
+        ]
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return next(states)
+
+    provider = _provider(handler)
+    findings, _ = await provider.structured([{"role": "user", "content": "review"}])
+    assert len(findings) == 2
+    assert provider.stats["schema_fallbacks"] == 1
+    assert provider.stats["repairs"] == 1
+
+
+@pytest.mark.asyncio
+async def test_fallback_attempts_not_counted_as_retries():
+    """P1-测试 7：降级请求计入 http_attempts，不误计为网络重试 http_retries。"""
+    calls = 0
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        body = json.loads(request.content)
+        if body.get("response_format", {}).get("type") == "json_schema":
+            return httpx.Response(400, json=_UNAVAILABLE)
+        return _ok_response(json.dumps(VALID_ENVELOPE))
+
+    provider = _provider(handler)
+    await provider.structured([{"role": "user", "content": "review"}])
+    assert calls == 2
+    assert provider.stats["http_attempts"] == 2  # 两次 HTTP 尝试都计入
+    assert provider.stats["http_retries"] == 0  # 400 非 429/5xx，不算网络重试
+    assert provider.stats["http_retryable_failures"] == 0
+
+
+@pytest.mark.asyncio
+async def test_invalid_schema_400_still_no_fallback():
+    """P1-测试 4：Schema 内容非法（无“不支持”语义）仍不降级（含 unavailable 场景边界）。"""
+    calls = 0
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        return httpx.Response(
+            400, json={"error": {"message": "Invalid schema for response_format: confidence missing"}}
+        )
+
+    provider = _provider(handler)
+    with pytest.raises(LLMRequestError):
+        await provider.structured([{"role": "user", "content": "review"}])
+    assert calls == 1
+
+
+@pytest.mark.asyncio
+async def test_non_400_and_auth_errors_no_fallback():
+    """P1-测试 5：非 400、认证/模型名错误不降级。"""
+    for status, message in [
+        (401, "Invalid API key"),
+        (404, "Model not found"),
+        (500, "internal unavailable"),  # 5xx 走网络重试，不走能力降级
+    ]:
+        calls = 0
+
+        def handler(request: httpx.Request, _status: int = status, _msg: str = message) -> httpx.Response:
+            nonlocal calls
+            calls += 1
+            return httpx.Response(_status, json={"error": {"message": _msg}})
+
+        provider = _provider(handler)
+        with pytest.raises(LLMRequestError):
+            await provider.structured([{"role": "user", "content": "review"}])
+        # 401/404：不降级也不重试（1 次）；500：网络重试（max_retries+1=3 次）
+        expected = 1 if status < 500 else 3
+        assert calls == expected, f"{status}: 期望 {expected} 次请求，实际 {calls}"
+        assert provider.stats["schema_fallbacks"] == 0
+        assert provider.stats["response_format_fallbacks"] == 0

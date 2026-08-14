@@ -1,16 +1,23 @@
 {
-  "model": "DP-V4-PRO",
+  "model": "deepseek-v4-pro",
   "base_url": "https://api.deepseek.com",
   "rounds": 20,
-  "timestamp": "2026-08-14T14:28:41+0800",
+  "timestamp": "2026-08-14T14:44:22+0800",
   "checks": {
     "minimal_request": {
-      "ok": false,
-      "error": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_er"
+      "ok": true,
+      "latency_ms": 945,
+      "usage": {
+        "model": "deepseek-v4-pro",
+        "input_tokens": 87,
+        "output_tokens": 23,
+        "cost_usd": 0.0,
+        "latency_ms": 0
+      }
     },
     "concurrency_3": {
-      "ok": false,
-      "error": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_er"
+      "ok": true,
+      "total_ms": 42580
     },
     "structured": {
       "ok": false,
@@ -30,102 +37,102 @@
     {
       "round": 1,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 2,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 3,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 4,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 5,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 6,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 7,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 8,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 9,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 10,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 11,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 12,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 13,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 14,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 15,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 16,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 17,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 18,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 19,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     },
     {
       "round": 20,
       "kind": "request",
-      "detail": "HTTP 400: {\"error\":{\"message\":\"The supported API model names are deepseek-v4-pro or deepseek-v4-flash, but you passed DP-V4-PRO.\",\"type\":\"invalid_request_error\""
+      "detail": "HTTP 400: {\"error\":{\"message\":\"This response_format type is unavailable now\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
     }
   ],
   "passed": false

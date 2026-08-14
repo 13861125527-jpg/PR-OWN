@@ -46,9 +46,10 @@ _SYSTEM_JSON_INSTRUCTION = """\
 "chunk_id": str|null, "evidence_ref": str|null, "trigger_condition": str, "impact": str, "explanation": str, "suggestion": str, "is_outside_diff": bool}], \
 "summary": {}}"""
 
-# 400 错误消息中表示“不支持 json_schema/response_format”的判断（P2-5）
-# 需同时满足：不支持语义 + 目标字段，避免宽泛子串误降级
-_SCHEMA_UNSUPPORTED_SEMANTICS = ("not support", "unsupported", "unknown parameter")
+# 400 错误消息中表示“不支持 json_schema/response_format”的判断（P1-1/P2-5）
+# 需同时满足：不支持语义 + 目标字段，避免宽泛子串误降级；unavailable 为真实
+# 服务（DeepSeek）实际表达（Round 2）
+_SCHEMA_UNSUPPORTED_SEMANTICS = ("not support", "unsupported", "unknown parameter", "unavailable")
 
 
 class LLMRequestError(RuntimeError):
@@ -106,13 +107,15 @@ class OpenAICompatProvider:
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
         )
         self._sleep = asyncio.sleep  # 可注入 sleeper（测试退避时序）
-        # 运行时统计（smoke 报告用）：attempts / retryable / 实际 retries / 429 / 修复
+        # 运行时统计（smoke 报告用）：attempts / retryable / 实际 retries / 429 / 修复 / 降级
         self.stats: dict[str, int] = {
             "http_attempts": 0,  # 所有请求尝试次数
             "http_retryable_failures": 0,  # 可重试失败（429/5xx/网络错误）
             "http_retries": 0,  # 实际执行的额外尝试（末次失败不再重试不计入）
             "http_429": 0,
             "repairs": 0,
+            "schema_fallbacks": 0,  # json_schema → json_object 降级次数
+            "response_format_fallbacks": 0,  # json_object → 移除 response_format 降级次数
         }
 
     @classmethod
@@ -186,7 +189,7 @@ class OpenAICompatProvider:
         try:
             data, usage = await self._post(body)
         except LLMRequestError as exc:
-            if not _is_schema_unsupported(exc):
+            if not _is_response_format_unsupported(exc):
                 raise
             body["response_format"] = {"type": "json_object"}
             data, usage = await self._post(body)
@@ -240,7 +243,11 @@ class OpenAICompatProvider:
         return candidates, self._make_usage(total_usage, latency_ms=latency_ms)
 
     async def _chat_structured_schema_first(self, messages: list[dict[str, Any]], usage_agg: dict[str, Any]) -> str:
-        """schema_first：json_schema → 仅“不支持”时降级 json_object + 内嵌 schema。"""
+        """schema_first 三级降级（Round 2 验收）：json_schema → json_object → 移除 response_format。
+
+        仅“明确不支持 response_format”的错误允许进入下一级（unavailable/unsupported…）；
+        模型名错误、认证错误、Schema 内容非法等其他 400 直接失败。
+        """
         body: dict[str, Any] = {
             "model": self.model,
             "messages": [*messages, {"role": "system", "content": _SYSTEM_JSON_INSTRUCTION}],
@@ -251,13 +258,24 @@ class OpenAICompatProvider:
                 "json_schema": {"name": "findings_envelope", "schema": envelope_json_schema()},
             },
         }
+        # 第一级：json_schema
         try:
             data, usage = await self._post(body)
         except LLMRequestError as exc:
-            if not _is_schema_unsupported(exc):
-                raise  # 其他 400：直接失败，不掩盖配置错误
+            if not _is_response_format_unsupported(exc):
+                raise
+            self.stats["schema_fallbacks"] += 1
+            # 第二级：json_object
             body["response_format"] = {"type": "json_object"}
-            data, usage = await self._post(body)
+            try:
+                data, usage = await self._post(body)
+            except LLMRequestError as exc2:
+                if not _is_response_format_unsupported(exc2):
+                    raise
+                self.stats["response_format_fallbacks"] += 1
+                # 第三级：移除 response_format（系统提示词 + 本地严格校验/修复兜底）
+                del body["response_format"]
+                data, usage = await self._post(body)
         _accumulate_usage(usage_agg, usage)
         return _content_of(data)
 
@@ -379,11 +397,12 @@ def _content_of(data: dict[str, Any]) -> str:
     return content
 
 
-def _is_schema_unsupported(exc: LLMRequestError) -> bool:
-    """400 是否明确表示不支持 json_schema/response_format（P2-5 双条件）。
+def _is_response_format_unsupported(exc: LLMRequestError) -> bool:
+    """400 是否明确表示不支持 response_format/json_schema（P1-1/P2-5 双条件）。
 
-    需同时满足：不支持语义（not support/unsupported/unknown parameter）+ 目标字段
-    （json_schema/response_format）；仅出现目标字段（如 schema 内容非法）不降级。
+    需同时满足：不支持语义（not support/unsupported/unknown parameter/unavailable）
+    + 目标字段（json_schema/response_format）；仅出现目标字段（如 schema 内容非法）
+    或非 400 不降级。
     """
     if exc.status_code != 400:
         return False

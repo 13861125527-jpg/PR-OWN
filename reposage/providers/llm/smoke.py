@@ -151,6 +151,8 @@ async def _run(
                 "structure_failures": structure_failures,
                 "request_failures": request_failures,
                 "repairs": provider.stats["repairs"],
+                "schema_fallbacks": provider.stats["schema_fallbacks"],
+                "response_format_fallbacks": provider.stats["response_format_fallbacks"],
                 "http_attempts": provider.stats["http_attempts"],
                 "http_retryable_failures": provider.stats["http_retryable_failures"],
                 "http_retries": provider.stats["http_retries"],
