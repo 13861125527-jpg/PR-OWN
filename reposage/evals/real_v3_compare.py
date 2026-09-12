@@ -63,7 +63,9 @@ def _capture_sessions() -> Iterator[list[AgentSession]]:
         agent_reviewer.run_agent_loop = original  # type: ignore[attr-defined]
 
 
-def _settings(model: str, *, agentic: bool) -> Settings:
+def _settings(
+    model: str, *, agentic: bool, negative_gate_enabled: bool = False
+) -> Settings:
     base = Settings()
     return base.model_copy(update={
         "llm": base.llm.model_copy(update={"model": model, "max_output_tokens": 8000}),
@@ -71,14 +73,21 @@ def _settings(model: str, *, agentic: bool) -> Settings:
             "strategy": "agentic" if agentic else "single_pass",
             "min_confidence": 0.0,
             "static": base.review.static.model_copy(update={"enabled": False}),
-            "judge": base.review.judge.model_copy(update={"enabled": False}),
+            "judge": base.review.judge.model_copy(
+                update={
+                    "enabled": negative_gate_enabled,
+                    "negative_gate_enabled": negative_gate_enabled,
+                    "max_output_tokens": 3000,
+                    "timeout_seconds": 90,
+                }
+            ),
             "feedback": base.review.feedback.model_copy(update={"enabled": False}),
             "incremental": base.review.incremental.model_copy(update={"enabled": False}),
         }),
         "context": base.context.model_copy(update={"symbol_retrieval": True}),
         "agent": base.agent.model_copy(update={
             "enabled": agentic, "tool_protocol": "native", "max_rounds": 12,
-            "max_tool_calls": 16, "max_wallclock_s": 300,
+            "max_tool_calls": 8, "max_wallclock_s": 300,
         }),
         "budget": base.budget.model_copy(update={
             "max_total_tokens": 120000, "max_cost_usd": 20.0, "max_runtime_seconds": 900,
@@ -91,13 +100,22 @@ def _db_rows(store: SqliteStorage, table: str, run_id: str) -> list[dict[str, An
     return [dict(row) for row in store._query(f"SELECT * FROM {table} WHERE run_id = ?", (run_id,))]  # noqa: S608, SLF001
 
 
-async def _arm(sample: EvalSample, provider: OpenAICompatProvider, *, model: str, agentic: bool) -> dict[str, Any]:
+async def _arm(
+    sample: EvalSample,
+    provider: OpenAICompatProvider,
+    *,
+    model: str,
+    agentic: bool,
+    negative_gate_enabled: bool = False,
+) -> dict[str, Any]:
     git = FakeGitProvider(repository_id=f"v3-live-{sample.id}")
     git.add_snapshot("base", sample.base_files)
     git.add_snapshot("head", sample.head_files)
     git.add_pr(1, base="base", head="head", title=sample.pr_title, description=sample.pr_description)
     store = SqliteStorage(":memory:")
-    settings = _settings(model, agentic=agentic)
+    settings = _settings(
+        model, agentic=agentic, negative_gate_enabled=negative_gate_enabled
+    )
     service = ReviewService(git, provider, store, settings=settings, logger=StructuredLogger(sink=io.StringIO()))
     started = time.perf_counter()
     sessions: list[AgentSession] = []
@@ -168,10 +186,24 @@ async def _score_judges(sample: EvalSample, arm: dict[str, Any], findings: list[
     arm.pop("finding_objects", None)
 
 
-async def _sample(sample: EvalSample, provider: OpenAICompatProvider, judges: list[OpenAICompatProvider], cfg: SemanticJudgeConfig, model: str) -> dict[str, Any]:
+async def _sample(
+    sample: EvalSample,
+    provider: OpenAICompatProvider,
+    judges: list[OpenAICompatProvider],
+    cfg: SemanticJudgeConfig,
+    model: str,
+    *,
+    negative_gate_enabled: bool = False,
+) -> dict[str, Any]:
     row: dict[str, Any] = {"id": sample.id, "kind": sample.kind}
     for name, agentic in (("base", False), ("v3", True)):
-        arm = await _arm(sample, provider, model=model, agentic=agentic)
+        arm = await _arm(
+            sample,
+            provider,
+            model=model,
+            agentic=agentic,
+            negative_gate_enabled=negative_gate_enabled,
+        )
         findings = list(arm["finding_objects"])
         await _score_judges(sample, arm, findings, judges, cfg)
         row[name] = arm
@@ -223,11 +255,11 @@ def _aggregate(rows: list[dict[str, Any]], model: str, judge_model: str) -> dict
             "exact_location_recall": round(
                 sum(item["exact_location_hits_ignoring_category"] for item in diagnostics) / expected_total,
                 3,
-            ),
+            ) if expected_total else 1.0,
             "within_5_lines_recall": round(
                 sum(item["within_5_lines_hits_ignoring_category"] for item in diagnostics) / expected_total,
                 3,
-            ),
+            ) if expected_total else 1.0,
             "negative_false_positive_samples": [
                 row["id"] for row in rows
                 if row[arm]["expected_count"] == 0 and row[arm]["semantic_judges"][0]["reported"] > 0
@@ -302,7 +334,13 @@ async def _main(args: argparse.Namespace) -> int:
         if payload.get("model") == model and payload.get("sample_ids") == [s.id for s in samples]:
             rows = payload["rows"]
     done = {row["id"] for row in rows}
-    provider = OpenAICompatProvider.from_config(_settings(model, agentic=False).llm)
+    provider = OpenAICompatProvider.from_config(
+        _settings(
+            model,
+            agentic=False,
+            negative_gate_enabled=args.enable_negative_gate,
+        ).llm
+    )
     judges = [OpenAICompatProvider(model=cfg.model, api_key=cfg.api_key, base_url=cfg.base_url,
         temperature=cfg.temperature, timeout_seconds=cfg.timeout_seconds, max_retries=cfg.max_retries,
         max_output_tokens=cfg.max_output_tokens) for _ in range(2)]
@@ -312,7 +350,14 @@ async def _main(args: argparse.Namespace) -> int:
                 continue
             print(f"[{index}/{len(samples)}] {sample.id}", flush=True)
             try:
-                row = await _sample(sample, provider, judges, cfg, model)
+                row = await _sample(
+                    sample,
+                    provider,
+                    judges,
+                    cfg,
+                    model,
+                    negative_gate_enabled=args.enable_negative_gate,
+                )
             except Exception as exc:
                 row = {"id": sample.id, "kind": sample.kind, "fatal_error": {"kind": type(exc).__name__, "detail": _redact(str(exc))}}
             rows.append(row)
@@ -344,6 +389,7 @@ def main() -> int:
     parser.add_argument("--model", default="")
     parser.add_argument("--sample-ids", default="")
     parser.add_argument("--fresh", action="store_true")
+    parser.add_argument("--enable-negative-gate", action="store_true")
     return asyncio.run(_main(parser.parse_args()))
 
 

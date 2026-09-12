@@ -144,6 +144,7 @@ def _settings(
                     "judge": base.review.judge.model_copy(
                         update={
                             "enabled": judge_enabled,
+                            "negative_gate_enabled": judge_enabled,
                             "max_output_tokens": 3000,
                             "timeout_seconds": 90,
                         }

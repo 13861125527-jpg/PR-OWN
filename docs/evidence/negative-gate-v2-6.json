@@ -1,0 +1,968 @@
+{
+  "version": "V2",
+  "configuration": {
+    "strategy": "multi_role",
+    "roles": [
+      "general",
+      "security",
+      "correctness",
+      "performance"
+    ],
+    "symbol_retrieval": true,
+    "static": false,
+    "judge": true,
+    "feedback": false,
+    "semantic_judge": true,
+    "pipeline_min_confidence": 0.0,
+    "correctness_gate": "added_lines"
+  },
+  "model": "deepseek-v4-pro",
+  "dataset": "reposage/evals/datasets/holdout_cross_file_30.yaml",
+  "timestamp": "2026-09-12T20:57:01+0800",
+  "sample_count": 6,
+  "successful_samples": 6,
+  "execution_completed": true,
+  "summary": {
+    "precision_macro": 1.0,
+    "recall_macro": 1.0,
+    "f1_macro": 1.0,
+    "position_accuracy_macro_positive": 0.0,
+    "negative_noise": 0,
+    "strict_defect_recall": 1.0,
+    "exact_location_recall_ignoring_category": 1.0,
+    "within_5_lines_recall_ignoring_category": 1.0,
+    "perfect_samples": 6,
+    "semantic_judge": {
+      "samples": 6,
+      "matched": 0,
+      "expected": 0,
+      "reported": 0,
+      "raw_reported": 0,
+      "duplicates_suppressed": 0,
+      "precision_micro": 1.0,
+      "recall_micro": 1.0,
+      "f1_micro": 1.0,
+      "perfect_samples": 6,
+      "category_agreement": 0.0,
+      "line_tolerance": 5
+    }
+  },
+  "original_v2_same_samples": null,
+  "delta_vs_original_v2": null,
+  "latency": {
+    "total_ms": 424578.13,
+    "avg_ms": 70763.02,
+    "median_ms": 65979.0
+  },
+  "usage": {
+    "logical_invocations": 18,
+    "provider_requests": 19,
+    "input_tokens": 17839,
+    "output_tokens": 33723,
+    "retries": 0,
+    "schema_repairs": 1,
+    "provider_latency_ms": 330493,
+    "cost_usd": 0.0
+  },
+  "roles": {
+    "general": 6,
+    "security": 0,
+    "correctness": 6,
+    "performance": 0
+  },
+  "l3": {
+    "total_hits": 6,
+    "samples_with_hits": 6
+  },
+  "category_confusions_at_exact_location": [],
+  "per_sample": [
+    {
+      "id": "holdout-25-negative-decimal",
+      "kind": "negative",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 115773.77,
+      "expected_count": 0,
+      "accepted_count": 0,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-holdout-25-negative-decimal",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "app/review_25.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "app/review_25.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "app/review_25.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "app/review_25.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-holdout-25-negative-decimal:app/review_25.py::general",
+          "run_id": "v2-holdout-25-negative-decimal",
+          "kind": "role_review",
+          "target": "app/review_25.py::general",
+          "status": "completed",
+          "input_tokens": 887,
+          "output_tokens": 2829,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-holdout-25-negative-decimal:app/review_25.py::correctness",
+          "run_id": "v2-holdout-25-negative-decimal",
+          "kind": "role_review",
+          "target": "app/review_25.py::correctness",
+          "status": "completed",
+          "input_tokens": 1781,
+          "output_tokens": 5603,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-ed1428fe4a38",
+          "run_id": "v2-holdout-25-negative-decimal",
+          "kind": "judge_adjudicate",
+          "target": "app/review_25.py",
+          "status": "completed",
+          "input_tokens": 1057,
+          "output_tokens": 851,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 4,
+        "input_tokens": 3725,
+        "output_tokens": 9283,
+        "retries": 0,
+        "schema_repairs": 1,
+        "provider_latency_ms": 102228,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 0,
+        "expected": 0,
+        "reported": 0,
+        "raw_reported": 0,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": []
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "holdout-26-negative-path",
+      "kind": "negative",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 49525.99,
+      "expected_count": 0,
+      "accepted_count": 0,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-holdout-26-negative-path",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "app/review_26.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "app/review_26.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "app/review_26.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "app/review_26.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-holdout-26-negative-path:app/review_26.py::general",
+          "run_id": "v2-holdout-26-negative-path",
+          "kind": "role_review",
+          "target": "app/review_26.py::general",
+          "status": "completed",
+          "input_tokens": 917,
+          "output_tokens": 2005,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-holdout-26-negative-path:app/review_26.py::correctness",
+          "run_id": "v2-holdout-26-negative-path",
+          "kind": "role_review",
+          "target": "app/review_26.py::correctness",
+          "status": "completed",
+          "input_tokens": 902,
+          "output_tokens": 1371,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-02d7bf27649b",
+          "run_id": "v2-holdout-26-negative-path",
+          "kind": "judge_adjudicate",
+          "target": "app/review_26.py",
+          "status": "completed",
+          "input_tokens": 1027,
+          "output_tokens": 565,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2846,
+        "output_tokens": 3941,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 41213,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 0,
+        "expected": 0,
+        "reported": 0,
+        "raw_reported": 0,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": []
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "holdout-27-negative-permission",
+      "kind": "negative",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 59938.04,
+      "expected_count": 0,
+      "accepted_count": 0,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-holdout-27-negative-permission",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "app/review_27.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "app/review_27.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "app/review_27.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "app/review_27.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-holdout-27-negative-permission:app/review_27.py::general",
+          "run_id": "v2-holdout-27-negative-permission",
+          "kind": "role_review",
+          "target": "app/review_27.py::general",
+          "status": "completed",
+          "input_tokens": 883,
+          "output_tokens": 972,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-holdout-27-negative-permission:app/review_27.py::correctness",
+          "run_id": "v2-holdout-27-negative-permission",
+          "kind": "role_review",
+          "target": "app/review_27.py::correctness",
+          "status": "completed",
+          "input_tokens": 868,
+          "output_tokens": 1241,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-c508735d4c2e",
+          "run_id": "v2-holdout-27-negative-permission",
+          "kind": "judge_adjudicate",
+          "target": "app/review_27.py",
+          "status": "completed",
+          "input_tokens": 1071,
+          "output_tokens": 2683,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2822,
+        "output_tokens": 4896,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 26850,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 0,
+        "expected": 0,
+        "reported": 0,
+        "raw_reported": 0,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": []
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "holdout-28-negative-tenant",
+      "kind": "negative",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 54855.54,
+      "expected_count": 0,
+      "accepted_count": 0,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-holdout-28-negative-tenant",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "app/review_28.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "app/review_28.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "app/review_28.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "app/review_28.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-holdout-28-negative-tenant:app/review_28.py::general",
+          "run_id": "v2-holdout-28-negative-tenant",
+          "kind": "role_review",
+          "target": "app/review_28.py::general",
+          "status": "completed",
+          "input_tokens": 895,
+          "output_tokens": 1984,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-holdout-28-negative-tenant:app/review_28.py::correctness",
+          "run_id": "v2-holdout-28-negative-tenant",
+          "kind": "role_review",
+          "target": "app/review_28.py::correctness",
+          "status": "completed",
+          "input_tokens": 880,
+          "output_tokens": 1565,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-1aae0b6ffd4b",
+          "run_id": "v2-holdout-28-negative-tenant",
+          "kind": "judge_adjudicate",
+          "target": "app/review_28.py",
+          "status": "completed",
+          "input_tokens": 1050,
+          "output_tokens": 1054,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2825,
+        "output_tokens": 4603,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 42098,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 0,
+        "expected": 0,
+        "reported": 0,
+        "raw_reported": 0,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": []
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "holdout-29-negative-optional",
+      "kind": "negative",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 72464.83,
+      "expected_count": 0,
+      "accepted_count": 0,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-holdout-29-negative-optional",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "app/review_29.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "app/review_29.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "app/review_29.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "app/review_29.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-holdout-29-negative-optional:app/review_29.py::general",
+          "run_id": "v2-holdout-29-negative-optional",
+          "kind": "role_review",
+          "target": "app/review_29.py::general",
+          "status": "completed",
+          "input_tokens": 882,
+          "output_tokens": 2824,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-holdout-29-negative-optional:app/review_29.py::correctness",
+          "run_id": "v2-holdout-29-negative-optional",
+          "kind": "role_review",
+          "target": "app/review_29.py::correctness",
+          "status": "completed",
+          "input_tokens": 867,
+          "output_tokens": 1782,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-952361d705bb",
+          "run_id": "v2-holdout-29-negative-optional",
+          "kind": "judge_adjudicate",
+          "target": "app/review_29.py",
+          "status": "completed",
+          "input_tokens": 1013,
+          "output_tokens": 1060,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2762,
+        "output_tokens": 5666,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 58112,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 0,
+        "expected": 0,
+        "reported": 0,
+        "raw_reported": 0,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": []
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "holdout-30-negative-token",
+      "kind": "negative",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 72019.96,
+      "expected_count": 0,
+      "accepted_count": 0,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-holdout-30-negative-token",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "app/review_30.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "app/review_30.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "app/review_30.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "app/review_30.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-holdout-30-negative-token:app/review_30.py::general",
+          "run_id": "v2-holdout-30-negative-token",
+          "kind": "role_review",
+          "target": "app/review_30.py::general",
+          "status": "completed",
+          "input_tokens": 898,
+          "output_tokens": 1574,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-holdout-30-negative-token:app/review_30.py::correctness",
+          "run_id": "v2-holdout-30-negative-token",
+          "kind": "role_review",
+          "target": "app/review_30.py::correctness",
+          "status": "completed",
+          "input_tokens": 883,
+          "output_tokens": 2923,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-1720046402f2",
+          "run_id": "v2-holdout-30-negative-token",
+          "kind": "judge_adjudicate",
+          "target": "app/review_30.py",
+          "status": "completed",
+          "input_tokens": 1078,
+          "output_tokens": 837,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2859,
+        "output_tokens": 5334,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 59992,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 0,
+        "expected": 0,
+        "reported": 0,
+        "raw_reported": 0,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": []
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    }
+  ]
+}

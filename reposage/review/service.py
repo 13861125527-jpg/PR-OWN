@@ -411,6 +411,7 @@ class ReviewService:
                 head_sha=req.head.sha,
                 min_confidence=self.settings.review.min_confidence,
                 judge_enabled=judge_cfg.enabled,
+                negative_gate_enabled=judge_cfg.negative_gate_enabled,
                 max_findings=judge_cfg.max_findings,
             )
             adjudicator = None

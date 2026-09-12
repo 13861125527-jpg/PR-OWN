@@ -63,12 +63,13 @@ def _cand(
     )
 
 
-def _pipeline(*, judge=False, max_findings=32) -> FindingPipeline:
+def _pipeline(*, judge=False, negative_gate=False, max_findings=32) -> FindingPipeline:
     return FindingPipeline(
         repo="repo",
         head_sha="abc1234",
         min_confidence=0.75,
         judge_enabled=judge,
+        negative_gate_enabled=negative_gate,
         max_findings=max_findings,
     )
 
@@ -235,6 +236,74 @@ async def test_absent_decision_is_keep():
     result = await _run(_pipeline(judge=True), [_cand()], adjudicator=fake)
     assert result.findings[0].status is FindingStatus.ACCEPTED
     assert result.metrics.judge_keep == 1
+
+
+@pytest.mark.asyncio
+async def test_negative_gate_requires_complete_validation():
+    class Validate(FakeAdjudicator):
+        async def adjudicate(self, **kwargs):
+            findings = kwargs["findings"]
+            self.decisions = [
+                JudgeDecision(
+                    finding_occurrence_id=findings[0].finding_occurrence_id,
+                    action=JudgeAction.KEEP,
+                    semantic_match=True,
+                    contract_violation_verified=True,
+                    trigger_reproducible=True,
+                    evidence_sufficient=False,
+                    existing_guard_present=False,
+                    reason="evidence does not prove the impact",
+                )
+            ]
+            return await super().adjudicate(**kwargs)
+
+    result = await _run(
+        _pipeline(judge=True, negative_gate=True),
+        [_cand()],
+        adjudicator=Validate(),
+    )
+    assert result.findings[0].status is FindingStatus.SUPPRESSED
+    assert result.findings[0].versions[-1].actor == "judge"
+    assert result.metrics.judge_downrank == 1
+
+
+@pytest.mark.asyncio
+async def test_negative_gate_accepts_fully_verified_finding():
+    class Validate(FakeAdjudicator):
+        async def adjudicate(self, **kwargs):
+            findings = kwargs["findings"]
+            self.decisions = [
+                JudgeDecision(
+                    finding_occurrence_id=findings[0].finding_occurrence_id,
+                    action=JudgeAction.KEEP,
+                    semantic_match=True,
+                    contract_violation_verified=True,
+                    trigger_reproducible=True,
+                    evidence_sufficient=True,
+                    existing_guard_present=False,
+                    reason="verified",
+                )
+            ]
+            return await super().adjudicate(**kwargs)
+
+    result = await _run(
+        _pipeline(judge=True, negative_gate=True),
+        [_cand()],
+        adjudicator=Validate(),
+    )
+    assert result.findings[0].status is FindingStatus.ACCEPTED
+    assert result.metrics.judge_keep == 1
+
+
+@pytest.mark.asyncio
+async def test_negative_gate_suppresses_missing_decision():
+    result = await _run(
+        _pipeline(judge=True, negative_gate=True),
+        [_cand()],
+        adjudicator=FakeAdjudicator(),
+    )
+    assert result.findings[0].status is FindingStatus.SUPPRESSED
+    assert result.findings[0].versions[-1].reason == "negative_gate:missing_decision"
 
 
 @pytest.mark.asyncio

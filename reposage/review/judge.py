@@ -41,6 +41,9 @@ class JudgeDecision(BaseModel):
     duplicate_of: str = ""
     semantic_match: bool = False
     contract_violation_verified: bool = False
+    trigger_reproducible: bool = False
+    evidence_sufficient: bool = False
+    existing_guard_present: bool = False
 
 
 class JudgeBatchOutput(BaseModel):
@@ -142,6 +145,7 @@ def apply_judge_decisions(
     decisions: list[JudgeDecision],
     *,
     judged_ids: set[str],
+    negative_gate_enabled: bool = False,
 ) -> tuple[int, int]:
     """应用 keep/downrank、规范类别与显式重复关系。缺席 = keep。
 
@@ -166,7 +170,16 @@ def apply_judge_decisions(
         if decision.canonical_category:
             with suppress(ValueError):
                 finding.category = FindingCategory(decision.canonical_category)
-        if decision.action is JudgeAction.DOWNRANK:
+        gate_passed = (
+            decision.semantic_match
+            and decision.contract_violation_verified
+            and decision.trigger_reproducible
+            and decision.evidence_sufficient
+            and not decision.existing_guard_present
+        )
+        if decision.action is JudgeAction.DOWNRANK or (
+            negative_gate_enabled and not gate_passed
+        ):
             duplicate = by_id.get(decision.duplicate_of or "")
             if (
                 duplicate is not None
@@ -184,7 +197,10 @@ def apply_judge_decisions(
             finding.record_transition(
                 FindingStatus.SUPPRESSED,
                 actor="judge",
-                reason=sanitize_judge_reason(decision.reason) or "downrank",
+                reason=(
+                    sanitize_judge_reason(decision.reason)
+                    or ("negative_gate" if negative_gate_enabled else "downrank")
+                ),
             )
             downrank_n += 1
         else:
@@ -196,8 +212,16 @@ def apply_judge_decisions(
             and finding.status is FindingStatus.MERGED
             and finding.finding_occurrence_id not in decided
         ):
-            _append_judge_source(finding)
-            keep_n += 1
+            if negative_gate_enabled:
+                finding.record_transition(
+                    FindingStatus.SUPPRESSED,
+                    actor="judge",
+                    reason="negative_gate:missing_decision",
+                )
+                downrank_n += 1
+            else:
+                _append_judge_source(finding)
+                keep_n += 1
     return keep_n, downrank_n
 
 

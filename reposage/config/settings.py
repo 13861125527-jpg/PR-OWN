@@ -105,6 +105,7 @@ class JudgeConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     enabled: bool = False
+    negative_gate_enabled: bool = False
     max_findings: int = Field(default=32, gt=0)
     timeout_seconds: float = Field(default=30.0, gt=0.0)
     temperature: float = Field(default=0.1, ge=0.0, le=2.0)

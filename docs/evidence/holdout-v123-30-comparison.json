@@ -1,0 +1,162 @@
+{
+  "dataset": "reposage/evals/datasets/holdout_cross_file_30.yaml",
+  "sample_count": 30,
+  "model": "deepseek-v4-pro",
+  "judge_model": "deepseek-v4-flash",
+  "base": {
+    "judge_1": {
+      "matched": 17,
+      "expected": 24,
+      "reported": 36,
+      "precision": 0.472,
+      "recall": 0.708,
+      "f1": 0.567,
+      "perfect_samples": 15
+    },
+    "judge_2": {
+      "matched": 17,
+      "expected": 24,
+      "reported": 36,
+      "precision": 0.472,
+      "recall": 0.708,
+      "f1": 0.567,
+      "perfect_samples": 15
+    },
+    "judge_agreement_samples": 30,
+    "avg_latency_ms": 38620.19,
+    "median_latency_ms": 26980.35,
+    "total_calls": 30,
+    "input_tokens": 23576,
+    "output_tokens": 66440,
+    "product_judge_calls": 0,
+    "tool_calls": 0,
+    "agent_failures": 0,
+    "task_clean_samples": 30,
+    "tool_attempts": 0,
+    "successful_tools": 0,
+    "tool_effectiveness": null,
+    "repeat_rate": null,
+    "exact_location_recall": 1.0,
+    "within_5_lines_recall": 1.0,
+    "negative_false_positive_samples": [
+      "holdout-25-negative-decimal",
+      "holdout-26-negative-path",
+      "holdout-27-negative-permission",
+      "holdout-28-negative-tenant",
+      "holdout-29-negative-optional",
+      "holdout-30-negative-token"
+    ],
+    "missed_positive_samples": [
+      "holdout-15-canonical-host",
+      "holdout-16-tenant-scope",
+      "holdout-17-cache-namespace",
+      "holdout-18-optional-presence",
+      "holdout-19-stream-position",
+      "holdout-22-csrf-binding",
+      "holdout-24-resource-owner"
+    ],
+    "quality": {
+      "matched": 17,
+      "expected": 24,
+      "reported": 36,
+      "precision": 0.472,
+      "recall": 0.708,
+      "f1": 0.567,
+      "perfect_samples": 15
+    }
+  },
+  "v2": {
+    "quality": {
+      "matched": 18,
+      "expected": 24,
+      "reported": 32,
+      "precision": 0.562,
+      "recall": 0.75,
+      "f1": 0.643,
+      "perfect_samples": 18
+    },
+    "judge_2": {
+      "matched": 17,
+      "expected": 24,
+      "reported": 32,
+      "precision": 0.531,
+      "recall": 0.708,
+      "f1": 0.607,
+      "perfect_samples": 17
+    },
+    "judge_agreement_samples": 29,
+    "total_calls": 60,
+    "input_tokens": 54436,
+    "output_tokens": 108040,
+    "negative_false_positive_samples": [
+      "holdout-25-negative-decimal",
+      "holdout-26-negative-path",
+      "holdout-27-negative-permission",
+      "holdout-28-negative-tenant",
+      "holdout-29-negative-optional",
+      "holdout-30-negative-token"
+    ],
+    "missed_positive_samples": [
+      "holdout-15-canonical-host",
+      "holdout-16-tenant-scope",
+      "holdout-17-cache-namespace",
+      "holdout-18-optional-presence",
+      "holdout-22-csrf-binding",
+      "holdout-24-resource-owner"
+    ]
+  },
+  "v3": {
+    "judge_1": {
+      "matched": 24,
+      "expected": 24,
+      "reported": 30,
+      "precision": 0.8,
+      "recall": 1.0,
+      "f1": 0.889,
+      "perfect_samples": 24
+    },
+    "judge_2": {
+      "matched": 24,
+      "expected": 24,
+      "reported": 30,
+      "precision": 0.8,
+      "recall": 1.0,
+      "f1": 0.889,
+      "perfect_samples": 24
+    },
+    "judge_agreement_samples": 30,
+    "avg_latency_ms": 34619.12,
+    "median_latency_ms": 26700.62,
+    "total_calls": 191,
+    "input_tokens": 661103,
+    "output_tokens": 80024,
+    "product_judge_calls": 0,
+    "tool_calls": 106,
+    "agent_failures": 0,
+    "task_clean_samples": 30,
+    "tool_attempts": 148,
+    "successful_tools": 106,
+    "tool_effectiveness": 0.716,
+    "repeat_rate": 0.0,
+    "exact_location_recall": 1.0,
+    "within_5_lines_recall": 1.0,
+    "negative_false_positive_samples": [
+      "holdout-25-negative-decimal",
+      "holdout-26-negative-path",
+      "holdout-27-negative-permission",
+      "holdout-28-negative-tenant",
+      "holdout-29-negative-optional",
+      "holdout-30-negative-token"
+    ],
+    "missed_positive_samples": [],
+    "quality": {
+      "matched": 24,
+      "expected": 24,
+      "reported": 30,
+      "precision": 0.8,
+      "recall": 1.0,
+      "f1": 0.889,
+      "perfect_samples": 24
+    }
+  }
+}

@@ -90,12 +90,14 @@ class FindingPipeline:
         head_sha: str,
         min_confidence: float = 0.75,
         judge_enabled: bool = False,
+        negative_gate_enabled: bool = False,
         max_findings: int = 32,
     ) -> None:
         self.repo = repo
         self.head_sha = head_sha
         self.min_confidence = min_confidence
         self.judge_enabled = judge_enabled
+        self.negative_gate_enabled = negative_gate_enabled
         self.max_findings = max_findings
 
     async def process(
@@ -173,7 +175,10 @@ class FindingPipeline:
                 )
                 judged_ids = {f.finding_occurrence_id for f in to_judge}
                 judge_keep, judge_downrank = apply_judge_decisions(
-                    merged_findings, adj.output.decisions, judged_ids=judged_ids
+                    merged_findings,
+                    adj.output.decisions,
+                    judged_ids=judged_ids,
+                    negative_gate_enabled=self.negative_gate_enabled,
                 )
                 for finding in merged_findings:
                     if finding.status is FindingStatus.MERGED:

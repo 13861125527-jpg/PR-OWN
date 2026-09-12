@@ -1,0 +1,1202 @@
+{
+  "version": "V3-live",
+  "model": "deepseek-v4-pro",
+  "judge_model": "deepseek-v4-flash",
+  "dataset": "reposage/evals/datasets/resume_l3_context_30.yaml",
+  "sample_count": 6,
+  "execution_completed": false,
+  "arms": {
+    "base": {
+      "judge_1": {
+        "matched": 0,
+        "expected": 0,
+        "reported": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "perfect_samples": 6
+      },
+      "judge_2": {
+        "matched": 0,
+        "expected": 0,
+        "reported": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "perfect_samples": 6
+      },
+      "judge_agreement_samples": 6,
+      "avg_latency_ms": 51772.03,
+      "median_latency_ms": 50423.35,
+      "total_calls": 12,
+      "input_tokens": 11947,
+      "output_tokens": 25193,
+      "product_judge_calls": 6,
+      "tool_calls": 0,
+      "agent_failures": 0,
+      "task_clean_samples": 6,
+      "tool_attempts": 0,
+      "successful_tools": 0,
+      "tool_effectiveness": null,
+      "repeat_rate": null,
+      "exact_location_recall": 1.0,
+      "within_5_lines_recall": 1.0,
+      "negative_false_positive_samples": [],
+      "missed_positive_samples": []
+    },
+    "v3": {
+      "judge_1": {
+        "matched": 0,
+        "expected": 0,
+        "reported": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "perfect_samples": 6
+      },
+      "judge_2": {
+        "matched": 0,
+        "expected": 0,
+        "reported": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "perfect_samples": 6
+      },
+      "judge_agreement_samples": 6,
+      "avg_latency_ms": 62479.42,
+      "median_latency_ms": 66458.44,
+      "total_calls": 56,
+      "input_tokens": 221352,
+      "output_tokens": 29303,
+      "product_judge_calls": 4,
+      "tool_calls": 39,
+      "agent_failures": 2,
+      "task_clean_samples": 4,
+      "tool_attempts": 57,
+      "successful_tools": 39,
+      "tool_effectiveness": 0.684,
+      "repeat_rate": 0.0,
+      "exact_location_recall": 1.0,
+      "within_5_lines_recall": 1.0,
+      "negative_false_positive_samples": [],
+      "missed_positive_samples": []
+    }
+  },
+  "per_sample": [
+    {
+      "id": "holdout-25-negative-decimal",
+      "kind": "negative",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "1bb67a66ea50437cb574d84e531466d6",
+            "title": "transform() 返回值格式改变且可能抛出异常，破坏原有行为契约",
+            "category": "correctness",
+            "path": "app/review_25.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "当 value 为整数、无小数位数值、非数值字符串、None 或任何无法解析为 Decimal 的输入时",
+            "impact": "返回字符串格式变化（如 '10' 变为 '10.00'），可能破坏下游解析；对非数值输入抛出未捕获异常，导致程序中断",
+            "explanation": "新增行 return str(apply(value)) 调用了 apply 函数。根据 L3 提供的 apply 实现，该函数使用 Decimal(value).quantize(Decimal('0.01')) 强制将输入转换为保留两位小数的 Decimal。原 transform 直接返回 str(value)，对整数 '10' 返回 '10'，新代码返回 '10.00'；对非数字字符串 'abc'，原代码返回 'abc'，新代码调用 Decimal('abc') 会抛出 InvalidOperation 异常；对 None 会抛出 TypeError。这些变化破坏了外部可观察行为，且未说明如何处理异常。",
+            "suggestion": "如果目标是仅处理负数舍入，应添加输入验证和类型检查，或使用更精准的格式化方法保留原字符串表示；或者为 apply 增加异常处理，避免程序崩溃；并补充单元测试覆盖整数、小数、非数值、None 等输入。",
+            "status": "suppressed",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 0,
+        "candidate_count": 1,
+        "accepted_count": 0,
+        "elapsed_ms": 42639.89,
+        "usage": {
+          "logical_invocations": 2,
+          "input_tokens": 1908,
+          "output_tokens": 3764,
+          "provider_latency_ms": 30568,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 1,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "35fb72fff0de4b0e8df84971698a98a5",
+            "title": "transform() breaking change: raises on non-numeric input and alters numeric string output",
+            "category": "correctness",
+            "path": "app/review_25.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling transform(None), transform(\"abc\"), or transform(1.1) under the new implementation.",
+            "impact": "",
+            "explanation": "The change replaces `str(value)` with `str(apply(value))`, where `apply(value)` is `Decimal(value).quantize(Decimal('0.01'))` (contracts/rule_25.py:2-3). The old implementation returned `str(value)` for any object, a total function. The new implementation calls `Decimal(value)` before stringification, so non-numeric inputs now raise instead of returning a string: e.g. `transform(None)` or `transform(\"abc\")` raises decimal.InvalidOperation. Numeric string output also changes: `transform(1.1)` previously returned \"1.1\" but now `Decimal(1.1)` exposes the binary float (1.1000000000000000888...) and quantize returns \"1.10\". Negative half values under default ROUND_HALF_EVEN produce \"-0.00\". Repo-wide reference search finds no callers and no validation/migration evidence that all users have adapted, so this is an unproven breaking change to the public `transform` contract, contradicting the PR claim of preserving externally observable behavior.",
+            "suggestion": "Restore total-function behavior: only apply quantize for Decimal/numeric inputs and fall back to `str(value)` on invalid input, or wrap in try/except (InvalidOperation, TypeError, ValueError). Also decide and document rounding mode to avoid unexpected \"-0.00\" for negative half values.",
+            "status": "suppressed",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 0,
+        "candidate_count": 1,
+        "accepted_count": 0,
+        "elapsed_ms": 69465.33,
+        "usage": {
+          "logical_invocations": 10,
+          "input_tokens": 42269,
+          "output_tokens": 6376,
+          "provider_latency_ms": 58476,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 1,
+        "tool_calls": 6,
+        "tool_attempts": 9,
+        "successful_tools": 6,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Submitted one compatibility/correctness finding for the behavior change in transform().",
+            "candidate_count": 1,
+            "rounds": 9
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "holdout-26-negative-path",
+      "kind": "negative",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "2f26cda56bf64df48323ac6eea19a9d2",
+            "title": "Return type changes from str to pathlib.Path, breaking callers expecting string",
+            "category": "correctness",
+            "path": "app/review_26.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Any call to transform(value) where caller uses the result as a string (e.g., string concatenation with str methods, JSON serialization, regex, or explicit type checks).",
+            "impact": "Regression: previously returned a str such as '/srv/files/foo'; now returns pathlib.Path. Code expecting str may raise TypeError or serialize incorrectly.",
+            "explanation": "The diff replaces '/srv/files/' + value with apply(value). The L3 definition of apply shows `return target` where target is created by Path(...).resolve(), so the return type is pathlib.Path, not str. This contradicts the PR claim of preserving externally observable behavior.",
+            "suggestion": "Either update apply to return str(target) (and document/prefer Path) or explicitly return str from transform; alternatively, keep old string semantics if callers require str.",
+            "status": "suppressed",
+            "needs_evidence": false
+          },
+          {
+            "finding_occurrence_id": "0079143a56264cee89aaf117a1d3e6a5",
+            "title": "Empty or root-resolving input now raises ValueError instead of returning a path",
+            "category": "edge_case",
+            "path": "app/review_26.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "transform('') or transform('.') or any value whose resolved target equals the root directory /srv/files.",
+            "impact": "Previously transform('') returned '/srv/files/' and transform('.') returned '/srv/files/.'; now both raise ValueError('outside root') because root not in target.parents. This is a regression for callers using the root directory.",
+            "explanation": "apply sets target=(root/value).resolve(). For value='' or '.', target equals root. The check `if root not in target.parents` does not treat root itself as inside root; Path.parents excludes the path itself. Thus an in-root path is rejected.",
+            "suggestion": "Change the containment check to `if root != target and root not in target.parents` or use `target.is_relative_to(root)`, which considers the root itself contained.",
+            "status": "suppressed",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 0,
+        "candidate_count": 2,
+        "accepted_count": 0,
+        "elapsed_ms": 72917.8,
+        "usage": {
+          "logical_invocations": 2,
+          "input_tokens": 2154,
+          "output_tokens": 5968,
+          "provider_latency_ms": 40220,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 1,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "e9a941107e5a48c6b4221ad032d94c88",
+            "title": "transform() 公开契约被破坏：返回类型由 str 变为 Path 且新增 ValueError，调用方未迁移",
+            "category": "correctness",
+            "path": "app/review_26.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "任何调用 app.review_26.transform 的外部代码：非越界输入现在得到 Path 而非 str；输入 ''、'.'、绝对路径或含 '..' 的值现在抛出 ValueError，而旧实现返回字符串。",
+            "impact": "",
+            "explanation": "旧实现 `return '/srv/files/' + value` 对任意输入总是返回 str，且从不抛异常；新实现委托给 contracts/rule_26.apply，返回 pathlib.Path，并且对解析后不在根目录下的输入抛出 ValueError（例如绝对路径 '/etc/passwd'、'../x'）。此外 apply 的包含检查 `root not in target.parents` 在 target == root 时也成立：`transform('')` 和 `transform('.')` 旧返回 '/srv/files/' 与 '/srv/files/.'，现在会抛 ValueError，因为 Path.parents 不包含自身。find_references/search 显示仓库内没有任何调用方或迁移证据，无法证明所有外部使用方已适配，description 所称“preserving externally observable behavior”不成立。",
+            "suggestion": "若要保持对外行为不变，应继续返回 str（例如 `return str(apply(value))`），并修正根目录自身被误判的问题（`target != root and root not in target.parents`）；若确实要改变返回类型与异常行为，则需提供调用方迁移证据并更新契约文档。",
+            "status": "suppressed",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 0,
+        "candidate_count": 1,
+        "accepted_count": 0,
+        "elapsed_ms": 99637.38,
+        "usage": {
+          "logical_invocations": 11,
+          "input_tokens": 51801,
+          "output_tokens": 8512,
+          "provider_latency_ms": 83861,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 1,
+        "tool_calls": 7,
+        "tool_attempts": 9,
+        "successful_tools": 7,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "已识别公开契约破坏性变更并提交候选 Finding，完成本文件审查。",
+            "candidate_count": 1,
+            "rounds": 10
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "holdout-27-negative-permission",
+      "kind": "negative",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "58595574d1f146a98db10169aaa39f71",
+            "title": "Transformation behavior changes for permissions not containing 'write'",
+            "category": "correctness",
+            "path": "app/review_27.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "When `value.permissions` is a non-empty collection that does not contain the string 'write'.",
+            "impact": "`transform` returns `False` where the previous implementation returned `True`, altering externally observable behavior and potentially breaking callers that rely on any non-empty permissions.",
+            "explanation": "The diff replaces `bool(value.permissions)` (truthy for any non-empty permissions) with `apply(value)`. According to the L3 context `contracts/rule_27.py:apply` returns `'write' in value.permissions`, which narrows the return condition to only the presence of `'write'`. The PR description claims to preserve externally observable behavior, but this change does not.",
+            "suggestion": "If preserving behavior is required, keep `return bool(value.permissions)` or ensure `apply` returns the same truthiness for all possible permission collections. If the intended semantic is truly 'write' presence, update the PR description and affected tests/callers to reflect the new contract.",
+            "status": "suppressed",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 0,
+        "candidate_count": 1,
+        "accepted_count": 0,
+        "elapsed_ms": 50311.45,
+        "usage": {
+          "logical_invocations": 2,
+          "input_tokens": 1842,
+          "output_tokens": 4042,
+          "provider_latency_ms": 15714,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 1,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "be7c2dced08b49d6b89f9645ded54afb",
+            "title": "transform() behavior changes: bool(permissions) vs 'write' in permissions are not equivalent",
+            "category": "correctness",
+            "path": "app/review_27.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling transform(value) where value.permissions is truthy but does not contain 'write' (e.g. ['read'] or the string 'read'); old code returned True, new code returns False.",
+            "impact": "",
+            "explanation": "The diff replaces `return bool(value.permissions)` with `return apply(value)`, where `contracts/rule_27.py:apply` returns `'write' in value.permissions`. These are not equivalent. The old function returned True for any truthy permissions value (e.g. `['read']`, `['execute']`, or the string `'read'`), while the new function returns False unless the exact element/character `'write'` is present. This is a public-contract change to `transform`, contradicting the stated goal of preserving externally observable behavior, and there are no callers/migration evidence in the repo showing all consumers were adapted.",
+            "suggestion": "Restore the original truthiness check, or if the intended semantics are \"has write permission\", document the breaking change and migrate all callers. Do not claim behavior preservation for `bool(x) -> 'write' in x`.",
+            "status": "suppressed",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 0,
+        "candidate_count": 1,
+        "accepted_count": 0,
+        "elapsed_ms": 63451.55,
+        "usage": {
+          "logical_invocations": 9,
+          "input_tokens": 31728,
+          "output_tokens": 4753,
+          "provider_latency_ms": 45827,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 1,
+        "tool_calls": 5,
+        "tool_attempts": 7,
+        "successful_tools": 5,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Submitted a correctness finding for the non-equivalent transform behavior change; review complete.",
+            "candidate_count": 1,
+            "rounds": 8
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "holdout-28-negative-tenant",
+      "kind": "negative",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "d110ab353de143d2bf568158127660cd",
+            "title": "新增 tenant_id 过滤改变了 transform 的返回结果，与描述声称的保持外部可观察行为不一致",
+            "category": "correctness",
+            "path": "app/review_28.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "当调用 transform 且 value 元组中的 query 未预先包含 tenant_id 过滤条件时，新代码会返回过滤后的结果；旧代码返回 query 的全量结果。",
+            "impact": "函数行为发生变化，下游依赖全量数据的逻辑可能收到不完整数据，导致业务错误或测试失败。",
+            "explanation": "diff 将 `return value[0].all()` 改为 `return apply(value).all()`。根据 L3 证据，`apply` 的实现为 `query, tenant_id = value; return query.where(tenant_id=tenant_id)`，即在原始 query 上附加 tenant_id 过滤条件。若旧代码中 `value[0]` 是最终查询集且不含该过滤条件，则新代码返回的结果集将缩小，改变了 transform 的外部行为。这与 PR 描述中的“preserving externally observable behavior”相矛盾。即使这是针对 negative tenant 的修复，也需要明确说明行为变化并更新相关测试。",
+            "suggestion": "确认 tenant_id 过滤是否为本次修复的预期行为；如果是，请更新 PR 描述和测试断言以反映结果集已按 tenant 过滤；如果必须保持外部行为不变，则不应在 transform 内部添加过滤逻辑。",
+            "status": "suppressed",
+            "needs_evidence": false
+          },
+          {
+            "finding_occurrence_id": "c12657399d7c496695f4677cf811270d",
+            "title": "新代码要求 value 必须可解包为两个元素，旧代码仅依赖 value[0]，可能对单元素调用方造成回归",
+            "category": "edge_case",
+            "path": "app/review_28.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "当调用 transform 传入的 value 元素个数不为 2（例如仅包含 query 元素）时，apply 内部的 `query, tenant_id = value` 会抛出 ValueError；而旧代码 `value[0].all()` 可正常工作。",
+            "impact": "现有调用方若未按两元素元组传递，将导致函数崩溃，引发回归。",
+            "explanation": "新代码调用 `apply(value)`，该函数内部使用 `query, tenant_id = value` 解包。这意味着 value 必须恰好包含两个可迭代元素。旧代码 `value[0].all()` 仅要求 value 支持索引且索引 0 存在。如果存在调用方只传递一个元素（例如仅 query 而未包含 tenant_id），旧代码能正常运行而新代码会抛出 ValueError。反之，如果 value 包含多于两个元素，也会抛出 ValueError。这增加了对调用方数据结构的约束，可能造成回归。",
+            "suggestion": "核对所有 transform 调用点是否都传入两元素元组；若存在历史调用以单元素或其他结构传入，请保持兼容或更新调用方。也可以考虑在 transform 内显式处理不同长度的 value，避免隐式解包失败。",
+            "status": "suppressed",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 0,
+        "candidate_count": 2,
+        "accepted_count": 0,
+        "elapsed_ms": 59850.25,
+        "usage": {
+          "logical_invocations": 2,
+          "input_tokens": 2353,
+          "output_tokens": 4945,
+          "provider_latency_ms": 48239,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 1,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 0,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 31646.51,
+        "usage": {
+          "logical_invocations": 9,
+          "input_tokens": 32078,
+          "output_tokens": 2054,
+          "provider_latency_ms": 31627,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 8,
+        "tool_attempts": 13,
+        "successful_tools": 8,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 1,
+        "agent_sessions": [
+          {
+            "status": "partial",
+            "stop_reason": "budget",
+            "candidate_count": 0,
+            "rounds": 9
+          }
+        ],
+        "task_failures": 1,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "holdout-29-negative-optional",
+      "kind": "negative",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "a6b38437058b45bf976a36bd07e30890",
+            "title": "Behavioral change: transform now returns True for explicitly set zero count",
+            "category": "correctness",
+            "path": "app/review_29.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "When value is a protobuf message where the count field is optional and explicitly set to 0.",
+            "impact": "The function's externally observable behavior changes: previously returned False for explicitly set zero (since value.count != 0 is false), now returns True because HasField('count') is true for presence. This violates the stated goal of preserving behavior and may affect callers relying on zero vs absence.",
+            "explanation": "The diff replaces `return value.count != 0` with `return apply(value)`, and the imported apply from L3 is shown to return `value.HasField('count')`. For protobuf optional scalar fields, HasField indicates presence, not non-zero value. Thus a present count=0 yields True, whereas original yielded False.",
+            "suggestion": "If preserving behavior is required, keep the original comparison or use `return value.count != 0` and only change if intentional. If presence detection is desired, update the description and verify all callers.",
+            "status": "suppressed",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 0,
+        "candidate_count": 1,
+        "accepted_count": 0,
+        "elapsed_ms": 34377.52,
+        "usage": {
+          "logical_invocations": 2,
+          "input_tokens": 1814,
+          "output_tokens": 2902,
+          "provider_latency_ms": 20491,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 1,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 0,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 21597.24,
+        "usage": {
+          "logical_invocations": 9,
+          "input_tokens": 30529,
+          "output_tokens": 1198,
+          "provider_latency_ms": 21579,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 8,
+        "tool_attempts": 12,
+        "successful_tools": 8,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 1,
+        "agent_sessions": [
+          {
+            "status": "partial",
+            "stop_reason": "budget",
+            "candidate_count": 0,
+            "rounds": 9
+          }
+        ],
+        "task_failures": 1,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "holdout-30-negative-token",
+      "kind": "negative",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "9e1b86e6d329453685adec1d86a7f380",
+            "title": "Delegating to apply introduces stricter input constraints and may raise where old code returned bool",
+            "category": "edge_case",
+            "path": "app/review_30.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "When transform is called with a value that is not exactly two ASCII string/bytes-like elements (e.g., length > 2, non-string elements, non-ASCII strings, or mixed bytes/str types).",
+            "impact": "Runtime ValueError/TypeError instead of the previous boolean result, which can break callers that previously accepted such inputs.",
+            "explanation": "The diff replaces `return value[0] == value[1]` with `return apply(value)`. The imported `apply` unpacks exactly two items via `supplied, expected = value` and calls `hmac.compare_digest`, which accepts only bytes-like objects or ASCII strings. Sequences with more than two elements that previously compared the first two now raise ValueError; non-string-like or non-ASCII string elements now raise TypeError.",
+            "suggestion": "If the expected input contract is exactly two ASCII string/bytes tokens, document or assert it. Otherwise add type/length handling to preserve backward compatibility or raise a clear validation error.",
+            "status": "suppressed",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 0,
+        "candidate_count": 1,
+        "accepted_count": 0,
+        "elapsed_ms": 50535.26,
+        "usage": {
+          "logical_invocations": 2,
+          "input_tokens": 1876,
+          "output_tokens": 3572,
+          "provider_latency_ms": 37705,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 1,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "f448e26266814611a732de59aa94b4cc",
+            "title": "transform() now raises on inputs that previously returned a boolean (non-str/bytes values or length != 2)",
+            "category": "correctness",
+            "path": "app/review_30.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling `transform` with a 2-element sequence whose elements are not str/bytes-like (e.g. ints) or with a sequence whose length is not exactly 2.",
+            "impact": "",
+            "explanation": "The old implementation `value[0] == value[1]` returns a bool for any subscriptable value with at least 2 elements and for any comparable element types (e.g. `transform([1, 2])` -> False, `transform([1, 2, 3])` -> False). The new implementation delegates to `apply`, which (1) unpacks `value` with `supplied, expected = value`, requiring exactly 2 items, and (2) calls `hmac.compare_digest`, which raises TypeError for non-str/non-bytes-like types and returns False only for supported types. Thus `transform([1, 2])` now raises `TypeError: comparing unsupported types`, and `transform([1, 2, 3])` raises `ValueError: too many values to unpack`. This contradicts the stated goal of preserving externally observable behavior. No in-repo caller or validation was found to constrain inputs to str/bytes 2-element sequences.",
+            "suggestion": "Either keep the original `==` for non-string/bytes inputs and only use `hmac.compare_digest` when both elements are str or bytes-like, or add explicit type/length validation and migrate all callers. If the public contract is intentionally narrowed, that is a breaking API change and requires caller updates/documentation.",
+            "status": "suppressed",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 0,
+        "candidate_count": 1,
+        "accepted_count": 0,
+        "elapsed_ms": 89078.48,
+        "usage": {
+          "logical_invocations": 8,
+          "input_tokens": 32947,
+          "output_tokens": 6410,
+          "provider_latency_ms": 64386,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 1,
+        "tool_calls": 5,
+        "tool_attempts": 7,
+        "successful_tools": 5,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Found and submitted a behavioral regression: transform() changed from `==` to unpacking + hmac.compare_digest, which raises for non-str/bytes types and length != 2.",
+            "candidate_count": 1,
+            "rounds": 7
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    }
+  ],
+  "delta_v3_minus_base": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0
+  },
+  "failures": []
+}
