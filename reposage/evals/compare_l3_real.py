@@ -113,7 +113,7 @@ def markdown(report: dict[str, Any]) -> str:
     for key, label in labels.items():
         row = report["quality"][key]
         lines.append(f"| {label} | {row['off']} | {row['on']} | {row['delta']:+} |")
-    e, c, r = report["execution"], report["cost_and_latency"], report["retrieval"]
+    e, c = report["execution"], report["cost_and_latency"]
     lines += [
         "",
         "## 执行、调用与延迟",

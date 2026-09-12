@@ -6,6 +6,7 @@ Pipeline 只依赖本模块协议，不 import OpenAI。Judge 不是审查角色
 from __future__ import annotations
 
 import asyncio
+from contextlib import suppress
 from typing import Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -163,10 +164,8 @@ def apply_judge_decisions(
             continue
         decided.add(oid)
         if decision.canonical_category:
-            try:
+            with suppress(ValueError):
                 finding.category = FindingCategory(decision.canonical_category)
-            except ValueError:
-                pass
         if decision.action is JudgeAction.DOWNRANK:
             duplicate = by_id.get(decision.duplicate_of or "")
             if (
