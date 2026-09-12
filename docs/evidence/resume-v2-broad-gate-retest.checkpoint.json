@@ -1,0 +1,1564 @@
+{
+  "dataset": "reposage/evals/datasets/resume_v123_40.yaml",
+  "model": "deepseek-v4-pro",
+  "sample_ids": [
+    "r08-log-secret",
+    "r09-zero-page-size",
+    "r10-empty-average",
+    "r11-off-by-one",
+    "r14-finally-return",
+    "r16-file-leak",
+    "r18-blocking-async",
+    "r21-lock-and-await",
+    "r23-contract-none",
+    "r24-unit-mismatch",
+    "r28-key-normalization"
+  ],
+  "completed_sample_ids": [
+    "r08-log-secret",
+    "r09-zero-page-size",
+    "r10-empty-average",
+    "r11-off-by-one",
+    "r14-finally-return",
+    "r16-file-leak",
+    "r18-blocking-async",
+    "r21-lock-and-await",
+    "r23-contract-none",
+    "r24-unit-mismatch",
+    "r28-key-normalization"
+  ],
+  "results": [
+    {
+      "id": "r08-log-secret",
+      "kind": "single_defect",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 29541.1,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 1,
+      "l3_hits": 0,
+      "l3_diagnostics": {
+        "repository_id": "eval-r08-log-secret",
+        "head_sha": "head",
+        "requests_attempted": 1,
+        "blobs_read": 1,
+        "candidates_considered": 0,
+        "blobs_kept": 1,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/client.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/client.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/client.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/client.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-r08-log-secret:src/client.py::general",
+          "run_id": "v2-r08-log-secret",
+          "kind": "role_review",
+          "target": "src/client.py::general",
+          "status": "completed",
+          "input_tokens": 792,
+          "output_tokens": 952,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-r08-log-secret:src/client.py::correctness",
+          "run_id": "v2-r08-log-secret",
+          "kind": "role_review",
+          "target": "src/client.py::correctness",
+          "status": "completed",
+          "input_tokens": 777,
+          "output_tokens": 798,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1569,
+        "output_tokens": 1750,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 29537,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/client.py",
+            "line": 2
+          }
+        ],
+        "accepted": [
+          {
+            "category": "security",
+            "path": "src/client.py",
+            "line": 2,
+            "confidence": 0.8
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "r09-zero-page-size",
+      "kind": "single_defect",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 24761.13,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 0,
+      "l3_diagnostics": {
+        "repository_id": "eval-r09-zero-page-size",
+        "head_sha": "head",
+        "requests_attempted": 1,
+        "blobs_read": 1,
+        "candidates_considered": 0,
+        "blobs_kept": 1,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/paging.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/paging.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/paging.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/paging.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-r09-zero-page-size:src/paging.py::general",
+          "run_id": "v2-r09-zero-page-size",
+          "kind": "role_review",
+          "target": "src/paging.py::general",
+          "status": "completed",
+          "input_tokens": 805,
+          "output_tokens": 699,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-r09-zero-page-size:src/paging.py::correctness",
+          "run_id": "v2-r09-zero-page-size",
+          "kind": "role_review",
+          "target": "src/paging.py::correctness",
+          "status": "completed",
+          "input_tokens": 790,
+          "output_tokens": 922,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1595,
+        "output_tokens": 1621,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 24757,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "edge_case",
+            "path": "src/paging.py",
+            "line": 2
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/paging.py",
+            "line": 2,
+            "confidence": 0.95
+          },
+          {
+            "category": "edge_case",
+            "path": "src/paging.py",
+            "line": 2,
+            "confidence": 0.9
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "r10-empty-average",
+      "kind": "single_defect",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 19473.3,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 0,
+      "l3_diagnostics": {
+        "repository_id": "eval-r10-empty-average",
+        "head_sha": "head",
+        "requests_attempted": 1,
+        "blobs_read": 1,
+        "candidates_considered": 0,
+        "blobs_kept": 1,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/stats.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/stats.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/stats.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/stats.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-r10-empty-average:src/stats.py::general",
+          "run_id": "v2-r10-empty-average",
+          "kind": "role_review",
+          "target": "src/stats.py::general",
+          "status": "completed",
+          "input_tokens": 795,
+          "output_tokens": 556,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-r10-empty-average:src/stats.py::correctness",
+          "run_id": "v2-r10-empty-average",
+          "kind": "role_review",
+          "target": "src/stats.py::correctness",
+          "status": "completed",
+          "input_tokens": 780,
+          "output_tokens": 785,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1575,
+        "output_tokens": 1341,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 19468,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "edge_case",
+            "path": "src/stats.py",
+            "line": 2
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/stats.py",
+            "line": 2,
+            "confidence": 0.95
+          },
+          {
+            "category": "correctness",
+            "path": "src/stats.py",
+            "line": 2,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": [
+          {
+            "path": "src/stats.py",
+            "line": 2,
+            "expected": "edge_case",
+            "actual": "correctness"
+          }
+        ]
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "r11-off-by-one",
+      "kind": "single_defect",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 50927.89,
+      "expected_count": 1,
+      "accepted_count": 0,
+      "candidate_count": 0,
+      "l3_hits": 0,
+      "l3_diagnostics": {
+        "repository_id": "eval-r11-off-by-one",
+        "head_sha": "head",
+        "requests_attempted": 1,
+        "blobs_read": 1,
+        "candidates_considered": 0,
+        "blobs_kept": 1,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/retry.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/retry.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/retry.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/retry.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-r11-off-by-one:src/retry.py::general",
+          "run_id": "v2-r11-off-by-one",
+          "kind": "role_review",
+          "target": "src/retry.py::general",
+          "status": "completed",
+          "input_tokens": 790,
+          "output_tokens": 1392,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-r11-off-by-one:src/retry.py::correctness",
+          "run_id": "v2-r11-off-by-one",
+          "kind": "role_review",
+          "target": "src/retry.py::correctness",
+          "status": "completed",
+          "input_tokens": 775,
+          "output_tokens": 1686,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1565,
+        "output_tokens": 3078,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 50924,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/retry.py",
+            "line": 2
+          }
+        ],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "r14-finally-return",
+      "kind": "single_defect",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 40686.58,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 0,
+      "l3_diagnostics": {
+        "repository_id": "eval-r14-finally-return",
+        "head_sha": "head",
+        "requests_attempted": 1,
+        "blobs_read": 1,
+        "candidates_considered": 0,
+        "blobs_kept": 1,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/work.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/work.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/work.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/work.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-r14-finally-return:src/work.py::general",
+          "run_id": "v2-r14-finally-return",
+          "kind": "role_review",
+          "target": "src/work.py::general",
+          "status": "completed",
+          "input_tokens": 864,
+          "output_tokens": 1695,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-r14-finally-return:src/work.py::correctness",
+          "run_id": "v2-r14-finally-return",
+          "kind": "role_review",
+          "target": "src/work.py::correctness",
+          "status": "completed",
+          "input_tokens": 849,
+          "output_tokens": 1321,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1713,
+        "output_tokens": 3016,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 40681,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "silent_failure",
+            "path": "src/work.py",
+            "line": 6
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/work.py",
+            "line": 6,
+            "confidence": 0.95
+          },
+          {
+            "category": "correctness",
+            "path": "src/work.py",
+            "line": 6,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": [
+          {
+            "path": "src/work.py",
+            "line": 6,
+            "expected": "silent_failure",
+            "actual": "correctness"
+          }
+        ]
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "r16-file-leak",
+      "kind": "single_defect",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 28015.54,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 0,
+      "l3_diagnostics": {
+        "repository_id": "eval-r16-file-leak",
+        "head_sha": "head",
+        "requests_attempted": 1,
+        "blobs_read": 1,
+        "candidates_considered": 0,
+        "blobs_kept": 1,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/files.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/files.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/files.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/files.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-r16-file-leak:src/files.py::general",
+          "run_id": "v2-r16-file-leak",
+          "kind": "role_review",
+          "target": "src/files.py::general",
+          "status": "completed",
+          "input_tokens": 810,
+          "output_tokens": 1094,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-r16-file-leak:src/files.py::correctness",
+          "run_id": "v2-r16-file-leak",
+          "kind": "role_review",
+          "target": "src/files.py::correctness",
+          "status": "completed",
+          "input_tokens": 795,
+          "output_tokens": 956,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1605,
+        "output_tokens": 2050,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 28012,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/files.py",
+            "line": 2
+          }
+        ],
+        "accepted": [
+          {
+            "category": "performance",
+            "path": "src/files.py",
+            "line": 2,
+            "confidence": 0.95
+          },
+          {
+            "category": "performance",
+            "path": "src/files.py",
+            "line": 2,
+            "confidence": 0.9
+          }
+        ],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": [
+          {
+            "path": "src/files.py",
+            "line": 2,
+            "expected": "correctness",
+            "actual": "performance"
+          }
+        ]
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "r18-blocking-async",
+      "kind": "single_defect",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 31494.6,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 0,
+      "l3_diagnostics": {
+        "repository_id": "eval-r18-blocking-async",
+        "head_sha": "head",
+        "requests_attempted": 1,
+        "blobs_read": 1,
+        "candidates_considered": 0,
+        "blobs_kept": 1,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/worker.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/worker.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/worker.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/worker.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-r18-blocking-async:src/worker.py::general",
+          "run_id": "v2-r18-blocking-async",
+          "kind": "role_review",
+          "target": "src/worker.py::general",
+          "status": "completed",
+          "input_tokens": 794,
+          "output_tokens": 1089,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-r18-blocking-async:src/worker.py::correctness",
+          "run_id": "v2-r18-blocking-async",
+          "kind": "role_review",
+          "target": "src/worker.py::correctness",
+          "status": "completed",
+          "input_tokens": 779,
+          "output_tokens": 1202,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1573,
+        "output_tokens": 2291,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 31490,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "performance",
+            "path": "src/worker.py",
+            "line": 3
+          }
+        ],
+        "accepted": [
+          {
+            "category": "concurrency",
+            "path": "src/worker.py",
+            "line": 3,
+            "confidence": 0.9
+          },
+          {
+            "category": "concurrency",
+            "path": "src/worker.py",
+            "line": 3,
+            "confidence": 0.9
+          }
+        ],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": [
+          {
+            "path": "src/worker.py",
+            "line": 3,
+            "expected": "performance",
+            "actual": "concurrency"
+          }
+        ]
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "r21-lock-and-await",
+      "kind": "multi_defect",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 60759.09,
+      "expected_count": 2,
+      "accepted_count": 1,
+      "candidate_count": 1,
+      "l3_hits": 0,
+      "l3_diagnostics": {
+        "repository_id": "eval-r21-lock-and-await",
+        "head_sha": "head",
+        "requests_attempted": 1,
+        "blobs_read": 1,
+        "candidates_considered": 0,
+        "blobs_kept": 1,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/shared.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/shared.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/shared.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/shared.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-r21-lock-and-await:src/shared.py::general",
+          "run_id": "v2-r21-lock-and-await",
+          "kind": "role_review",
+          "target": "src/shared.py::general",
+          "status": "completed",
+          "input_tokens": 804,
+          "output_tokens": 2562,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-r21-lock-and-await:src/shared.py::correctness",
+          "run_id": "v2-r21-lock-and-await",
+          "kind": "role_review",
+          "target": "src/shared.py::correctness",
+          "status": "completed",
+          "input_tokens": 789,
+          "output_tokens": 1266,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1593,
+        "output_tokens": 3828,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 60755,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "concurrency",
+            "path": "src/shared.py",
+            "line": 3
+          },
+          {
+            "category": "correctness",
+            "path": "src/shared.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "performance",
+            "path": "src/shared.py",
+            "line": 3,
+            "confidence": 0.7
+          }
+        ],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": [
+          {
+            "path": "src/shared.py",
+            "line": 3,
+            "expected": "concurrency",
+            "actual": "performance"
+          }
+        ]
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "r23-contract-none",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 32287.54,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 1,
+      "l3_hits": 0,
+      "l3_diagnostics": {
+        "repository_id": "eval-r23-contract-none",
+        "head_sha": "head",
+        "requests_attempted": 1,
+        "blobs_read": 1,
+        "candidates_considered": 0,
+        "blobs_kept": 1,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/service.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/service.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/service.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/service.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-r23-contract-none:src/service.py::general",
+          "run_id": "v2-r23-contract-none",
+          "kind": "role_review",
+          "target": "src/service.py::general",
+          "status": "completed",
+          "input_tokens": 797,
+          "output_tokens": 1785,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-r23-contract-none:src/service.py::correctness",
+          "run_id": "v2-r23-contract-none",
+          "kind": "role_review",
+          "target": "src/service.py::correctness",
+          "status": "completed",
+          "input_tokens": 782,
+          "output_tokens": 516,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1579,
+        "output_tokens": 2301,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 32282,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/service.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/service.py",
+            "line": 4,
+            "confidence": 0.6
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "r24-unit-mismatch",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 19854.86,
+      "expected_count": 1,
+      "accepted_count": 0,
+      "candidate_count": 0,
+      "l3_hits": 0,
+      "l3_diagnostics": {
+        "repository_id": "eval-r24-unit-mismatch",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/view.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/view.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/view.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/view.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-r24-unit-mismatch:src/view.py::general",
+          "run_id": "v2-r24-unit-mismatch",
+          "kind": "role_review",
+          "target": "src/view.py::general",
+          "status": "completed",
+          "input_tokens": 892,
+          "output_tokens": 360,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-r24-unit-mismatch:src/view.py::correctness",
+          "run_id": "v2-r24-unit-mismatch",
+          "kind": "role_review",
+          "target": "src/view.py::correctness",
+          "status": "completed",
+          "input_tokens": 877,
+          "output_tokens": 826,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1769,
+        "output_tokens": 1186,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 19850,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/view.py",
+            "line": 3
+          }
+        ],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "r28-key-normalization",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 62705.85,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 0,
+      "l3_diagnostics": {
+        "repository_id": "eval-r28-key-normalization",
+        "head_sha": "head",
+        "requests_attempted": 1,
+        "blobs_read": 1,
+        "candidates_considered": 0,
+        "blobs_kept": 1,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/keys.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/keys.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/keys.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/keys.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-r28-key-normalization:src/keys.py::general",
+          "run_id": "v2-r28-key-normalization",
+          "kind": "role_review",
+          "target": "src/keys.py::general",
+          "status": "completed",
+          "input_tokens": 786,
+          "output_tokens": 1904,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-r28-key-normalization:src/keys.py::correctness",
+          "run_id": "v2-r28-key-normalization",
+          "kind": "role_review",
+          "target": "src/keys.py::correctness",
+          "status": "completed",
+          "input_tokens": 771,
+          "output_tokens": 2954,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1557,
+        "output_tokens": 4858,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 62702,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/keys.py",
+            "line": 2
+          }
+        ],
+        "accepted": [
+          {
+            "category": "security",
+            "path": "src/keys.py",
+            "line": 2,
+            "confidence": 0.6
+          },
+          {
+            "category": "edge_case",
+            "path": "src/keys.py",
+            "line": 2,
+            "confidence": 0.5
+          }
+        ],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": [
+          {
+            "path": "src/keys.py",
+            "line": 2,
+            "expected": "correctness",
+            "actual": "security"
+          }
+        ]
+      },
+      "warnings": [],
+      "failures": []
+    }
+  ]
+}

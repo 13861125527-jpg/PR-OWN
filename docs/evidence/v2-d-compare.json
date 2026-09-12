@@ -1,0 +1,104 @@
+{
+  "mode": "scripted_fake",
+  "dataset": "reposage/evals/datasets/v2d_dedup.yaml",
+  "samples": 5,
+  "real_api": "not_run",
+  "dedup": {
+    "cases": [
+      {
+        "id": "collapse-five-duplicates",
+        "kind": "dedup",
+        "ok": true,
+        "n_raw": 5,
+        "n_merged": 1,
+        "duplicate_survival_rate": 0.2,
+        "dedup_collapse_rate": 0.8,
+        "n_accepted": 1,
+        "judge_keep": 0,
+        "judge_downrank": 0,
+        "fingerprints": [
+          "f794d85c59d666bcfc6b752d907bece6b4b56cd2bff9ba8ee54f767a15e24911"
+        ]
+      },
+      {
+        "id": "no-merge-distinct-triggers",
+        "kind": "no_merge",
+        "ok": true,
+        "n_raw": 2,
+        "n_merged": 2,
+        "duplicate_survival_rate": 1.0,
+        "dedup_collapse_rate": 0.0,
+        "n_accepted": 2,
+        "judge_keep": 0,
+        "judge_downrank": 0,
+        "fingerprints": [
+          "268b6c1d598572acad46ebf94e7f4ece5363779e557fb0f218ef5ffd44afb358",
+          "efeaa7a6f1382b08eabf94b34a2a6a7a18b7abbc1cd39273dcb4da03ed879a95"
+        ]
+      }
+    ],
+    "passed": 2,
+    "total": 2,
+    "note": "重复候选压缩与不应合并的对；口径是 duplicate_survival_rate，不是真实重复占比。"
+  },
+  "judge": {
+    "cases": [
+      {
+        "id": "judge-downrank",
+        "kind": "judge",
+        "ok": true,
+        "n_raw": 1,
+        "n_merged": 1,
+        "duplicate_survival_rate": 1.0,
+        "dedup_collapse_rate": 0.0,
+        "n_accepted": 0,
+        "judge_keep": 0,
+        "judge_downrank": 1,
+        "fingerprints": [
+          "268b6c1d598572acad46ebf94e7f4ece5363779e557fb0f218ef5ffd44afb358"
+        ]
+      },
+      {
+        "id": "judge-keep",
+        "kind": "judge",
+        "ok": true,
+        "n_raw": 1,
+        "n_merged": 1,
+        "duplicate_survival_rate": 1.0,
+        "dedup_collapse_rate": 0.0,
+        "n_accepted": 1,
+        "judge_keep": 1,
+        "judge_downrank": 0,
+        "fingerprints": [
+          "268b6c1d598572acad46ebf94e7f4ece5363779e557fb0f218ef5ffd44afb358"
+        ]
+      },
+      {
+        "id": "judge-fail-open",
+        "kind": "judge",
+        "ok": true,
+        "n_raw": 1,
+        "n_merged": 1,
+        "duplicate_survival_rate": 1.0,
+        "dedup_collapse_rate": 0.0,
+        "n_accepted": 1,
+        "judge_keep": 1,
+        "judge_downrank": 0,
+        "fingerprints": [
+          "268b6c1d598572acad46ebf94e7f4ece5363779e557fb0f218ef5ffd44afb358"
+        ]
+      }
+    ],
+    "passed": 3,
+    "total": 3,
+    "note": "Fake 裁决 keep/downrank/fail-open；不宣称真实模型质量。"
+  },
+  "cost": {
+    "model_calls": {
+      "off": 0,
+      "on": 0
+    },
+    "note": "本对照 Fake Adjudicator 不经 LLM complete；真实 Judge 成本见 real_compare（非本里程碑 DoD）。"
+  },
+  "all_passed": true
+}

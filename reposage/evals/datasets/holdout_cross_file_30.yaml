@@ -1,0 +1,832 @@
+name: holdout-cross-file-30
+samples:
+- id: holdout-01-decimal-money
+  kind: cross_file
+  pr_title: Refine decimal money handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_01.py: "from contracts.rule_01 import apply\n\ndef transform(value):\n\
+      \    return str(apply(value))\n"
+    contracts/rule_01.py: "from decimal import Decimal\ndef apply(value):\n    return\
+      \ Decimal(value).quantize(Decimal('0.01'))\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_01.py: "from contracts.rule_01 import apply\n\ndef transform(value):\n\
+      \    return str(float(apply(value)))\n"
+    contracts/rule_01.py: "from decimal import Decimal\ndef apply(value):\n    return\
+      \ Decimal(value).quantize(Decimal('0.01'))\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: correctness
+    path: app/review_01.py
+    line: 4
+    severity: medium
+    note: Converting the normalized Decimal through float can change exact monetary
+      output.
+  notes: frozen_holdout=true; expected_context=contracts/rule_01.py; audit=Converting
+    the normalized Decimal through float can change exact monetary output.
+- id: holdout-02-safe-path
+  kind: cross_file
+  pr_title: Refine safe path handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_02.py: "from contracts.rule_02 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_02.py: "from pathlib import Path\ndef apply(value):\n    root =\
+      \ Path('/srv/files').resolve()\n    target = (root / value).resolve()\n    if\
+      \ root not in target.parents:\n        raise ValueError('outside root')\n  \
+      \  return target\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_02.py: "from contracts.rule_02 import apply\n\ndef transform(value):\n\
+      \    return (apply(value), '/srv/files/' + value)[1]\n"
+    contracts/rule_02.py: "from pathlib import Path\ndef apply(value):\n    root =\
+      \ Path('/srv/files').resolve()\n    target = (root / value).resolve()\n    if\
+      \ root not in target.parents:\n        raise ValueError('outside root')\n  \
+      \  return target\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: security
+    path: app/review_02.py
+    line: 4
+    severity: medium
+    note: The validated resolved path is discarded and traversal text is returned.
+  notes: frozen_holdout=true; expected_context=contracts/rule_02.py; audit=The validated
+    resolved path is discarded and traversal text is returned.
+- id: holdout-03-enum-wire-value
+  kind: cross_file
+  pr_title: Refine enum wire value handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_03.py: "from contracts.rule_03 import apply\n\ndef transform(value):\n\
+      \    return apply(value).value\n"
+    contracts/rule_03.py: "from enum import Enum\nclass State(Enum):\n    OPEN = 'open'\n\
+      \    CLOSED = 'closed'\ndef apply(value):\n    return State(value)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_03.py: "from contracts.rule_03 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_03.py: "from enum import Enum\nclass State(Enum):\n    OPEN = 'open'\n\
+      \    CLOSED = 'closed'\ndef apply(value):\n    return State(value)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: correctness
+    path: app/review_03.py
+    line: 4
+    severity: medium
+    note: The public string result changes to an Enum instance.
+  notes: frozen_holdout=true; expected_context=contracts/rule_03.py; audit=The public
+    string result changes to an Enum instance.
+- id: holdout-04-timezone-aware
+  kind: cross_file
+  pr_title: Refine timezone aware handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_04.py: "from contracts.rule_04 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_04.py: "from datetime import datetime, timezone\ndef apply(value):\n\
+      \    return datetime.fromtimestamp(value, tz=timezone.utc)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_04.py: "from contracts.rule_04 import apply\n\ndef transform(value):\n\
+      \    return apply(value).replace(tzinfo=None)\n"
+    contracts/rule_04.py: "from datetime import datetime, timezone\ndef apply(value):\n\
+      \    return datetime.fromtimestamp(value, tz=timezone.utc)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: correctness
+    path: app/review_04.py
+    line: 4
+    severity: medium
+    note: The result silently loses UTC timezone awareness.
+  notes: frozen_holdout=true; expected_context=contracts/rule_04.py; audit=The result
+    silently loses UTC timezone awareness.
+- id: holdout-05-permission-check
+  kind: cross_file
+  pr_title: Refine permission check handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_05.py: "from contracts.rule_05 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_05.py: "def apply(value):\n    return 'write' in value.permissions\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_05.py: "from contracts.rule_05 import apply\n\ndef transform(value):\n\
+      \    return bool(value.permissions)\n"
+    contracts/rule_05.py: "def apply(value):\n    return 'write' in value.permissions\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: security
+    path: app/review_05.py
+    line: 4
+    severity: medium
+    note: Any permission now authorizes an operation that requires write access.
+  notes: frozen_holdout=true; expected_context=contracts/rule_05.py; audit=Any permission
+    now authorizes an operation that requires write access.
+- id: holdout-06-byte-order
+  kind: cross_file
+  pr_title: Refine byte order handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_06.py: "from contracts.rule_06 import apply\n\ndef transform(value):\n\
+      \    return int.from_bytes(apply(value), 'little')\n"
+    contracts/rule_06.py: "def apply(value):\n    return value.to_bytes(4, byteorder='little',\
+      \ signed=False)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_06.py: "from contracts.rule_06 import apply\n\ndef transform(value):\n\
+      \    return int.from_bytes(apply(value), 'big')\n"
+    contracts/rule_06.py: "def apply(value):\n    return value.to_bytes(4, byteorder='little',\
+      \ signed=False)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: correctness
+    path: app/review_06.py
+    line: 4
+    severity: medium
+    note: The unchanged little-endian payload is decoded as big-endian.
+  notes: frozen_holdout=true; expected_context=contracts/rule_06.py; audit=The unchanged
+    little-endian payload is decoded as big-endian.
+- id: holdout-07-digest-format
+  kind: cross_file
+  pr_title: Refine digest format handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_07.py: "from contracts.rule_07 import apply\n\ndef transform(value):\n\
+      \    return apply(value).hexdigest()\n"
+    contracts/rule_07.py: "import hashlib\ndef apply(value):\n    return hashlib.sha256(value)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_07.py: "from contracts.rule_07 import apply\n\ndef transform(value):\n\
+      \    return apply(value).digest()\n"
+    contracts/rule_07.py: "import hashlib\ndef apply(value):\n    return hashlib.sha256(value)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: correctness
+    path: app/review_07.py
+    line: 4
+    severity: medium
+    note: The public hexadecimal digest changes to raw bytes.
+  notes: frozen_holdout=true; expected_context=contracts/rule_07.py; audit=The public
+    hexadecimal digest changes to raw bytes.
+- id: holdout-08-account-pattern
+  kind: cross_file
+  pr_title: Refine account pattern handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_08.py: "from contracts.rule_08 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_08.py: "import re\ndef apply(value):\n    return re.fullmatch(r'[a-z][a-z0-9_]{2,15}',\
+      \ value) is not None\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_08.py: "from contracts.rule_08 import apply\n\ndef transform(value):\n\
+      \    return bool(value)\n"
+    contracts/rule_08.py: "import re\ndef apply(value):\n    return re.fullmatch(r'[a-z][a-z0-9_]{2,15}',\
+      \ value) is not None\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: security
+    path: app/review_08.py
+    line: 4
+    severity: medium
+    note: Non-empty invalid account names bypass full validation.
+  notes: frozen_holdout=true; expected_context=contracts/rule_08.py; audit=Non-empty
+    invalid account names bypass full validation.
+- id: holdout-09-opaque-cursor
+  kind: cross_file
+  pr_title: Refine opaque cursor handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_09.py: "from contracts.rule_09 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_09.py: "def apply(value):\n    return f'cursor:{value}:next'\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_09.py: "from contracts.rule_09 import apply\n\ndef transform(value):\n\
+      \    return int(apply(value)) + 1\n"
+    contracts/rule_09.py: "def apply(value):\n    return f'cursor:{value}:next'\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: correctness
+    path: app/review_09.py
+    line: 4
+    severity: medium
+    note: An opaque cursor is parsed as an integer and raises ValueError.
+  notes: frozen_holdout=true; expected_context=contracts/rule_09.py; audit=An opaque
+    cursor is parsed as an integer and raises ValueError.
+- id: holdout-10-retry-delay
+  kind: cross_file
+  pr_title: Refine retry delay handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_10.py: "from contracts.rule_10 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_10.py: "def apply(value):\n    return max(0, int(value.headers['Retry-After']))\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_10.py: "from contracts.rule_10 import apply\n\ndef transform(value):\n\
+      \    return apply(value) * 1000\n"
+    contracts/rule_10.py: "def apply(value):\n    return max(0, int(value.headers['Retry-After']))\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: correctness
+    path: app/review_10.py
+    line: 4
+    severity: medium
+    note: A seconds delay is exposed as milliseconds without migrating callers.
+  notes: frozen_holdout=true; expected_context=contracts/rule_10.py; audit=A seconds
+    delay is exposed as milliseconds without migrating callers.
+- id: holdout-11-deep-copy
+  kind: cross_file
+  pr_title: Refine deep copy handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_11.py: "from contracts.rule_11 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_11.py: "import copy\ndef apply(value):\n    return copy.deepcopy(value)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_11.py: "from contracts.rule_11 import apply\n\ndef transform(value):\n\
+      \    return (apply(value), value)[1]\n"
+    contracts/rule_11.py: "import copy\ndef apply(value):\n    return copy.deepcopy(value)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: correctness
+    path: app/review_11.py
+    line: 4
+    severity: medium
+    note: The defensive copy is discarded and mutable caller state leaks out.
+  notes: frozen_holdout=true; expected_context=contracts/rule_11.py; audit=The defensive
+    copy is discarded and mutable caller state leaks out.
+- id: holdout-12-unicode-normalization
+  kind: cross_file
+  pr_title: Refine unicode normalization handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_12.py: "from contracts.rule_12 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_12.py: "import unicodedata\ndef apply(value):\n    return unicodedata.normalize('NFC',\
+      \ value)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_12.py: "from contracts.rule_12 import apply\n\ndef transform(value):\n\
+      \    return (apply(value), value)[1]\n"
+    contracts/rule_12.py: "import unicodedata\ndef apply(value):\n    return unicodedata.normalize('NFC',\
+      \ value)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: correctness
+    path: app/review_12.py
+    line: 4
+    severity: medium
+    note: The normalized identifier is discarded, allowing canonically equivalent
+      duplicates.
+  notes: frozen_holdout=true; expected_context=contracts/rule_12.py; audit=The normalized
+    identifier is discarded, allowing canonically equivalent duplicates.
+- id: holdout-13-constant-time-token
+  kind: cross_file
+  pr_title: Refine constant time token handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_13.py: "from contracts.rule_13 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_13.py: "import hmac\ndef apply(value):\n    supplied, expected\
+      \ = value\n    return hmac.compare_digest(supplied, expected)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_13.py: "from contracts.rule_13 import apply\n\ndef transform(value):\n\
+      \    return value[0] == value[1]\n"
+    contracts/rule_13.py: "import hmac\ndef apply(value):\n    supplied, expected\
+      \ = value\n    return hmac.compare_digest(supplied, expected)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: security
+    path: app/review_13.py
+    line: 4
+    severity: medium
+    note: The constant-time secret comparison is replaced by ordinary equality.
+  notes: frozen_holdout=true; expected_context=contracts/rule_13.py; audit=The constant-time
+    secret comparison is replaced by ordinary equality.
+- id: holdout-14-bounded-limit
+  kind: cross_file
+  pr_title: Refine bounded limit handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_14.py: "from contracts.rule_14 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_14.py: "def apply(value):\n    return min(max(int(value), 1), 100)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_14.py: "from contracts.rule_14 import apply\n\ndef transform(value):\n\
+      \    return int(value)\n"
+    contracts/rule_14.py: "def apply(value):\n    return min(max(int(value), 1), 100)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: edge_case
+    path: app/review_14.py
+    line: 4
+    severity: medium
+    note: Out-of-range limits are no longer bounded before downstream use.
+  notes: frozen_holdout=true; expected_context=contracts/rule_14.py; audit=Out-of-range
+    limits are no longer bounded before downstream use.
+- id: holdout-15-canonical-host
+  kind: cross_file
+  pr_title: Refine canonical host handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_15.py: "from contracts.rule_15 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_15.py: "from urllib.parse import urlsplit\ndef apply(value):\n\
+      \    host = urlsplit(value).hostname\n    return host.lower() if host else None\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_15.py: "from contracts.rule_15 import apply\n\ndef transform(value):\n\
+      \    return value.split('/')[2]\n"
+    contracts/rule_15.py: "from urllib.parse import urlsplit\ndef apply(value):\n\
+      \    host = urlsplit(value).hostname\n    return host.lower() if host else None\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: security
+    path: app/review_15.py
+    line: 4
+    severity: medium
+    note: Manual URL splitting preserves user-info and port text instead of the canonical
+      hostname.
+  notes: frozen_holdout=true; expected_context=contracts/rule_15.py; audit=Manual
+    URL splitting preserves user-info and port text instead of the canonical hostname.
+- id: holdout-16-tenant-scope
+  kind: cross_file
+  pr_title: Refine tenant scope handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_16.py: "from contracts.rule_16 import apply\n\ndef transform(value):\n\
+      \    return apply(value).all()\n"
+    contracts/rule_16.py: "def apply(value):\n    query, tenant_id = value\n    return\
+      \ query.where(tenant_id=tenant_id)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_16.py: "from contracts.rule_16 import apply\n\ndef transform(value):\n\
+      \    return value[0].all()\n"
+    contracts/rule_16.py: "def apply(value):\n    query, tenant_id = value\n    return\
+      \ query.where(tenant_id=tenant_id)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: security
+    path: app/review_16.py
+    line: 4
+    severity: medium
+    note: The tenant predicate is removed from the executed query.
+  notes: frozen_holdout=true; expected_context=contracts/rule_16.py; audit=The tenant
+    predicate is removed from the executed query.
+- id: holdout-17-cache-namespace
+  kind: cross_file
+  pr_title: Refine cache namespace handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_17.py: "from contracts.rule_17 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_17.py: "def apply(value):\n    tenant, key = value\n    return\
+      \ f'{tenant}:{key}'.lower()\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_17.py: "from contracts.rule_17 import apply\n\ndef transform(value):\n\
+      \    return value[1].lower()\n"
+    contracts/rule_17.py: "def apply(value):\n    tenant, key = value\n    return\
+      \ f'{tenant}:{key}'.lower()\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: correctness
+    path: app/review_17.py
+    line: 4
+    severity: medium
+    note: Removing the tenant namespace causes cross-tenant cache collisions.
+  notes: frozen_holdout=true; expected_context=contracts/rule_17.py; audit=Removing
+    the tenant namespace causes cross-tenant cache collisions.
+- id: holdout-18-optional-presence
+  kind: cross_file
+  pr_title: Refine optional presence handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_18.py: "from contracts.rule_18 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_18.py: "def apply(value):\n    return value.HasField('count')\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_18.py: "from contracts.rule_18 import apply\n\ndef transform(value):\n\
+      \    return value.count != 0\n"
+    contracts/rule_18.py: "def apply(value):\n    return value.HasField('count')\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: correctness
+    path: app/review_18.py
+    line: 4
+    severity: medium
+    note: A present zero value is confused with an absent optional field.
+  notes: frozen_holdout=true; expected_context=contracts/rule_18.py; audit=A present
+    zero value is confused with an absent optional field.
+- id: holdout-19-stream-position
+  kind: cross_file
+  pr_title: Refine stream position handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_19.py: "from contracts.rule_19 import apply\n\ndef transform(value):\n\
+      \    return apply(value).read()\n"
+    contracts/rule_19.py: "def apply(value):\n    value.seek(0)\n    return value\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_19.py: "from contracts.rule_19 import apply\n\ndef transform(value):\n\
+      \    return value.read()\n"
+    contracts/rule_19.py: "def apply(value):\n    value.seek(0)\n    return value\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: correctness
+    path: app/review_19.py
+    line: 4
+    severity: medium
+    note: The stream is read from its current position instead of rewinding first.
+  notes: frozen_holdout=true; expected_context=contracts/rule_19.py; audit=The stream
+    is read from its current position instead of rewinding first.
+- id: holdout-20-compressed-bytes
+  kind: cross_file
+  pr_title: Refine compressed bytes handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_20.py: "from contracts.rule_20 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_20.py: "import gzip\ndef apply(value):\n    return gzip.compress(value.encode('utf-8'))\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_20.py: "from contracts.rule_20 import apply\n\ndef transform(value):\n\
+      \    return apply(value).decode('utf-8')\n"
+    contracts/rule_20.py: "import gzip\ndef apply(value):\n    return gzip.compress(value.encode('utf-8'))\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: correctness
+    path: app/review_20.py
+    line: 4
+    severity: medium
+    note: Arbitrary gzip bytes are decoded as UTF-8 and can raise UnicodeDecodeError.
+  notes: frozen_holdout=true; expected_context=contracts/rule_20.py; audit=Arbitrary
+    gzip bytes are decoded as UTF-8 and can raise UnicodeDecodeError.
+- id: holdout-21-idempotency-key
+  kind: cross_file
+  pr_title: Refine idempotency key handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_21.py: "from contracts.rule_21 import apply\n\ndef transform(value):\n\
+      \    return send(value, idempotency_key=apply(value))\n"
+    contracts/rule_21.py: "import hashlib\ndef apply(value):\n    return hashlib.sha256(value.encode()).hexdigest()\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_21.py: "from contracts.rule_21 import apply\n\ndef transform(value):\n\
+      \    return send(value)\n"
+    contracts/rule_21.py: "import hashlib\ndef apply(value):\n    return hashlib.sha256(value.encode()).hexdigest()\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: correctness
+    path: app/review_21.py
+    line: 4
+    severity: medium
+    note: Removing the deterministic idempotency key permits duplicate side effects
+      on retries.
+  notes: frozen_holdout=true; expected_context=contracts/rule_21.py; audit=Removing
+    the deterministic idempotency key permits duplicate side effects on retries.
+- id: holdout-22-csrf-binding
+  kind: cross_file
+  pr_title: Refine csrf binding handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_22.py: "from contracts.rule_22 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_22.py: "def apply(value):\n    token, session_token = value\n \
+      \   return token == session_token and bool(token)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_22.py: "from contracts.rule_22 import apply\n\ndef transform(value):\n\
+      \    return bool(value[0])\n"
+    contracts/rule_22.py: "def apply(value):\n    token, session_token = value\n \
+      \   return token == session_token and bool(token)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: security
+    path: app/review_22.py
+    line: 4
+    severity: medium
+    note: Any non-empty CSRF token is accepted without binding it to the session.
+  notes: frozen_holdout=true; expected_context=contracts/rule_22.py; audit=Any non-empty
+    CSRF token is accepted without binding it to the session.
+- id: holdout-23-sequence-window
+  kind: cross_file
+  pr_title: Refine sequence window handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_23.py: "from contracts.rule_23 import apply\n\ndef transform(value):\n\
+      \    return list(apply(value))\n"
+    contracts/rule_23.py: "def apply(value):\n    start, end = value\n    if end <\
+      \ start:\n        raise ValueError('reversed')\n    return range(start, end\
+      \ + 1)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_23.py: "from contracts.rule_23 import apply\n\ndef transform(value):\n\
+      \    return list(range(value[0], value[1]))\n"
+    contracts/rule_23.py: "def apply(value):\n    start, end = value\n    if end <\
+      \ start:\n        raise ValueError('reversed')\n    return range(start, end\
+      \ + 1)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: correctness
+    path: app/review_23.py
+    line: 4
+    severity: medium
+    note: The inclusive end becomes exclusive and reversed ranges stop raising.
+  notes: frozen_holdout=true; expected_context=contracts/rule_23.py; audit=The inclusive
+    end becomes exclusive and reversed ranges stop raising.
+- id: holdout-24-resource-owner
+  kind: cross_file
+  pr_title: Refine resource owner handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_24.py: "from contracts.rule_24 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_24.py: "def apply(value):\n    resource, actor = value\n    return\
+      \ resource.owner_id == actor.id\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_24.py: "from contracts.rule_24 import apply\n\ndef transform(value):\n\
+      \    return value[0].owner_id is not None\n"
+    contracts/rule_24.py: "def apply(value):\n    resource, actor = value\n    return\
+      \ resource.owner_id == actor.id\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected:
+  - category: security
+    path: app/review_24.py
+    line: 4
+    severity: medium
+    note: Ownership authorization is replaced with a non-null owner check.
+  notes: frozen_holdout=true; expected_context=contracts/rule_24.py; audit=Ownership
+    authorization is replaced with a non-null owner check.
+- id: holdout-25-negative-decimal
+  kind: negative
+  pr_title: Refine negative decimal handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_25.py: "from contracts.rule_25 import apply\n\ndef transform(value):\n\
+      \    return str(value)\n"
+    contracts/rule_25.py: "from decimal import Decimal\ndef apply(value):\n    return\
+      \ Decimal(value).quantize(Decimal('0.01'))\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_25.py: "from contracts.rule_25 import apply\n\ndef transform(value):\n\
+      \    return str(apply(value))\n"
+    contracts/rule_25.py: "from decimal import Decimal\ndef apply(value):\n    return\
+      \ Decimal(value).quantize(Decimal('0.01'))\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected: []
+  notes: frozen_holdout=true; expected_context=contracts/rule_25.py; audit=The helper
+    correctly introduces deterministic money normalization.
+- id: holdout-26-negative-path
+  kind: negative
+  pr_title: Refine negative path handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_26.py: "from contracts.rule_26 import apply\n\ndef transform(value):\n\
+      \    return '/srv/files/' + value\n"
+    contracts/rule_26.py: "from pathlib import Path\ndef apply(value):\n    root =\
+      \ Path('/srv/files').resolve()\n    target = (root / value).resolve()\n    if\
+      \ root not in target.parents:\n        raise ValueError('outside root')\n  \
+      \  return target\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_26.py: "from contracts.rule_26 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_26.py: "from pathlib import Path\ndef apply(value):\n    root =\
+      \ Path('/srv/files').resolve()\n    target = (root / value).resolve()\n    if\
+      \ root not in target.parents:\n        raise ValueError('outside root')\n  \
+      \  return target\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected: []
+  notes: frozen_holdout=true; expected_context=contracts/rule_26.py; audit=The changed
+    code correctly adopts containment validation.
+- id: holdout-27-negative-permission
+  kind: negative
+  pr_title: Refine negative permission handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_27.py: "from contracts.rule_27 import apply\n\ndef transform(value):\n\
+      \    return bool(value.permissions)\n"
+    contracts/rule_27.py: "def apply(value):\n    return 'write' in value.permissions\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_27.py: "from contracts.rule_27 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_27.py: "def apply(value):\n    return 'write' in value.permissions\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected: []
+  notes: frozen_holdout=true; expected_context=contracts/rule_27.py; audit=The change
+    correctly checks the required permission.
+- id: holdout-28-negative-tenant
+  kind: negative
+  pr_title: Refine negative tenant handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_28.py: "from contracts.rule_28 import apply\n\ndef transform(value):\n\
+      \    return value[0].all()\n"
+    contracts/rule_28.py: "def apply(value):\n    query, tenant_id = value\n    return\
+      \ query.where(tenant_id=tenant_id)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_28.py: "from contracts.rule_28 import apply\n\ndef transform(value):\n\
+      \    return apply(value).all()\n"
+    contracts/rule_28.py: "def apply(value):\n    query, tenant_id = value\n    return\
+      \ query.where(tenant_id=tenant_id)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected: []
+  notes: frozen_holdout=true; expected_context=contracts/rule_28.py; audit=The query
+    is correctly scoped to the tenant.
+- id: holdout-29-negative-optional
+  kind: negative
+  pr_title: Refine negative optional handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_29.py: "from contracts.rule_29 import apply\n\ndef transform(value):\n\
+      \    return value.count != 0\n"
+    contracts/rule_29.py: "def apply(value):\n    return value.HasField('count')\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_29.py: "from contracts.rule_29 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_29.py: "def apply(value):\n    return value.HasField('count')\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected: []
+  notes: frozen_holdout=true; expected_context=contracts/rule_29.py; audit=Presence
+    is correctly distinguished from a present zero.
+- id: holdout-30-negative-token
+  kind: negative
+  pr_title: Refine negative token handling
+  pr_description: Simplify the transformation while preserving externally observable
+    behavior.
+  base_files:
+    app/review_30.py: "from contracts.rule_30 import apply\n\ndef transform(value):\n\
+      \    return value[0] == value[1]\n"
+    contracts/rule_30.py: "import hmac\ndef apply(value):\n    supplied, expected\
+      \ = value\n    return hmac.compare_digest(supplied, expected)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  head_files:
+    app/review_30.py: "from contracts.rule_30 import apply\n\ndef transform(value):\n\
+      \    return apply(value)\n"
+    contracts/rule_30.py: "import hmac\ndef apply(value):\n    supplied, expected\
+      \ = value\n    return hmac.compare_digest(supplied, expected)\n"
+    contracts/common.py: 'DEFAULT_LIMIT = 100
+
+      '
+  expected: []
+  notes: frozen_holdout=true; expected_context=contracts/rule_30.py; audit=The change
+    correctly adopts constant-time secret comparison.

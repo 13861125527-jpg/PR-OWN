@@ -1,0 +1,858 @@
+{
+  "model": "deepseek-v4-pro",
+  "sample_ids": [
+    "l3-07-raises-missing",
+    "l3-12-path-containment",
+    "l3-14-sql-identifier",
+    "l3-24-retry-safety"
+  ],
+  "rows": [
+    {
+      "id": "l3-07-raises-missing",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "edge_case",
+              "path": "src/case_07.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_07.py",
+              "line": 4,
+              "confidence": 0.8
+            }
+          ],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": [
+            {
+              "path": "src/case_07.py",
+              "line": 4,
+              "expected": "edge_case",
+              "actual": "correctness"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "44e3e308c6384766824f12eb569810b6",
+            "title": "Removal of None guard causes KeyError for None input",
+            "category": "correctness",
+            "path": "src/case_07.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "process() is called with value=None",
+            "impact": "Function now raises KeyError instead of returning 'default', breaking previous contract and potentially causing runtime errors.",
+            "explanation": "The diff removes the conditional expression that returned 'default' when value is None, relying solely on check(value). The retrieved L3 snippet for check() shows it raises KeyError('missing') when value is None. Therefore, passing None to process() will propagate that exception instead of returning the previous default value. This is a behavioral change that may break callers expecting graceful handling of None.",
+            "suggestion": "If the new behavior is intended to propagate the error, consider documenting it and updating callers; otherwise, preserve the None guard or handle the exception explicitly."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "44e3e308c6384766824f12eb569810b6",
+            "title": "Removal of None guard causes KeyError for None input",
+            "category": "correctness",
+            "path": "src/case_07.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "process() is called with value=None",
+            "impact": "Function now raises KeyError instead of returning 'default', breaking previous contract and potentially causing runtime errors.",
+            "explanation": "The diff removes the conditional expression that returned 'default' when value is None, relying solely on check(value). The retrieved L3 snippet for check() shows it raises KeyError('missing') when value is None. Therefore, passing None to process() will propagate that exception instead of returning the previous default value. This is a behavioral change that may break callers expecting graceful handling of None.",
+            "suggestion": "If the new behavior is intended to propagate the error, consider documenting it and updating callers; otherwise, preserve the None guard or handle the exception explicitly.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 26914.06,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 837,
+          "output_tokens": 1627,
+          "provider_latency_ms": 26905,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both describe the same defect: removal of the None guard causes the helper's documented missing-value exception (KeyError) to propagate for None input instead of returning the default value."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.93,
+                "reason": "Both describe the same defect: the removed None guard in process() at src/case_07.py:4 now lets the helper's missing-value exception (KeyError('missing')) propagate when value is None, instead of returning the previous default. Trigger (None input) and impact (exception instead of graceful default) match; category label difference is non-binding."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "edge_case",
+              "path": "src/case_07.py",
+              "line": 4
+            }
+          ],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 1,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 40717.39,
+        "usage": {
+          "logical_invocations": 5,
+          "input_tokens": 14127,
+          "output_tokens": 1807,
+          "provider_latency_ms": 40701,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 4,
+        "tool_attempts": 6,
+        "successful_tools": 4,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "The diff intentionally replaces the None fallback with check(value), which raises KeyError per the unchanged helper contract; no defect found.",
+            "candidate_count": 0,
+            "rounds": 5
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-12-path-containment",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "security",
+              "path": "src/case_12.py",
+              "line": 4
+            }
+          ],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 1,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 104341.24,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 1785,
+          "output_tokens": 6000,
+          "provider_latency_ms": 104337,
+          "retries": 0,
+          "schema_repairs": 1
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 1,
+        "warnings": [
+          "src/case_12.py 部分块失败: src/case_12.py: StructuredOutputError: 结构化输出解析失败（修复重试后仍失败）"
+        ],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "security",
+              "path": "src/case_12.py",
+              "line": 4
+            }
+          ],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 1,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 163578.3,
+        "usage": {
+          "logical_invocations": 5,
+          "input_tokens": 27435,
+          "output_tokens": 9344,
+          "provider_latency_ms": 163567,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 2,
+        "tool_attempts": 3,
+        "successful_tools": 2,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 1,
+        "agent_sessions": [
+          {
+            "status": "partial",
+            "stop_reason": "no_progress",
+            "candidate_count": 0,
+            "rounds": 5
+          }
+        ],
+        "task_failures": 1,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-14-sql-identifier",
+      "kind": "negative",
+      "base": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 1.0,
+          "f1": 0.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 1
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [
+            {
+              "category": "maintainability",
+              "path": "src/case_14.py",
+              "line": 4,
+              "confidence": 0.6
+            }
+          ],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "c73f711f8e92439899f1cd81f37d1232",
+            "title": "Validation helper return value discarded through tuple indexing",
+            "category": "maintainability",
+            "path": "src/case_14.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "When process(value) is called with a valid whitelisted SQL identifier, check(value) is invoked but its return value is ignored.",
+            "impact": "Current behavior appears equivalent because the referenced check returns the same value for valid inputs, but the indirect tuple indexing obscures the validation contract and would silently bypass future canonicalization or transformation performed by check.",
+            "explanation": "The diff changes `return check(value)` to `return (check(value), value)[1]`. The call to check(value) still runs and raises ValueError for invalid identifiers, but the validated return value is discarded and the original value is returned. Based on the L3 source, check only validates membership and returns the value unchanged, so runtime behavior is currently equivalent. However, the expression is needlessly opaque and makes the dependency on check's return behavior implicit.",
+            "suggestion": "Restore `return check(value)` to keep intent clear. If validation without using the return value is intended, use `check(value); return value` with a comment explaining that check only validates and returns the input unchanged."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "c73f711f8e92439899f1cd81f37d1232",
+            "title": "Validation helper return value discarded through tuple indexing",
+            "category": "maintainability",
+            "path": "src/case_14.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "When process(value) is called with a valid whitelisted SQL identifier, check(value) is invoked but its return value is ignored.",
+            "impact": "Current behavior appears equivalent because the referenced check returns the same value for valid inputs, but the indirect tuple indexing obscures the validation contract and would silently bypass future canonicalization or transformation performed by check.",
+            "explanation": "The diff changes `return check(value)` to `return (check(value), value)[1]`. The call to check(value) still runs and raises ValueError for invalid identifiers, but the validated return value is discarded and the original value is returned. Based on the L3 source, check only validates membership and returns the value unchanged, so runtime behavior is currently equivalent. However, the expression is needlessly opaque and makes the dependency on check's return behavior implicit.",
+            "suggestion": "Restore `return check(value)` to keep intent clear. If validation without using the return value is intended, use `check(value); return value` with a comment explaining that check only validates and returns the input unchanged.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 0,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 102665.02,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 1712,
+          "output_tokens": 5699,
+          "provider_latency_ms": 102659,
+          "retries": 0,
+          "schema_repairs": 1
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 0,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 22784.18,
+        "usage": {
+          "logical_invocations": 3,
+          "input_tokens": 7613,
+          "output_tokens": 1092,
+          "provider_latency_ms": 22774,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 2,
+        "tool_attempts": 3,
+        "successful_tools": 2,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "The tuple literal eagerly evaluates check(value), so validation still raises ValueError for invalid identifiers; check returns value unchanged, so the result is equivalent. No defect found.",
+            "candidate_count": 0,
+            "rounds": 3
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-24-retry-safety",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_24.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_24.py",
+              "line": 4,
+              "confidence": 1.0
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "12798241ccd24fb8a5a0dc366c51b277",
+            "title": "Undefined name 'retry' in process",
+            "category": "correctness",
+            "path": "src/case_24.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling process(value) after this change, because retry is not imported or defined in the module.",
+            "impact": "Any invocation of process raises NameError, breaking functionality entirely.",
+            "explanation": "The diff replaces check(value) with retry(lambda: check(value), attempts=3) but does not import retry from any module. There is no built-in retry in Python, so the name is undefined.",
+            "suggestion": "Import retry from the appropriate module (e.g., from lib.retry import retry) or define a retry helper before using it."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "12798241ccd24fb8a5a0dc366c51b277",
+            "title": "Undefined name 'retry' in process",
+            "category": "correctness",
+            "path": "src/case_24.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling process(value) after this change, because retry is not imported or defined in the module.",
+            "impact": "Any invocation of process raises NameError, breaking functionality entirely.",
+            "explanation": "The diff replaces check(value) with retry(lambda: check(value), attempts=3) but does not import retry from any module. There is no built-in retry in Python, so the name is undefined.",
+            "suggestion": "Import retry from the appropriate module (e.g., from lib.retry import retry) or define a retry helper before using it.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 30437.81,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 828,
+          "output_tokens": 1767,
+          "provider_latency_ms": 30433,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": false,
+                "confidence": 0.95,
+                "reason": "The expected defect concerns placing a non-idempotent helper inside a retry loop, while the finding claims 'retry' is undefined and would raise NameError. These are different root causes, triggers, and impacts."
+              }
+            ]
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": false,
+                "confidence": 0.9,
+                "reason": "The expected defect concerns a non-idempotent helper being retried (behavioral correctness issue on retry), while the finding claims the `retry` name is undefined and raises NameError. These are different root causes, triggers, and impacts."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_24.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_24.py",
+              "line": 4,
+              "confidence": 0.95
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "0cf305f9a5c3487a8c95d841732310ed",
+            "title": "Retrying a non-idempotent charge can double-charge the caller",
+            "category": "correctness",
+            "path": "src/case_24.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "`value.charge()` raises an exception after the charge has already been applied.",
+            "impact": "",
+            "explanation": "The unchanged helper `lib/contract_24.py:check` explicitly performs a \"non-idempotent charge exactly once\" (it calls `value.charge()`). The diff wraps `check(value)` in `retry(..., attempts=3)`, so if `value.charge()` raises after performing the charge (e.g. a network timeout after a successful charge), the retry re-invokes `check` and charges the customer a second time. This directly violates the helper's exactly-once contract. Additionally, `retry` is not imported or defined anywhere in the repository, so the modified `process` would raise NameError as written.",
+            "suggestion": "Do not retry non-idempotent operations. Keep a single call to `check(value)` (or, if retries are truly required, use an idempotency key and ensure the underlying charge is idempotent before retrying)."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "0cf305f9a5c3487a8c95d841732310ed",
+            "title": "Retrying a non-idempotent charge can double-charge the caller",
+            "category": "correctness",
+            "path": "src/case_24.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "`value.charge()` raises an exception after the charge has already been applied.",
+            "impact": "",
+            "explanation": "The unchanged helper `lib/contract_24.py:check` explicitly performs a \"non-idempotent charge exactly once\" (it calls `value.charge()`). The diff wraps `check(value)` in `retry(..., attempts=3)`, so if `value.charge()` raises after performing the charge (e.g. a network timeout after a successful charge), the retry re-invokes `check` and charges the customer a second time. This directly violates the helper's exactly-once contract. Additionally, `retry` is not imported or defined anywhere in the repository, so the modified `process` would raise NameError as written.",
+            "suggestion": "Do not retry non-idempotent operations. Keep a single call to `check(value)` (or, if retries are truly required, use an idempotency key and ensure the underlying charge is idempotent before retrying).",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 79797.91,
+        "usage": {
+          "logical_invocations": 8,
+          "input_tokens": 29579,
+          "output_tokens": 4004,
+          "provider_latency_ms": 79782,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 4,
+        "tool_attempts": 6,
+        "successful_tools": 4,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Identified a correctness defect: retrying a non-idempotent charge violates the helper's exactly-once contract (and retry is undefined). Submitted finding and finished.",
+            "candidate_count": 1,
+            "rounds": 8
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.95,
+                "reason": "Both describe the same defect: the non-idempotent charge helper is invoked inside a retry loop, risking duplicate charges."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.97,
+                "reason": "Both identify the same defect: a non-idempotent charge helper (`check`/`value.charge()`) invoked inside a 3-attempt retry loop, so a failure after the charge succeeds causes a duplicate charge. Same file/line, same category, same trigger and impact; the extra NameError remark does not change the identified root cause."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "dataset": "v3b_loop",
+  "samples": 14,
+  "real_api": false,
+  "loop": {
+    "passed": 14,
+    "total": 14,
+    "cases": [
+      {
+        "id": "happy-read-submit-finish",
+        "kind": "trajectory",
+        "ok": true,
+        "status": "completed",
+        "detail": ""
+      },
+      {
+        "id": "unknown-tool-attempt",
+        "kind": "trajectory",
+        "ok": true,
+        "status": "completed",
+        "detail": ""
+      },
+      {
+        "id": "repeat-loop",
+        "kind": "trajectory",
+        "ok": true,
+        "status": "partial",
+        "detail": ""
+      },
+      {
+        "id": "idle-no-progress",
+        "kind": "trajectory",
+        "ok": true,
+        "status": "partial",
+        "detail": ""
+      },
+      {
+        "id": "grace-no-new-tools",
+        "kind": "trajectory",
+        "ok": true,
+        "status": "completed",
+        "detail": ""
+      },
+      {
+        "id": "stub-invoke-not-bound",
+        "kind": "control",
+        "ok": true,
+        "status": "error",
+        "detail": ""
+      },
+      {
+        "id": "default-review-isolation",
+        "kind": "isolate",
+        "ok": true,
+        "status": "ok",
+        "detail": ""
+      },
+      {
+        "id": "agentic-disabled-reject",
+        "kind": "isolate",
+        "ok": true,
+        "status": "rejected",
+        "detail": "review.strategy=agentic 需要 agent.enabled=true"
+      },
+      {
+        "id": "early-grace-cap",
+        "kind": "trajectory",
+        "ok": true,
+        "status": "partial",
+        "detail": ""
+      },
+      {
+        "id": "json-repair-counts-round",
+        "kind": "trajectory",
+        "ok": true,
+        "status": "completed",
+        "detail": ""
+      },
+      {
+        "id": "unique-same-name-tool-ids",
+        "kind": "trajectory",
+        "ok": true,
+        "status": "completed",
+        "detail": ""
+      },
+      {
+        "id": "settle-idempotent",
+        "kind": "control",
+        "ok": true,
+        "status": "idempotent",
+        "detail": ""
+      },
+      {
+        "id": "waiting-tool-cancel",
+        "kind": "control",
+        "ok": true,
+        "status": "cancelled",
+        "detail": ""
+      },
+      {
+        "id": "shared-pool-concurrent",
+        "kind": "control",
+        "ok": true,
+        "status": "one_winner",
+        "detail": ""
+      }
+    ],
+    "note": "脚本化 Fake 轨迹；无真实模型。agent.enabled 默认 false。experimental。"
+  },
+  "all_passed": true
+}

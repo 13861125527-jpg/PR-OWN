@@ -7,6 +7,7 @@ from reposage.domain.diff import parse_unified_diff
 from reposage.domain.enums import (
     ChangeRequestSource,
     FindingCategory,
+    FindingSourceKind,
     FindingStatus,
     ReviewStrategyName,
     ReviewTaskStatus,
@@ -251,6 +252,19 @@ def test_unit_to_messages_malicious_path_not_in_system():
     assert '\\n' in messages[1]["content"]  # 换行被转义为字面 \n
 
 
+def test_unit_to_messages_role_prompt_none_matches_v1():
+    unit = _units()[0]
+    assert unit_to_messages(unit) == unit_to_messages(unit, role_prompt=None)
+
+
+def test_unit_to_messages_inserts_role_prompt_in_system():
+    unit = _units()[0]
+    messages = unit_to_messages(unit, role_prompt="# role: security\nfocus on auth")
+    assert "# role: security" in messages[0]["content"]
+    assert "focus on auth" in messages[0]["content"]
+    assert "# role: security" not in messages[1]["content"]
+
+
 def test_l4_hit_text_does_not_embed_repo_path():
     """P1（十轮安全审查 HIGH）：L4 命中文本不再拼接仓库可控的 file.path。"""
     from reposage.domain.diff import parse_unified_diff
@@ -323,9 +337,9 @@ async def test_null_path_filled_then_pipeline_accepts():
     result = await reviewer.execute(_units()[:1], _run(), budget=GlobalBudget())
     # 补全后 claimed_path == src/a.py，canonical 定位成功 → 不再 BODY_ONLY
     file_map = {"src/a.py": parse_unified_diff(DIFF_A)[0]}
-    findings = FindingPipeline(repo="r", head_sha="h", min_confidence=0.0).process(
+    findings = (await FindingPipeline(repo="r", head_sha="h", min_confidence=0.0).process(
         run_id="r1", candidates=result.candidates, file_map=file_map
-    )
+    )).findings
     assert len(findings) == 1
     assert findings[0].status is FindingStatus.ACCEPTED  # 而非 BODY_ONLY
     assert findings[0].canonical_path == "src/a.py"
@@ -354,6 +368,20 @@ async def test_null_path_fill_does_not_mutate_provider_object():
     assert result.candidates[0].claimed_path == "src/a.py"
     # Provider 原始对象未被污染
     assert shared.claimed_path is None
+
+
+@pytest.mark.asyncio
+async def test_llm_source_fields_stripped_at_strategy_boundary():
+    poisoned = _cand(path="src/a.py", start=3)
+    poisoned.source_kind = FindingSourceKind.STATIC_ANALYZER
+    poisoned.rule_id = "ruff:B006"
+    poisoned.analyzer_id = "ruff"
+    fake = FakeLLMProvider(default_findings=[poisoned], input_tokens=100, output_tokens=50)
+    reviewer = SinglePassReviewer(fake, file_tasks=1, model_requests=1)
+    result = await reviewer.execute(_units()[:1], _run(), budget=GlobalBudget())
+    assert result.candidates[0].source_kind is None
+    assert result.candidates[0].rule_id is None
+    assert result.candidates[0].analyzer_id is None
 
 
 def test_supports_single_pass_only():

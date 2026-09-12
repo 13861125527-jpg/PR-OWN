@@ -953,3 +953,449 @@ def test_real_compare_redacts_secrets_in_failure_detail():
     assert "sk-xyz" not in redacted
     assert "<redacted>" in redacted
     assert "boom" in redacted  # 安全摘要保留
+
+
+@pytest.mark.asyncio
+async def test_v2a_compare_emits_three_tables(tmp_path):
+    """V2-A T10：同一评测集产出质量/成本/延迟三表，并写出 JSON+Markdown。"""
+    from reposage.evals.v2a_compare import render_markdown, run_compare, write_report
+
+    report = await run_compare("reposage/evals/datasets/v1_demo.yaml", repeats=1)
+    assert set(report) >= {"quality", "cost", "latency", "gate", "real_api"}
+    for table in ("quality", "cost", "latency"):
+        assert "v1" in str(report[table])
+        assert "v2a" in str(report[table])
+    q = report["quality"]
+    for key in ("precision", "recall", "f1", "position_accuracy", "negative_noise"):
+        assert key in q
+        assert "v1" in q[key] and "v2a" in q[key]
+    c = report["cost"]
+    for key in ("model_calls", "input_tokens", "output_tokens", "total_tokens", "budget_rejects"):
+        assert key in c
+    lat = report["latency"]
+    for key in ("total_ms", "p50_ms", "p95_ms"):
+        assert key in lat
+    assert report["real_api"] == "not_run"
+    assert report["cost"]["model_calls"]["v2a"] >= report["cost"]["model_calls"]["v1"]
+    json_path = tmp_path / "v2-a-compare.json"
+    md_path = tmp_path / "v2-a-compare.md"
+    write_report(report, json_path=json_path, markdown_path=md_path)
+    text = md_path.read_text(encoding="utf-8")
+    assert "## 质量（Finding，macro）" in text
+    assert "## 成本（Fake 记账）" in text
+    assert "## 延迟（全数据集墙钟）" in text
+    assert "不代表多角色模型效果相同" in text
+    assert render_markdown(report) == text
+
+
+def test_budget_rejects_counts_once_when_task_and_truncated():
+    """同一次预算拒绝同时有 failed task 与 TRUNCATED coverage 时只计 1。"""
+    from reposage.domain.enums import (
+        CoverageReason,
+        ReviewStrategyName,
+        ReviewTaskKind,
+        ReviewTaskStatus,
+    )
+    from reposage.domain.models import CoverageItem
+    from reposage.domain.run import ReviewTask, SourceRunResult
+    from reposage.domain.strategy import StrategyResult
+    from reposage.evals.v2a_compare import _budget_rejects
+
+    result = StrategyResult(
+        candidates=[],
+        source_run=SourceRunResult(
+            strategy=ReviewStrategyName.MULTI_ROLE,
+            tasks=[
+                ReviewTask(
+                    task_id="t1",
+                    run_id="r1",
+                    kind=ReviewTaskKind.ROLE_REVIEW,
+                    target="src/a.py",
+                    status=ReviewTaskStatus.FAILED,
+                    error="预算不足 BudgetExceeded",
+                )
+            ],
+            coverage_items=[
+                CoverageItem(target="src/a.py", reason=CoverageReason.TRUNCATED),
+            ],
+        ),
+    )
+    assert _budget_rejects(result) == 1
+
+
+def test_l3_dataset_meets_hit_rate():
+    from reposage.evals.l3 import FALSE_RATE_MAX, HIT_RATE_MIN, evaluate_l3_dataset, load_l3_dataset
+
+    samples = load_l3_dataset()
+    assert len(samples) >= 12
+    metrics = evaluate_l3_dataset(samples)
+    assert metrics.hit_rate >= HIT_RATE_MIN, metrics.misses
+    assert metrics.false_rate <= FALSE_RATE_MAX, metrics.misses
+    assert metrics.expected_total >= 6
+    assert metrics.tp + metrics.fn == metrics.expected_total
+
+
+@pytest.mark.asyncio
+async def test_v2b_compare_emits_tables(tmp_path):
+    from reposage.evals.v2b_compare import render_markdown, run_compare, write_report
+
+    report = await run_compare("reposage/evals/datasets/v2b_compare.yaml", repeats=1)
+    assert "quality" in report and "cost" in report and "latency" in report
+    assert "retrieval" in report
+    assert report["real_api"] == "not_run"
+    assert report["cost"]["l3_chunks"]["off"] == 0
+    assert report["cost"]["l3_chunks"]["on"] > 0
+    assert report["cost"]["input_tokens"]["on"] > report["cost"]["input_tokens"]["off"]
+    assert report["quality"]["position_accuracy"]["off"] > 0
+    md_path = tmp_path / "v2-b-compare.md"
+    write_report(report, json_path=tmp_path / "v2-b-compare.json", markdown_path=md_path)
+    text = md_path.read_text(encoding="utf-8")
+    assert "## 检索命中" in text
+    assert "不代表真实模型增益" in text or "不代表模型因 L3 变强" in text
+    assert render_markdown(report) == text
+
+
+def test_v2c_compare_conversion_and_dedup(tmp_path):
+    from reposage.evals.v2c_compare import render_markdown, run_compare, write_report
+
+    report = run_compare("reposage/evals/datasets/v2c_static.yaml")
+    assert report["all_passed"] is True
+    assert report["conversion"]["passed"] == report["conversion"]["total"]
+    assert report["dedup"]["passed"] == report["dedup"]["total"]
+    md_path = tmp_path / "v2-c-compare.md"
+    write_report(report, json_path=tmp_path / "v2-c-compare.json", markdown_path=md_path)
+    text = md_path.read_text(encoding="utf-8")
+    assert "## 转换" in text
+    assert "## 去重 / 融合" in text
+    assert render_markdown(report) == text
+
+
+def test_v2d_compare_dedup_and_judge(tmp_path):
+    from reposage.evals.v2d_compare import render_markdown, run_compare, write_report
+
+    report = run_compare("reposage/evals/datasets/v2d_dedup.yaml")
+    assert report["all_passed"] is True
+    assert report["dedup"]["passed"] == report["dedup"]["total"]
+    assert report["judge"]["passed"] == report["judge"]["total"]
+    md_path = tmp_path / "v2-d-compare.md"
+    write_report(report, json_path=tmp_path / "v2-d-compare.json", markdown_path=md_path)
+    text = md_path.read_text(encoding="utf-8")
+    assert "## 确定性去重" in text
+    assert "survival" in text
+    assert render_markdown(report) == text
+
+
+def test_v2e_compare_feedback_suppress_and_restore(tmp_path):
+    from reposage.evals.v2e_compare import render_markdown, run_compare, write_report
+
+    report = run_compare("reposage/evals/datasets/v2e_feedback.yaml")
+    assert report["all_passed"] is True
+    assert report["feedback"]["passed"] == report["feedback"]["total"]
+    assert report["feedback"]["global_reject"] is True
+    md_path = tmp_path / "v2-e-compare.md"
+    write_report(report, json_path=tmp_path / "v2-e-compare.json", markdown_path=md_path)
+    text = md_path.read_text(encoding="utf-8")
+    assert "## 反馈抑制" in text
+    assert render_markdown(report) == text
+
+
+def test_v3a_compare_sandbox_tables(tmp_path):
+    from reposage.evals.v3a_compare import render_markdown, run_compare, write_report
+
+    report = run_compare("reposage/evals/datasets/v3a_sandbox.yaml")
+    assert report["all_passed"] is True
+    assert report["sandbox"]["passed"] == report["sandbox"]["total"]
+    md_path = tmp_path / "v3-a-compare.md"
+    write_report(report, json_path=tmp_path / "v3-a-compare.json", markdown_path=md_path)
+    text = md_path.read_text(encoding="utf-8")
+    assert "## 越界" in text
+    assert render_markdown(report) == text
+
+
+def test_v3b_compare_loop_tables(tmp_path):
+    from reposage.evals.v3b_compare import render_markdown, run_compare
+
+    report = run_compare("reposage/evals/datasets/v3b_loop.yaml")
+    assert report["all_passed"] is True
+    assert report["loop"]["passed"] == report["loop"]["total"]
+    ids = {row["id"] for row in report["loop"]["cases"]}
+    assert "early-grace-cap" in ids
+    assert "json-repair-counts-round" in ids
+    assert "unique-same-name-tool-ids" in ids
+    assert "settle-idempotent" in ids
+    assert "waiting-tool-cancel" in ids
+    assert "shared-pool-concurrent" in ids
+    md_path = tmp_path / "v3-b-compare.md"
+    md_path.write_text(render_markdown(report), encoding="utf-8")
+    text = md_path.read_text(encoding="utf-8")
+    assert "## 轨迹 / 控制工具 / 隔离 / 预算" in text
+    assert render_markdown(report) == text
+
+
+def test_v3c_compare_compact_tables(tmp_path):
+    from reposage.evals.v3c_compare import render_markdown, run_compare
+
+    report = run_compare("reposage/evals/datasets/v3c_compact.yaml")
+    assert report["all_passed"] is True
+    assert report["compact"]["passed"] == report["compact"]["total"]
+    ids = {row["id"] for row in report["compact"]["cases"]}
+    assert "compact-keeps-min-l3" in ids
+    assert "compact-keeps-evidence-ids" in ids
+    assert "compact-not-a-round" in ids
+    assert "compact-native-pairing" in ids
+    assert "compact-recompact-keeps-old-facts" in ids
+    assert "compact-json-repair-keeps-repair-instruction" in ids
+    assert "overflow-after-compact" in ids
+    assert "default-agent-off" in ids
+    md_path = tmp_path / "v3-c-compare.md"
+    md_path.write_text(render_markdown(report), encoding="utf-8")
+    text = md_path.read_text(encoding="utf-8")
+    assert "## 压缩 / 证据索引 / 隔离" in text
+    assert render_markdown(report) == text
+
+
+def test_v3d_compare_quality_cost_latency_tables(tmp_path):
+    from reposage.config.settings import Settings
+    from reposage.evals import v3d_compare as v3d_mod
+    from reposage.evals.v3d_compare import _v2_settings, render_markdown, run_compare, write_report
+    from reposage.storage.sqlite import SqliteStorage
+
+    report = run_compare("reposage/evals/datasets/v3d_cross_file.yaml")
+    assert report["real_api"] is False
+    assert report["dataset_status"] == "ok"
+    assert report["dataset_errors"] == []
+    assert not hasattr(v3d_mod, "_ANCHORS")
+    assert not hasattr(v3d_mod, "_QUALITY_EXCLUDE")
+    assert report["recommendation"] == "keep_agent_experimental"
+    assert {"quality", "cost", "latency"} <= set(report)
+    q = report["quality"]
+    for key in ("precision", "recall", "f1", "position_accuracy", "negative_noise"):
+        assert "v2" in q[key] and "v3" in q[key]
+    assert "v2" in report["cost"]["model_calls"] and "v3" in report["cost"]["model_calls"]
+    assert "v2" in report["latency"]["total_ms"] and "v3" in report["latency"]["total_ms"]
+    assert report["cost"]["tool_calls"]["v2"] == 0
+    assert "v2" in report["cost"]["cost_usd"] and "v3" in report["cost"]["cost_usd"]
+    assert report["latency"]["repeats"] == 3
+    assert report["agent_ops"]["v2_tool_calls"] == 0
+    assert "tool_groundedness" in report["agent_ops"]
+    assert "needs_evidence" in report["agent_ops"]
+    # 脚本构造差值，不把 V3 F1 > V2 当产品真理（26 §9.2）
+    assert "v2" in q["f1"] and "v3" in q["f1"]
+    assert "不代表真实模型质量" in q["note"]
+    assert report["protocol_ab"]["all_passed"] is True
+    assert report["protocol_ab"]["hits_preserved"] is True
+    assert report["protocol_ab"]["groundedness_preserved"] is True
+    assert report["v2_is_default_settings"] is True
+    assert report["v3_file_tasks_is_default"] is True
+    assert report["v3_file_tasks"] == Settings().concurrency.file_tasks
+    assert set(report["quality"]["excluded"]) == {"xf-ungrounded", "xf-spam-tools"}
+    assert report["v1_demo_default"]["enabled"] is False
+    assert report["v1_demo_default"]["tool_calls"] == 0
+    assert _v2_settings().model_dump() == Settings().model_dump()
+    assert report["default_agent"]["enabled"] is False
+    assert report["default_agent"]["tool_calls"] == 0
+    assert report["user_version"] == 5
+    assert Settings().agent.enabled is False
+    assert Settings().agent.tool_protocol == "native"
+    assert SqliteStorage(":memory:")._query("PRAGMA user_version")[0][0] == 5  # noqa: SLF001
+
+    by_id = {row["id"]: row for row in report["per_sample"]}
+    miss = by_id["xf-l3-miss"]
+    assert miss["l3_expected"] == "miss"
+    assert miss["v2_hit"] == 0
+    assert miss["v3_hit"] == 1
+    assert miss["v3_tool_call_ids"]
+    assert miss["v3_ids_in_db"] is True
+    assert miss["v3_evidence_path_ok"] is True
+    assert miss["v3_anchor_observed"] is True
+    assert miss["v3_effectiveness"] >= 0.7
+    assert miss["v3_repeat_rate"] < 0.3
+    hit = by_id["xf-l3-hit"]
+    assert hit["l3_expected"] == "hit"
+    assert hit["v2_hit"] == 1
+    assert hit["v3_hit"] == 1
+    assert by_id["xf-l3-miss-search"]["v3_evidence_path_ok"] is True
+    assert by_id["xf-l3-miss-search"]["v3_anchor_observed"] is True
+    assert by_id["xf-spam-tools"]["v3_effectiveness"] < 0.7
+    assert by_id["xf-negative"]["v3_hit"] == 0
+    grounded = by_id["xf-grounded"]
+    assert grounded["v3_tool_call_ids"] == ["xf-grounded-refs"]
+    assert grounded["v3_tool_groundedness"] == 1.0
+    # Program-verified TOOL_AGENT evidence is already grounded by the invocation layer.
+    assert grounded["v3_needs_evidence"] == 0
+    assert grounded["v3_ids_in_db"] is True
+    assert grounded["v3_evidence_path_ok"] is True
+    assert grounded["v3_anchor_observed"] is True
+    ungrounded = by_id["xf-ungrounded"]
+    assert ungrounded["v3_hit"] == 1
+    assert ungrounded["v3_tool_call_ids"] == []
+    assert ungrounded["v3_tool_groundedness"] == 0.0
+    assert ungrounded["v3_needs_evidence"] == 0
+    assert ungrounded["v3_evidence_path_ok"] is False
+    assert ungrounded["v3_anchor_observed"] is False
+    assert by_id["xf-negative"]["v3_evidence_path_ok"] is False
+    assert by_id["xf-negative"]["v3_anchor_observed"] is False
+
+    ab_by_id = {row["id"]: row for row in report["protocol_ab"]["cases"]}
+    miss_ab = ab_by_id["xf-l3-miss"]
+    assert miss_ab["native_json_repair"] is False
+    assert miss_ab["action_json_json_repair"] is True
+    assert miss_ab["action_json_calls"] > miss_ab["native_calls"]
+    assert miss_ab["action_json_completed"] is True
+    assert miss_ab["action_json_hit"] == 1
+    for sid in ("xf-l3-hit", "xf-l3-miss", "xf-l3-miss-search", "xf-grounded"):
+        ids = ab_by_id[sid]["action_json_tool_call_ids"]
+        assert ids
+        assert all(item.startswith("aj-") for item in ids)
+        assert ab_by_id[sid]["native_hit"] == ab_by_id[sid]["action_json_hit"]
+        assert ab_by_id[sid]["native_tool_groundedness"] == 1.0
+        assert ab_by_id[sid]["action_json_tool_groundedness"] == 1.0
+        assert ab_by_id[sid]["action_json_ids_in_db"] is True
+    assert ab_by_id["xf-ungrounded"]["action_json_tool_call_ids"] == []
+
+    md_path = tmp_path / "v3-d-compare.md"
+    write_report(report, json_path=tmp_path / "v3-d-compare.json", markdown_path=md_path)
+    text = md_path.read_text(encoding="utf-8")
+    assert "## 质量（Finding，macro）" in text
+    assert "## 成本（Fake 记账）" in text
+    assert "## 延迟（全数据集墙钟）" in text
+    assert "## Agent 运行" in text
+    assert "## 协议 A/B" in text
+    assert "## 脚本门槛" in text
+    assert "keep_agent_experimental" in text
+    assert "不代表真实模型质量" in text
+    assert "xf-ungrounded 不进本表" in text or "不进质量主表" in text
+    assert "xf-spam-tools" in text
+    assert "cost_usd" in text
+    assert "xf-grounded-refs" in text
+    assert "hits_preserved" in text
+    assert "groundedness_preserved" in text
+    assert "aj-" in text
+    assert "v2_is_default_settings=True" in text
+    assert "v3_file_tasks_is_default=True" in text
+    assert "v1_demo" in text
+    assert render_markdown(report) == text
+
+
+def test_v3d_validate_dataset_ok_and_anchor_leak(tmp_path):
+    from pathlib import Path
+
+    import yaml
+    from reposage.evals.dataset import EvalDataset
+    from reposage.evals.v3d_compare import main, validate_dataset
+
+    ds = EvalDataset.load_yaml(Path("reposage/evals/datasets/v3d_cross_file.yaml"))
+    result = validate_dataset(ds)
+    assert result["status"] == "ok"
+    assert result["errors"] == []
+
+    leaked = ds.model_copy(deep=True)
+    miss = next(item for item in leaked.samples if item.id == "xf-l3-miss")
+    miss.head_files["src/app.py"] = miss.head_files["src/app.py"] + "  # ANCHOR_xf_l3_miss\n"
+    bad = validate_dataset(leaked)
+    assert bad["status"] == "dataset_invalid"
+    assert any(err["code"] == "anchor_leak" and err["id"] == "xf-l3-miss" for err in bad["errors"])
+
+    leak_path = tmp_path / "leaked.yaml"
+    leak_path.write_text(
+        yaml.safe_dump(leaked.model_dump(), allow_unicode=True, sort_keys=False),
+        encoding="utf-8",
+    )
+    code = main(
+        [
+            "--dataset",
+            str(leak_path),
+            "--output",
+            str(tmp_path / "out.json"),
+            "--markdown",
+            str(tmp_path / "out.md"),
+            "--repeats",
+            "1",
+        ]
+    )
+    assert code == 1
+
+
+def test_v3d_validate_dataset_metadata_leak():
+    from pathlib import Path
+
+    from reposage.evals.dataset import EvalDataset
+    from reposage.evals.v3d_compare import validate_dataset
+
+    ds = EvalDataset.load_yaml(Path("reposage/evals/datasets/v3d_cross_file.yaml"))
+    miss = next(item for item in ds.samples if item.id == "xf-l3-miss")
+    anchor = "ANCHOR_xf_l3_miss"
+
+    titled = ds.model_copy(deep=True)
+    next(item for item in titled.samples if item.id == "xf-l3-miss").pr_title = f"{miss.pr_title} {anchor}"
+    titled_bad = validate_dataset(titled)
+    assert titled_bad["status"] == "dataset_invalid"
+    assert any(
+        err["code"] == "anchor_leak" and "pr_title" in err["detail"] for err in titled_bad["errors"]
+    )
+
+    described = ds.model_copy(deep=True)
+    next(item for item in described.samples if item.id == "xf-l3-miss").pr_description = anchor
+    desc_bad = validate_dataset(described)
+    assert desc_bad["status"] == "dataset_invalid"
+    assert any(
+        err["code"] == "anchor_leak" and "pr_description" in err["detail"]
+        for err in desc_bad["errors"]
+    )
+
+    noted = ds.model_copy(deep=True)
+    next(item for item in noted.samples if item.id == "xf-l3-miss").expected[0].note = anchor
+    note_bad = validate_dataset(noted)
+    assert note_bad["status"] == "dataset_invalid"
+    assert any(
+        err["code"] == "anchor_leak" and "expected.note" in err["detail"]
+        for err in note_bad["errors"]
+    )
+
+
+def test_v3d_evidence_chain_binds_cited_tool_id():
+    from reposage.domain.enums import ReviewTaskKind
+    from reposage.domain.models import AgentBudget
+    from reposage.domain.run import ReviewTask
+    from reposage.evals.v3d_compare import _evidence_chain
+    from reposage.review.agent.session import AgentSession
+
+    task = ReviewTask(
+        task_id="t",
+        run_id="r",
+        kind=ReviewTaskKind.AGENT_TASK,
+        target="src/app.py",
+    )
+    session = AgentSession(task, file_path="src/app.py", budget=AgentBudget())
+    session.add_tool_observation(
+        tool_call_id="uncited-read",
+        name="read_file",
+        content='{"path": "src/util.py", "lines": ["def helper(x):  # ANCHOR_X"]}',
+    )
+    session.add_tool_observation(
+        tool_call_id="cited-other",
+        name="read_file",
+        content='{"path": "src/app.py", "lines": ["return eval(x)"]}',
+    )
+    empty = _evidence_chain(
+        [session],
+        cited_ids=[],
+        evidence_path="src/util.py",
+        anchor="ANCHOR_X",
+    )
+    assert empty == (False, False)
+    uncited = _evidence_chain(
+        [session],
+        cited_ids=["cited-other"],
+        evidence_path="src/util.py",
+        anchor="ANCHOR_X",
+    )
+    assert uncited == (False, False)
+    cited = _evidence_chain(
+        [session],
+        cited_ids=["uncited-read"],
+        evidence_path="src/util.py",
+        anchor="ANCHOR_X",
+    )
+    assert cited == (True, True)
+

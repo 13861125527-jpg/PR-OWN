@@ -133,6 +133,7 @@ def test_fixed_overhead_crowds_out_l2_fails_explicitly():
         l0_ratio=0.5,  # L0 固定文本约 46 tokens
         l1_ratio=0.3,
         l2_ratio=0.1,
+        l3_ratio=0.0,
         l4_ratio=0.0,
         reserve_ratio=0.1,
     )
@@ -552,4 +553,4 @@ def test_unit_budget_relationships():
         assert u.output_reserve_tokens == budget.output_reserve_tokens
         assert u.total_window_tokens == budget.total_tokens
         assert u.input_limit + u.output_reserve_tokens == u.total_window_tokens
-        assert u.context.total_tokens <= u.input_limit < u.total_window_tokens
+        assert u.context.total_tokens <= u.input_limit < u.total_window_tokens

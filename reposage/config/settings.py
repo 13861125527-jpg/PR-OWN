@@ -48,7 +48,7 @@ class LLMConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     provider: str = "openai_compatible"
-    model: str = "DP-V4-PRO"
+    model: str = "deepseek-v4-pro"
     api_key_env: str = "MODEL_API_KEY"
     base_url_env: str = "MODEL_BASE_URL"
     temperature: float = Field(default=0.1, ge=0.0, le=2.0)
@@ -63,6 +63,67 @@ class LLMConfig(BaseModel):
     output_price_per_1k: float | None = Field(default=None, ge=0.0)
 
 
+class RoleOverlayConfig(BaseModel):
+    """单角色覆盖（V2-A）。None = 不覆盖该字段。"""
+
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool | None = None
+    required: bool | None = None
+    budget_weight: float | None = Field(default=None, gt=0.0)
+    gate_id: Literal["always", "added_lines", "security", "correctness", "performance"] | None = None
+
+
+_STATIC_RULE_SUBSET = Literal["B", "S"]
+_KNOWN_STATIC_ANALYZERS = frozenset({"ruff"})
+
+
+def _default_rule_subsets() -> list[_STATIC_RULE_SUBSET]:
+    return ["B", "S"]
+
+
+class StaticConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = False
+    analyzers: list[str] = Field(default_factory=lambda: ["ruff"])
+    rule_subsets: list[_STATIC_RULE_SUBSET] = Field(default_factory=_default_rule_subsets)
+    timeout_seconds: float = Field(default=30.0, gt=0.0)
+    denylist: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _known_analyzers(self) -> StaticConfig:
+        unknown = [name for name in self.analyzers if name not in _KNOWN_STATIC_ANALYZERS]
+        if unknown:
+            raise ValueError(f"未知静态分析器: {unknown}")
+        if self.enabled and not self.analyzers:
+            raise ValueError("static.enabled 时 analyzers 不能为空")
+        return self
+
+
+class JudgeConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = False
+    max_findings: int = Field(default=32, gt=0)
+    timeout_seconds: float = Field(default=30.0, gt=0.0)
+    temperature: float = Field(default=0.1, ge=0.0, le=2.0)
+    max_output_tokens: int = Field(default=1024, gt=0)
+
+
+class FeedbackConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = True
+    max_items_per_file: int = Field(default=5, gt=0)
+
+
+class IncrementalConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = False
+
+
 class ReviewConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -71,6 +132,11 @@ class ReviewConfig(BaseModel):
     min_confidence: float = Field(default=0.75, gt=0.0, le=1.0)
     max_files: int = Field(default=40, gt=0)
     roles: list[str] = Field(default_factory=lambda: ["general"])
+    role_overrides: dict[str, RoleOverlayConfig] = Field(default_factory=dict)
+    static: StaticConfig = Field(default_factory=StaticConfig)
+    judge: JudgeConfig = Field(default_factory=JudgeConfig)
+    feedback: FeedbackConfig = Field(default_factory=FeedbackConfig)
+    incremental: IncrementalConfig = Field(default_factory=IncrementalConfig)
 
 
 class ContextConfig(BaseModel):
@@ -81,7 +147,7 @@ class ContextConfig(BaseModel):
     related_code_ratio: float = Field(default=0.25, ge=0.0, le=1.0)
     rules_ratio: float = Field(default=0.10, ge=0.0, le=1.0)
     reserve_ratio: float = Field(default=0.15, ge=0.0, le=1.0)
-    symbol_retrieval: bool = False  # V2
+    symbol_retrieval: bool = True
 
     @model_validator(mode="after")
     def _ratio_sum(self) -> ContextConfig:
@@ -111,6 +177,15 @@ class AgentConfig(BaseModel):
     grace_rounds: int = Field(default=2, ge=0)
     repeat_threshold: int = Field(default=3, gt=0)
     tool_protocol: _TOOL_PROTOCOL = "native"  # 以评测为准
+    max_tool_attempts: int | None = Field(default=None, gt=0)
+    compact_threshold_ratio: float = Field(default=0.60, gt=0.0, le=1.0)
+    compact_keep_rounds: int = Field(default=2, ge=0)
+    max_session_chars: int = Field(default=200_000, ge=4096)
+
+    def effective_max_tool_attempts(self) -> int:
+        if self.max_tool_attempts is None:
+            return self.max_tool_calls * 3
+        return self.max_tool_attempts
 
 
 class BudgetConfig(BaseModel):
@@ -177,12 +252,25 @@ class Settings(BaseModel):
     privacy: PrivacyConfig = Field(default_factory=PrivacyConfig)
 
     def snapshot_hash(self) -> str:
-        """配置快照哈希（复现与缓存键，06 §7）。"""
+        """配置快照哈希（复现与缓存键，06 §7 / 10 §5：剥离 secret 字段）。"""
         import hashlib
-        import json
 
-        canonical = json.dumps(self.model_dump(mode="json"), sort_keys=True, ensure_ascii=False)
-        return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+        return hashlib.sha256(self.snapshot_payload().encode("utf-8")).hexdigest()
+
+    def snapshot_payload(self) -> str:
+        """稳定序列化的配置快照文本（不含 secret 值，只存 xxx_env 名）。
+
+        10 §5：config 快照写入前剥离 secret 字段——api_key/token/secret/authorization
+        等值一律脱敏为 ***，保证密钥不进入快照内容；行为配置（模型/阈值/预算等）保留。
+        """
+        import json
+        payload = self.model_dump(mode="json")
+        # ``api_key_env`` normally stores an environment-variable name. A local
+        # demo may place a literal key there, which must never enter snapshots.
+        key_ref = str(payload.get("llm", {}).get("api_key_env", ""))
+        if key_ref.lower().startswith(("sk-", "key-", "api-")):
+            payload["llm"]["api_key_env"] = "***"
+        return json.dumps(payload, sort_keys=True, ensure_ascii=False)
 
 
 def _merge_into(base: dict[str, Any], overlay: dict[str, Any]) -> dict[str, Any]:

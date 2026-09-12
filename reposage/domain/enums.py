@@ -54,6 +54,8 @@ class ReviewRunStatus(StrEnum):
 class ReviewTaskKind(StrEnum):
     FILE_REVIEW = "file_review"
     ROLE_REVIEW = "role_review"
+    STATIC_ANALYZE = "static_analyze"
+    JUDGE_ADJUDICATE = "judge_adjudicate"
     AGENT_TASK = "agent_task"
 
 
@@ -111,6 +113,20 @@ class ContextSourceKind(StrEnum):
     FEEDBACK = "feedback"
     ISSUE = "issue"
     SYSTEM = "system"
+    TOOL = "tool"
+
+
+class SymbolKind(StrEnum):
+    FUNCTION = "function"
+    CLASS = "class"
+    METHOD = "method"
+    MODULE = "module"
+
+
+class L3HitReason(StrEnum):
+    DEFINITION = "definition"
+    IMPORT = "import"
+    TEST = "test"
 
 
 class EvidenceKind(StrEnum):
@@ -130,6 +146,11 @@ class FindingSourceKind(StrEnum):
     JUDGE = "judge"
 
 
+class JudgeAction(StrEnum):
+    KEEP = "keep"
+    DOWNRANK = "downrank"
+
+
 class PublishPlanStatus(StrEnum):
     PREPARED = "prepared"
     PUBLISHING = "publishing"
@@ -138,6 +159,7 @@ class PublishPlanStatus(StrEnum):
     FAILED = "failed"
     CLEANUP_PENDING = "cleanup_pending"
     COMPLETED = "completed"
+    OBSOLETE = "obsolete"  # 旧 head 的 plan 被新 head 取代（V1-e 四轮 P0）
 
 
 class CommentStatus(StrEnum):
@@ -195,6 +217,13 @@ class FeedbackKind(StrEnum):
     RULE = "rule"
 
 
+class RevokeFeedbackResult(StrEnum):
+    REVOKED = "revoked"
+    ALREADY_REVOKED = "already_revoked"
+    NOT_FOUND = "not_found"
+    WRONG_REPO = "wrong_repo"
+
+
 class ToolPermission(StrEnum):
     READ_ONLY = "read_only"
 
@@ -207,6 +236,16 @@ class CoverageReason(StrEnum):
     ROLE_FAILED = "role_failed"
     TASK_FAILED = "task_failed"
     TRUNCATED = "truncated"
+
+
+class GateReason(StrEnum):
+    """门控决策原因（V2-A；miss 落 gate_decisions，不进 CoverageItem）。"""
+
+    ALWAYS = "always"
+    GATE_HIT = "gate_hit"
+    GATE_MISS = "gate_miss"
+    LANG_MISS = "lang_miss"
+    NO_ADDED_LINES = "no_added_lines"
 
 
 class RuleScope(StrEnum):

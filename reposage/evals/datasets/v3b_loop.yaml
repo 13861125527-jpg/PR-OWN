@@ -1,0 +1,30 @@
+name: v3b_loop
+cases:
+  - id: happy-read-submit-finish
+    kind: trajectory
+  - id: unknown-tool-attempt
+    kind: trajectory
+  - id: repeat-loop
+    kind: trajectory
+  - id: idle-no-progress
+    kind: trajectory
+  - id: grace-no-new-tools
+    kind: trajectory
+  - id: stub-invoke-not-bound
+    kind: control
+  - id: default-review-isolation
+    kind: isolate
+  - id: agentic-disabled-reject
+    kind: isolate
+  - id: early-grace-cap
+    kind: trajectory
+  - id: json-repair-counts-round
+    kind: trajectory
+  - id: unique-same-name-tool-ids
+    kind: trajectory
+  - id: settle-idempotent
+    kind: control
+  - id: waiting-tool-cancel
+    kind: control
+  - id: shared-pool-concurrent
+    kind: control

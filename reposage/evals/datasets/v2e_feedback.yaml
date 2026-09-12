@@ -1,0 +1,73 @@
+# V2-E 反馈记忆标注（程序指标；不是真实模型质量）
+name: v2e-feedback
+cases:
+  - id: suppress-false-positive
+    kind: suppress
+    path: src/app.py
+    category: security
+    diff: |
+      diff --git a/src/app.py b/src/app.py
+      --- a/src/app.py
+      +++ b/src/app.py
+      @@ -1,2 +1,4 @@
+       def f():
+           return 1
+      +def g():
+      +    return eval(x)
+    candidates:
+      - {title: eval, start_line: 4, trigger: eval(x), category: security}
+    expect_accepted: 0
+    expect_suppressed: 1
+  - id: revoke-restores
+    kind: restore
+    path: src/app.py
+    category: security
+    revoked: true
+    diff: |
+      diff --git a/src/app.py b/src/app.py
+      --- a/src/app.py
+      +++ b/src/app.py
+      @@ -1,2 +1,4 @@
+       def f():
+           return 1
+      +def g():
+      +    return eval(x)
+    candidates:
+      - {title: eval, start_line: 4, trigger: eval(x), category: security}
+    expect_accepted: 1
+    expect_suppressed: 0
+  - id: code-move-still-matches
+    kind: move
+    path: src/app.py
+    category: security
+    diff: |
+      diff --git a/src/app.py b/src/app.py
+      --- a/src/app.py
+      +++ b/src/app.py
+      @@ -1,2 +1,4 @@
+       def f():
+           return 1
+      +def g():
+      +    return eval(x)
+    candidates:
+      - {title: eval, start_line: 3, trigger: eval(x), category: security}
+    expect_accepted: 0
+    expect_suppressed: 1
+  - id: feedback-disabled-ignores-mark
+    kind: isolated
+    path: src/app.py
+    category: security
+    feedback_enabled: false
+    diff: |
+      diff --git a/src/app.py b/src/app.py
+      --- a/src/app.py
+      +++ b/src/app.py
+      @@ -1,2 +1,4 @@
+       def f():
+           return 1
+      +def g():
+      +    return eval(x)
+    candidates:
+      - {title: eval, start_line: 4, trigger: eval(x), category: security}
+    expect_accepted: 1
+    expect_suppressed: 0

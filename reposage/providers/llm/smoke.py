@@ -33,6 +33,7 @@ from reposage.providers.llm.openai_compat import (
     LLMRequestError,
     OpenAICompatProvider,
     StructuredOutputError,
+    resolve_credentials,
 )
 
 DEFAULT_ROUNDS = 20  # 架构要求重复 20 次测稳定 JSON（14 OQ-1）
@@ -59,8 +60,7 @@ async def _run(
     - 报告包含 overall ``passed`` 字段，顶层 ``model`` 与实际请求模型一致。
     """
     settings = Settings()
-    api_key = os.environ.get(settings.llm.api_key_env, "")
-    base_url = os.environ.get(settings.llm.base_url_env, "")
+    api_key, base_url = resolve_credentials(settings.llm)
     if not api_key or not base_url:
         print(f"缺少配置：请设置 {settings.llm.api_key_env} 与 {settings.llm.base_url_env} 环境变量")
         return 1

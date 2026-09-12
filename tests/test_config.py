@@ -13,6 +13,14 @@ def test_defaults():
     assert s.review.strategy == "single_pass"
     assert s.publishing.dry_run is True
     assert s.agent.reserved_finalize_ratio == 0.10
+    assert s.context.symbol_retrieval is True
+    assert s.review.static.enabled is False
+    assert s.review.judge.enabled is False
+    assert s.review.judge.max_findings == 32
+    assert s.review.feedback.enabled is True
+    assert s.review.feedback.max_items_per_file == 5
+    assert s.review.incremental.enabled is False
+    assert s.review.static.analyzers == ["ruff"]
 
 
 def test_load_settings_merge(tmp_path: Path):
@@ -31,6 +39,24 @@ def test_snapshot_hash_changes_with_config():
     a = Settings()
     b = Settings.model_validate({"review": {"max_files": 3}})
     assert a.snapshot_hash() != b.snapshot_hash()
+
+
+def test_snapshot_hash_stable_for_same_config():
+    """V1-f：相同配置快照哈希稳定。"""
+    a = Settings()
+    b = Settings()
+    assert a.snapshot_hash() == b.snapshot_hash()
+
+
+def test_snapshot_payload_excludes_secrets():
+    """V1-f：config 快照剥离 secret 字段（只存 xxx_env 名），密钥不进快照内容。"""
+    payload = Settings().snapshot_payload()
+    # 环境变量名保留（可复现），但不得出现任何高熵 secret 值
+    assert "MODEL_API_KEY" in payload or '"api_key_env": "***"' in payload
+    assert "GITHUB_TOKEN" in payload
+    # 不泄漏任何 secret 形态
+    assert "sk-" not in payload
+    assert "ghp_" not in payload
 
 
 def test_unknown_field_rejected():
@@ -60,6 +86,11 @@ def test_request_changes_with_dry_run_rejected():
         Settings.model_validate({"publishing": {"dry_run": True, "request_changes": True}})
     # dry_run=false 时允许
     Settings.model_validate({"publishing": {"dry_run": False, "request_changes": True}})
+
+
+def test_unknown_static_analyzer_rejected():
+    with pytest.raises(ValidationError, match="未知静态分析器"):
+        Settings.model_validate({"review": {"static": {"analyzers": ["bandit"]}}})
 
 
 def test_negative_budget_rejected():

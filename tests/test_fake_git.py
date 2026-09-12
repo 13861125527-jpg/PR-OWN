@@ -53,16 +53,28 @@ async def test_get_diff_contains_unified_diff():
 
 
 @pytest.mark.asyncio
+async def test_get_blob_and_list_paths():
+    fake = FakeGitProvider()
+    fake.add_snapshot("head", {"src/a.py": "x = 1\n"})
+    assert await fake.list_paths("head") == ["src/a.py"]
+    assert await fake.get_blob("head", "src/a.py") == "x = 1\n"
+    assert await fake.get_blob("head", "missing.py") is None
+    assert await fake.get_blob("head", "../secret") is None
+
+
+@pytest.mark.asyncio
 async def test_publish_comments_idempotent():
-    """P1-6：同 (plan_id, comment_id) 重复发布不重复创建，复用 remote_comment_id。"""
+    """P1-6 / V1-e 返工 P0：同 marker 重复发布不重复创建，复用 remote_comment_id。"""
     fake = FakeGitProvider()
     plan = PublishPlan(
         plan_id="p1",
         run_id="r1",
         mode="publish",
         comments=[
-            CommentPlan(comment_id="c1", kind=CommentKind.INLINE, path="src/a.py", line=2, body="issue"),
-            CommentPlan(comment_id="c2", kind=CommentKind.SUMMARY, body="summary"),
+            CommentPlan(comment_id="c1", kind=CommentKind.INLINE, path="src/a.py", line=2,
+                        body="issue", marker="<!-- reposage:Repo#1:k1:inline -->"),
+            CommentPlan(comment_id="c2", kind=CommentKind.SUMMARY, body="summary",
+                        marker="<!-- reposage:Repo#1:summary:summary -->"),
         ],
     )
     first = await fake.publish_comments(plan)

@@ -1,0 +1,383 @@
+{
+  "mode": "scripted_fake",
+  "dataset": "reposage/evals/datasets/v3d_cross_file.yaml",
+  "samples": 7,
+  "real_api": false,
+  "recommendation": "keep_agent_experimental",
+  "dataset_status": "ok",
+  "dataset_errors": [],
+  "quality": {
+    "precision": {
+      "v2": 0.4,
+      "v3": 1.0
+    },
+    "recall": {
+      "v2": 0.4,
+      "v3": 1.0
+    },
+    "f1": {
+      "v2": 0.4,
+      "v3": 1.0
+    },
+    "position_accuracy": {
+      "v2": 0.25,
+      "v3": 1.0
+    },
+    "negative_noise": {
+      "v2": 0.0,
+      "v3": 0.0
+    },
+    "note": "脚本化 Fake；V2 仅当 L3 prompt 含锚点才吐 Finding。带 tool_call_id 的 V3 候选只有 TOOL_RESULT，Pipeline 不验证该证据并打 0.8 折；脚本用 confidence=1.0（折后 0.8）才能过默认 min_confidence=0.75。若用与 V2 相同的 0.9，折后 0.72 会被抑制。xf-spam-tools / xf-ungrounded 不进本表。不代表真实模型质量。",
+    "excluded": [
+      "xf-spam-tools",
+      "xf-ungrounded"
+    ]
+  },
+  "cost": {
+    "model_calls": {
+      "v2": 7,
+      "v3": 23
+    },
+    "input_tokens": {
+      "v2": 700,
+      "v3": 2300
+    },
+    "output_tokens": {
+      "v2": 350,
+      "v3": 1150
+    },
+    "total_tokens": {
+      "v2": 1050,
+      "v3": 3450
+    },
+    "tool_calls": {
+      "v2": 0,
+      "v3": 7
+    },
+    "cost_usd": {
+      "v2": 0.007,
+      "v3": 0.023
+    },
+    "note": "Fake ModelUsage 累计（含 cost_usd），非真实 API 账单。"
+  },
+  "latency": {
+    "repeats": 3,
+    "total_ms": {
+      "v2": 44.23,
+      "v3": 68.5
+    },
+    "sum_sample_ms": {
+      "v2": 41.7,
+      "v3": 62.48
+    },
+    "p50_ms": {
+      "v2": 42.15,
+      "v3": 68.47
+    },
+    "p95_ms": {
+      "v2": 47.94,
+      "v3": 70.8
+    },
+    "note": "全数据集墙钟，repeats=3；质量取第 1 次。Fake 延迟不代表真实模型。"
+  },
+  "agent_ops": {
+    "tool_calls": 7,
+    "successful_tools": 7,
+    "tool_attempts": 10,
+    "effectiveness": 0.7,
+    "repeat_rate": 0.3,
+    "failure_rate": 0.0,
+    "groundedness": 1.0,
+    "tool_groundedness": 0.833,
+    "v2_tool_calls": 0,
+    "needs_evidence": 5,
+    "note": "控制工具不计 attempt。本表是数据集合计，不是 0.7/0.3 门槛；门槛只钉 xf-l3-miss / xf-spam-tools。groundedness 含 diff 行（Pipeline 已定位则常为 1.0）；tool_groundedness 只认 evidence.tool_call_id。V3 带 TOOL_RESULT 的 accepted 常 needs_evidence=True（Pipeline 不验证该证据）。"
+  },
+  "protocol_ab": {
+    "native_completed": 7,
+    "action_json_completed": 7,
+    "samples": 7,
+    "all_passed": true,
+    "hits_preserved": true,
+    "groundedness_preserved": true,
+    "cases": [
+      {
+        "id": "xf-l3-hit",
+        "native_completed": true,
+        "action_json_completed": true,
+        "native_calls": 3,
+        "action_json_calls": 3,
+        "native_hit": 1,
+        "action_json_hit": 1,
+        "native_tool_call_ids": [
+          "xf-l3-hit-read"
+        ],
+        "action_json_tool_call_ids": [
+          "aj-read_file-63dbbce9d038"
+        ],
+        "native_tool_groundedness": 1.0,
+        "action_json_tool_groundedness": 1.0,
+        "native_json_repair": false,
+        "action_json_json_repair": false,
+        "native_ids_in_db": true,
+        "action_json_ids_in_db": true
+      },
+      {
+        "id": "xf-l3-miss",
+        "native_completed": true,
+        "action_json_completed": true,
+        "native_calls": 3,
+        "action_json_calls": 4,
+        "native_hit": 1,
+        "action_json_hit": 1,
+        "native_tool_call_ids": [
+          "xf-l3-miss-read"
+        ],
+        "action_json_tool_call_ids": [
+          "aj-read_file-bde3a5f6e50e"
+        ],
+        "native_tool_groundedness": 1.0,
+        "action_json_tool_groundedness": 1.0,
+        "native_json_repair": false,
+        "action_json_json_repair": true,
+        "native_ids_in_db": true,
+        "action_json_ids_in_db": true
+      },
+      {
+        "id": "xf-l3-miss-search",
+        "native_completed": true,
+        "action_json_completed": true,
+        "native_calls": 3,
+        "action_json_calls": 3,
+        "native_hit": 1,
+        "action_json_hit": 1,
+        "native_tool_call_ids": [
+          "xf-l3-miss-search-search"
+        ],
+        "action_json_tool_call_ids": [
+          "aj-search_code-eca59cd3fbdc"
+        ],
+        "native_tool_groundedness": 1.0,
+        "action_json_tool_groundedness": 1.0,
+        "native_json_repair": false,
+        "action_json_json_repair": false,
+        "native_ids_in_db": true,
+        "action_json_ids_in_db": true
+      },
+      {
+        "id": "xf-negative",
+        "native_completed": true,
+        "action_json_completed": true,
+        "native_calls": 2,
+        "action_json_calls": 2,
+        "native_hit": 0,
+        "action_json_hit": 0,
+        "native_tool_call_ids": [],
+        "action_json_tool_call_ids": [],
+        "native_tool_groundedness": null,
+        "action_json_tool_groundedness": null,
+        "native_json_repair": false,
+        "action_json_json_repair": false,
+        "native_ids_in_db": true,
+        "action_json_ids_in_db": true
+      },
+      {
+        "id": "xf-grounded",
+        "native_completed": true,
+        "action_json_completed": true,
+        "native_calls": 3,
+        "action_json_calls": 3,
+        "native_hit": 1,
+        "action_json_hit": 1,
+        "native_tool_call_ids": [
+          "xf-grounded-refs"
+        ],
+        "action_json_tool_call_ids": [
+          "aj-find_references-dcaeeafc0e52"
+        ],
+        "native_tool_groundedness": 1.0,
+        "action_json_tool_groundedness": 1.0,
+        "native_json_repair": false,
+        "action_json_json_repair": false,
+        "native_ids_in_db": true,
+        "action_json_ids_in_db": true
+      },
+      {
+        "id": "xf-spam-tools",
+        "native_completed": true,
+        "action_json_completed": true,
+        "native_calls": 6,
+        "action_json_calls": 6,
+        "native_hit": 1,
+        "action_json_hit": 1,
+        "native_tool_call_ids": [
+          "xf-spam-tools-r0"
+        ],
+        "action_json_tool_call_ids": [
+          "aj-read_file-0d518ff1ad68"
+        ],
+        "native_tool_groundedness": 1.0,
+        "action_json_tool_groundedness": 1.0,
+        "native_json_repair": false,
+        "action_json_json_repair": false,
+        "native_ids_in_db": true,
+        "action_json_ids_in_db": true
+      },
+      {
+        "id": "xf-ungrounded",
+        "native_completed": true,
+        "action_json_completed": true,
+        "native_calls": 3,
+        "action_json_calls": 3,
+        "native_hit": 1,
+        "action_json_hit": 1,
+        "native_tool_call_ids": [],
+        "action_json_tool_call_ids": [],
+        "native_tool_groundedness": 0.0,
+        "action_json_tool_groundedness": 0.0,
+        "native_json_repair": false,
+        "action_json_json_repair": false,
+        "native_ids_in_db": true,
+        "action_json_ids_in_db": true
+      }
+    ],
+    "note": "action_json 臂经真实 Action JSON 解析器，命中样本 tool_call_id 为 aj-*；xf-l3-miss 另含 1 条 parse_error→repair。Fake 下两列接近是预期。协议可切换；选型等 live。不关闭 OQ-11。"
+  },
+  "per_sample": [
+    {
+      "id": "xf-l3-hit",
+      "l3_expected": "hit",
+      "v2_hit": 1,
+      "v3_hit": 1,
+      "v3_tool_call_ids": [
+        "xf-l3-hit-read"
+      ],
+      "v3_effectiveness": 1.0,
+      "v3_repeat_rate": 0.0,
+      "v3_groundedness": 1.0,
+      "v3_tool_groundedness": 1.0,
+      "v3_needs_evidence": 1,
+      "v3_ids_in_db": true,
+      "v3_evidence_path_ok": true,
+      "v3_anchor_observed": true
+    },
+    {
+      "id": "xf-l3-miss",
+      "l3_expected": "miss",
+      "v2_hit": 0,
+      "v3_hit": 1,
+      "v3_tool_call_ids": [
+        "xf-l3-miss-read"
+      ],
+      "v3_effectiveness": 1.0,
+      "v3_repeat_rate": 0.0,
+      "v3_groundedness": 1.0,
+      "v3_tool_groundedness": 1.0,
+      "v3_needs_evidence": 1,
+      "v3_ids_in_db": true,
+      "v3_evidence_path_ok": true,
+      "v3_anchor_observed": true
+    },
+    {
+      "id": "xf-l3-miss-search",
+      "l3_expected": "miss",
+      "v2_hit": 0,
+      "v3_hit": 1,
+      "v3_tool_call_ids": [
+        "xf-l3-miss-search-search"
+      ],
+      "v3_effectiveness": 1.0,
+      "v3_repeat_rate": 0.0,
+      "v3_groundedness": 1.0,
+      "v3_tool_groundedness": 1.0,
+      "v3_needs_evidence": 1,
+      "v3_ids_in_db": true,
+      "v3_evidence_path_ok": true,
+      "v3_anchor_observed": true
+    },
+    {
+      "id": "xf-negative",
+      "l3_expected": "n/a",
+      "v2_hit": 0,
+      "v3_hit": 0,
+      "v3_tool_call_ids": [],
+      "v3_effectiveness": 1.0,
+      "v3_repeat_rate": 0.0,
+      "v3_groundedness": null,
+      "v3_tool_groundedness": null,
+      "v3_needs_evidence": 0,
+      "v3_ids_in_db": true,
+      "v3_evidence_path_ok": false,
+      "v3_anchor_observed": false
+    },
+    {
+      "id": "xf-grounded",
+      "l3_expected": "miss",
+      "v2_hit": 0,
+      "v3_hit": 1,
+      "v3_tool_call_ids": [
+        "xf-grounded-refs"
+      ],
+      "v3_effectiveness": 1.0,
+      "v3_repeat_rate": 0.0,
+      "v3_groundedness": 1.0,
+      "v3_tool_groundedness": 1.0,
+      "v3_needs_evidence": 1,
+      "v3_ids_in_db": true,
+      "v3_evidence_path_ok": true,
+      "v3_anchor_observed": true
+    },
+    {
+      "id": "xf-spam-tools",
+      "l3_expected": "miss",
+      "v2_hit": 0,
+      "v3_hit": 1,
+      "v3_tool_call_ids": [
+        "xf-spam-tools-r0"
+      ],
+      "v3_effectiveness": 0.25,
+      "v3_repeat_rate": 0.75,
+      "v3_groundedness": 1.0,
+      "v3_tool_groundedness": 1.0,
+      "v3_needs_evidence": 1,
+      "v3_ids_in_db": true,
+      "v3_evidence_path_ok": true,
+      "v3_anchor_observed": true
+    },
+    {
+      "id": "xf-ungrounded",
+      "l3_expected": "miss",
+      "v2_hit": 0,
+      "v3_hit": 1,
+      "v3_tool_call_ids": [],
+      "v3_effectiveness": 1.0,
+      "v3_repeat_rate": 0.0,
+      "v3_groundedness": 1.0,
+      "v3_tool_groundedness": 0.0,
+      "v3_needs_evidence": 0,
+      "v3_ids_in_db": true,
+      "v3_evidence_path_ok": false,
+      "v3_anchor_observed": false
+    }
+  ],
+  "default_agent": {
+    "enabled": false,
+    "strategy": "single_pass",
+    "tool_calls": 0,
+    "tool_protocol": "native",
+    "user_version": 5
+  },
+  "v1_demo_default": {
+    "enabled": false,
+    "strategy": "single_pass",
+    "tool_calls": 0,
+    "tool_protocol": "native",
+    "user_version": 5,
+    "dataset": "reposage/evals/datasets/v1_demo.yaml",
+    "sample_id": "s01-eval"
+  },
+  "v3_file_tasks": 3,
+  "v3_file_tasks_is_default": true,
+  "v2_is_default_settings": true,
+  "user_version": 5
+}

@@ -1,0 +1,40 @@
+{
+  "model": "deepseek-v4-pro",
+  "base_url": "https://api.deepseek.com",
+  "rounds": 3,
+  "timestamp": "2026-09-10T00:00:27+0800",
+  "checks": {
+    "minimal_request": {
+      "ok": true,
+      "latency_ms": 2543,
+      "usage": {
+        "model": "deepseek-v4-pro",
+        "input_tokens": 87,
+        "output_tokens": 35,
+        "cost_usd": 0.0,
+        "latency_ms": 0
+      }
+    },
+    "concurrency_3": {
+      "ok": true,
+      "total_ms": 40108
+    },
+    "structured": {
+      "ok": true,
+      "parsed": 3,
+      "total": 3,
+      "rate": 1.0,
+      "structure_failures": 0,
+      "request_failures": 0,
+      "repairs": 0,
+      "schema_fallbacks": 3,
+      "response_format_fallbacks": 0,
+      "http_attempts": 10,
+      "http_retryable_failures": 0,
+      "http_retries": 0,
+      "http_429": 0
+    }
+  },
+  "failures": [],
+  "passed": true
+}

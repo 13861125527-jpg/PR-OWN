@@ -1,0 +1,196 @@
+{
+  "model": "deepseek-v4-pro",
+  "base_url": "https://api.deepseek.com",
+  "dataset": "reposage/evals/datasets/resume_v123_40.yaml",
+  "repeats": 1,
+  "temperature": 0.1,
+  "max_output_tokens": 3000,
+  "timestamp": "2026-09-10T00:06:03+0800",
+  "summary": {
+    "v1": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "position_accuracy": 1.0,
+      "negative_noise": 0.0
+    },
+    "baseline": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "position_accuracy": 1.0,
+      "negative_noise": 0.0
+    }
+  },
+  "paired_summary": {
+    "sample_ids": [
+      "r01-sql-injection"
+    ],
+    "sample_count": 1,
+    "v1": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "position_accuracy": 1.0
+    },
+    "baseline": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "position_accuracy": 1.0
+    }
+  },
+  "missing": {
+    "v1": [],
+    "baseline": []
+  },
+  "cost": {
+    "v1": {
+      "total_cost_usd": 0.0,
+      "avg_cost_per_invocation_usd": 0.0,
+      "pricing_status": "unknown",
+      "logical_invocations": 1,
+      "successful_logical_invocations": 1,
+      "failed_logical_invocations": 0,
+      "provider_requests": 1,
+      "input_tokens": 756,
+      "output_tokens": 937,
+      "retries": 0,
+      "schema_repairs": 0
+    },
+    "baseline": {
+      "total_cost_usd": 0.0,
+      "avg_cost_per_invocation_usd": 0.0,
+      "pricing_status": "unknown",
+      "logical_invocations": 1,
+      "successful_logical_invocations": 1,
+      "failed_logical_invocations": 0,
+      "provider_requests": 1,
+      "input_tokens": 557,
+      "output_tokens": 647,
+      "retries": 0,
+      "schema_repairs": 0
+    }
+  },
+  "latency": {
+    "v1": {
+      "run_latency": {
+        "success_total_ms": 15123.57,
+        "success_count": 1,
+        "success_avg_ms": 15123.57,
+        "failed_total_ms": 0.0
+      },
+      "provider_latency": {
+        "total_ms": 15122.0,
+        "invocation_count": 1,
+        "avg_ms": 15122.0
+      }
+    },
+    "baseline": {
+      "run_latency": {
+        "success_total_ms": 10920.9,
+        "success_count": 1,
+        "success_avg_ms": 10920.9,
+        "failed_total_ms": 0.0
+      },
+      "provider_latency": {
+        "total_ms": 10920.0,
+        "invocation_count": 1,
+        "avg_ms": 10920.0
+      }
+    }
+  },
+  "per_sample": [
+    {
+      "id": "r01-sql-injection",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 756,
+      "v1_output_tokens": 937,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 557,
+      "baseline_output_tokens": 647,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/users.py",
+            "claimed_start_line": 2,
+            "confidence": 0.95
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/users.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/users.py",
+            "canonical_start_line": 2,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/users.py",
+            "line": 2
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/users.py",
+            "claimed_start_line": 2,
+            "confidence": 1.0
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/users.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/users.py",
+            "canonical_start_line": 2,
+            "confidence": 1.0,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    }
+  ],
+  "failures": [],
+  "execution_completed": true,
+  "quality_gate_passed": true,
+  "comparison_result": "equal"
+}

@@ -1,0 +1,94 @@
+{
+  "mode": "scripted_fake",
+  "dataset": "reposage/evals/datasets/v2c_static.yaml",
+  "samples": 8,
+  "real_api": "not_run",
+  "conversion": {
+    "cases": [
+      {
+        "id": "convert-b006",
+        "kind": "convert",
+        "ok": true,
+        "n_candidates": 1
+      },
+      {
+        "id": "reject-traversal",
+        "kind": "convert",
+        "ok": true,
+        "n_candidates": 0
+      },
+      {
+        "id": "reject-old-line",
+        "kind": "convert",
+        "ok": true,
+        "n_candidates": 0
+      }
+    ],
+    "passed": 3,
+    "total": 3,
+    "note": "诊断 → Candidate 的路径/新增行过滤；不跑真实模型。"
+  },
+  "dedup": {
+    "cases": [
+      {
+        "id": "dedup-same-rule",
+        "kind": "dedup",
+        "ok": true,
+        "n_accepted": 1,
+        "source_kinds": [
+          "static_analyzer"
+        ]
+      },
+      {
+        "id": "distinct-rules",
+        "kind": "dedup",
+        "ok": true,
+        "n_accepted": 2,
+        "source_kinds": [
+          "static_analyzer"
+        ]
+      },
+      {
+        "id": "fuse-llm-static",
+        "kind": "fuse",
+        "ok": true,
+        "n_accepted": 1,
+        "source_kinds": [
+          "llm_general",
+          "static_analyzer"
+        ]
+      },
+      {
+        "id": "no-fuse-different-category",
+        "kind": "no_fuse",
+        "ok": true,
+        "n_accepted": 2,
+        "source_kinds": [
+          "llm_general",
+          "static_analyzer"
+        ]
+      },
+      {
+        "id": "no-fuse-two-static-via-llm",
+        "kind": "no_fuse",
+        "ok": true,
+        "n_accepted": 2,
+        "source_kinds": [
+          "llm_general",
+          "static_analyzer"
+        ]
+      }
+    ],
+    "passed": 5,
+    "total": 5,
+    "note": "同码去重、异码并存、LLM+静态融合；fingerprint 用静态 rule_id。"
+  },
+  "cost": {
+    "model_calls": {
+      "off": 0,
+      "on": 0
+    },
+    "note": "本对照不经 LLM；模型 calls 相对 V2-B 不变由单测/Service 开关保证。静态分析不占 GlobalBudget。"
+  },
+  "all_passed": true
+}

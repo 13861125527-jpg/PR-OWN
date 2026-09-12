@@ -1,0 +1,3297 @@
+{
+  "version": "V3-live",
+  "model": "deepseek-v4-pro",
+  "judge_model": "deepseek-v4-flash",
+  "dataset": "reposage/evals/datasets/resume_l3_context_30.yaml",
+  "sample_count": 15,
+  "execution_completed": false,
+  "arms": {
+    "base": {
+      "judge_1": {
+        "matched": 9,
+        "expected": 11,
+        "reported": 10,
+        "precision": 0.9,
+        "recall": 0.818,
+        "f1": 0.857,
+        "perfect_samples": 12
+      },
+      "judge_2": {
+        "matched": 9,
+        "expected": 11,
+        "reported": 10,
+        "precision": 0.9,
+        "recall": 0.818,
+        "f1": 0.857,
+        "perfect_samples": 12
+      },
+      "judge_agreement_samples": 15,
+      "avg_latency_ms": 79466.43,
+      "total_calls": 15,
+      "input_tokens": 15960,
+      "output_tokens": 41072,
+      "product_judge_calls": 0,
+      "tool_calls": 0,
+      "agent_failures": 0
+    },
+    "v3": {
+      "judge_1": {
+        "matched": 4,
+        "expected": 11,
+        "reported": 6,
+        "precision": 0.667,
+        "recall": 0.364,
+        "f1": 0.471,
+        "perfect_samples": 6
+      },
+      "judge_2": {
+        "matched": 4,
+        "expected": 11,
+        "reported": 6,
+        "precision": 0.667,
+        "recall": 0.364,
+        "f1": 0.471,
+        "perfect_samples": 6
+      },
+      "judge_agreement_samples": 15,
+      "avg_latency_ms": 70664.68,
+      "total_calls": 78,
+      "input_tokens": 288056,
+      "output_tokens": 52673,
+      "product_judge_calls": 0,
+      "tool_calls": 48,
+      "agent_failures": 3
+    }
+  },
+  "per_sample": [
+    {
+      "id": "l3-02-milliseconds",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_02.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_02.py",
+              "line": 4,
+              "confidence": 0.5
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "bd6fae48026149e6aa6b315ef43f1d7d",
+            "title": "Potential unit mismatch in check call after removal of *1000",
+            "category": "correctness",
+            "path": "src/case_02.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "If the caller of process() still passes value in seconds (or any unit other than milliseconds), the returned value will be divided by 1000 incorrectly.",
+            "impact": "The function will return a value 1000 times smaller than expected, causing downstream timeout or timing logic to fail.",
+            "explanation": "The previous code multiplied value by 1000 before passing it to check(), which is consistent with check() expecting milliseconds and returning seconds. The diff removed the multiplication, which may be correct if value is now already in milliseconds (as the PR title suggests), but without confirmation of the caller contract this introduces a high-risk regression. The L3 snippet is from an unchanged module and is not independently verified, but it clearly documents that check() accepts milliseconds.",
+            "suggestion": "Verify that all callers of process() now pass value in milliseconds. If any caller still passes seconds, either restore the multiplication or update the contract of process() to explicitly require milliseconds and update all call sites."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "bd6fae48026149e6aa6b315ef43f1d7d",
+            "title": "Potential unit mismatch in check call after removal of *1000",
+            "category": "correctness",
+            "path": "src/case_02.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "If the caller of process() still passes value in seconds (or any unit other than milliseconds), the returned value will be divided by 1000 incorrectly.",
+            "impact": "The function will return a value 1000 times smaller than expected, causing downstream timeout or timing logic to fail.",
+            "explanation": "The previous code multiplied value by 1000 before passing it to check(), which is consistent with check() expecting milliseconds and returning seconds. The diff removed the multiplication, which may be correct if value is now already in milliseconds (as the PR title suggests), but without confirmation of the caller contract this introduces a high-risk regression. The L3 snippet is from an unchanged module and is not independently verified, but it clearly documents that check() accepts milliseconds.",
+            "suggestion": "Verify that all callers of process() now pass value in milliseconds. If any caller still passes seconds, either restore the multiplication or update the contract of process() to explicitly require milliseconds and update all call sites.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 35222.81,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 819,
+          "output_tokens": 1520,
+          "provider_latency_ms": 35216,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.97,
+                "reason": "Both identify the same unit-mismatch defect: after removing the *1000, the caller still passes seconds while check() expects milliseconds, causing a 1000x timing error."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.95,
+                "reason": "Both findings describe the same unit mismatch caused by removing the *1000 conversion before check(), where the helper still expects milliseconds while the caller may now pass seconds, yielding a value 1000 times too small."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_02.py",
+              "line": 4
+            }
+          ],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 1,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 96961.91,
+        "usage": {
+          "logical_invocations": 6,
+          "input_tokens": 20025,
+          "output_tokens": 4534,
+          "provider_latency_ms": 96949,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 5,
+        "tool_attempts": 7,
+        "successful_tools": 5,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Diff changes process to pass value directly to check, which per the unchanged helper contract accepts milliseconds and returns seconds. This aligns with PR title \"milliseconds\"; no defect found.",
+            "candidate_count": 0,
+            "rounds": 6
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-05-mutates-input",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_05.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_05.py",
+              "line": 4,
+              "confidence": 0.9
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "b3302fd6e5d340ffbb644032bc5e1001",
+            "title": "process returns None instead of the sorted list",
+            "category": "correctness",
+            "path": "src/case_05.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling process(value) with a list.",
+            "impact": "process now returns None, losing the sorted list that was previously returned.",
+            "explanation": "The diff changes the return statement from `(check(value), value)[1]` (which returns `value` after `check` mutates it) to `return check(value)`. The imported helper `check` sorts its argument in place and returns None (as shown in the L3 snippet). Therefore `process` now returns None instead of the sorted list.",
+            "suggestion": "Restore the return of the mutated value, e.g., `check(value); return value` or `return (check(value), value)[1]`."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "b3302fd6e5d340ffbb644032bc5e1001",
+            "title": "process returns None instead of the sorted list",
+            "category": "correctness",
+            "path": "src/case_05.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling process(value) with a list.",
+            "impact": "process now returns None, losing the sorted list that was previously returned.",
+            "explanation": "The diff changes the return statement from `(check(value), value)[1]` (which returns `value` after `check` mutates it) to `return check(value)`. The imported helper `check` sorts its argument in place and returns None (as shown in the L3 snippet). Therefore `process` now returns None instead of the sorted list.",
+            "suggestion": "Restore the return of the mutated value, e.g., `check(value); return value` or `return (check(value), value)[1]`.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 14582.44,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 820,
+          "output_tokens": 781,
+          "provider_latency_ms": 14578,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both findings describe the same defect: process now returns the result of check(value), but check mutates in place and returns None, so callers receive None instead of the sorted list."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.99,
+                "reason": "Both describe the same defect: process returns the result of an in-place mutating helper that returns None, so callers lose the sorted list."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_05.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_05.py",
+              "line": 4,
+              "confidence": 0.8
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "7bb54ad329274c27a370c520b9868224",
+            "title": "process now returns None instead of the sorted value, a silent API regression",
+            "category": "correctness",
+            "path": "src/case_05.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "任何依赖 process(value) 返回值（排序后的列表）的调用方。",
+            "impact": "",
+            "explanation": "lib/contract_05.py 的 check(value) 就地排序并隐式返回 None。旧实现 (check(value), value)[1] 先执行 check 就地排序，再返回已排序的 value。新实现 return check(value) 使 process 返回 None，而非排序后的列表。若调用方依赖 process 的返回值，将静默得到 None，属于行为回归。",
+            "suggestion": "若需保持原语义，改为 check(value) 后返回 value（例如 check(value); return value），或明确文档化返回类型由 list 变为 None 并更新所有调用方。"
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "7bb54ad329274c27a370c520b9868224",
+            "title": "process now returns None instead of the sorted value, a silent API regression",
+            "category": "correctness",
+            "path": "src/case_05.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "任何依赖 process(value) 返回值（排序后的列表）的调用方。",
+            "impact": "",
+            "explanation": "lib/contract_05.py 的 check(value) 就地排序并隐式返回 None。旧实现 (check(value), value)[1] 先执行 check 就地排序，再返回已排序的 value。新实现 return check(value) 使 process 返回 None，而非排序后的列表。若调用方依赖 process 的返回值，将静默得到 None，属于行为回归。",
+            "suggestion": "若需保持原语义，改为 check(value) 后返回 value（例如 check(value); return value），或明确文档化返回类型由 list 变为 None 并更新所有调用方。",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 95404.54,
+        "usage": {
+          "logical_invocations": 5,
+          "input_tokens": 20681,
+          "output_tokens": 5472,
+          "provider_latency_ms": 95394,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 2,
+        "tool_attempts": 3,
+        "successful_tools": 2,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "已识别并提交 process 返回值由排序列表变为 None 的回归缺陷。",
+            "candidate_count": 1,
+            "rounds": 5
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.97,
+                "reason": "Both describe the same defect: the refactor changes `return (check(value), value)[1]` to `return check(value)`, so the in-place mutating helper's implicit None is propagated to callers instead of the sorted list, silently breaking return-value-dependent callers. Same root cause, trigger, and impact."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both describe the same defect: process now returns the helper's implicit None instead of the sorted list because the helper mutates in place and returns None, causing callers relying on the return value to silently receive None."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-07-raises-missing",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "edge_case",
+              "path": "src/case_07.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_07.py",
+              "line": 4,
+              "confidence": 0.75
+            }
+          ],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": [
+            {
+              "path": "src/case_07.py",
+              "line": 4,
+              "expected": "edge_case",
+              "actual": "correctness"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "9f5d93e528bb42a8b639c3f2fd1e138c",
+            "title": "Unconditional call to check() turns missing values into unhandled KeyError",
+            "category": "correctness",
+            "path": "src/case_07.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "process is called with value=None",
+            "impact": "KeyError('missing') is raised instead of the previous 'default' return; callers relying on the default can crash or fail unexpectedly.",
+            "explanation": "The diff removes the None guard and directly calls check(value). Since check explicitly raises KeyError when value is None, the edge case of None input now propagates an exception rather than returning the previous default.",
+            "suggestion": "If default behavior is intended, restore the None guard; otherwise, document the new exception behavior and ensure callers handle KeyError."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "9f5d93e528bb42a8b639c3f2fd1e138c",
+            "title": "Unconditional call to check() turns missing values into unhandled KeyError",
+            "category": "correctness",
+            "path": "src/case_07.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "process is called with value=None",
+            "impact": "KeyError('missing') is raised instead of the previous 'default' return; callers relying on the default can crash or fail unexpectedly.",
+            "explanation": "The diff removes the None guard and directly calls check(value). Since check explicitly raises KeyError when value is None, the edge case of None input now propagates an exception rather than returning the previous default.",
+            "suggestion": "If default behavior is intended, restore the None guard; otherwise, document the new exception behavior and ensure callers handle KeyError.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 33189.07,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 837,
+          "output_tokens": 1570,
+          "provider_latency_ms": 33185,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both describe the same defect: removing the None guard at src/case_07.py:4 causes None input to reach check(), which raises KeyError instead of returning the previous default, matching the expected removed-guard edge-case defect."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both describe the same defect: removing the None guard in process causes value=None to reach check(), which raises the documented KeyError('missing') instead of returning the previous default. Same trigger, code location, and impact."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "edge_case",
+              "path": "src/case_07.py",
+              "line": 4
+            }
+          ],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 1,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 106430.34,
+        "usage": {
+          "logical_invocations": 5,
+          "input_tokens": 16173,
+          "output_tokens": 5869,
+          "provider_latency_ms": 106357,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 3,
+        "tool_attempts": 5,
+        "successful_tools": 3,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 1,
+        "agent_sessions": [
+          {
+            "status": "partial",
+            "stop_reason": "model_error:HTTP 400: {\"error\":{\"message\":\"The `reasoning_content` in the thinking mode must be passed back to the API.\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":",
+            "candidate_count": 0,
+            "rounds": 6
+          }
+        ],
+        "task_failures": 1,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-08-empty-rejected",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "edge_case",
+              "path": "src/case_08.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "edge_case",
+              "path": "src/case_08.py",
+              "line": 4,
+              "confidence": 0.6
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "83eb304c953844b6937e38438725838b",
+            "title": "Empty input now raises ValueError instead of returning None",
+            "category": "edge_case",
+            "path": "src/case_08.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "When process() is called with a falsy value (e.g., empty list, None, empty string).",
+            "impact": "Function now raises ValueError('empty') instead of returning None, potentially breaking callers that expect None for empty input.",
+            "explanation": "The diff removes the conditional that returned None for falsy values. The imported check function (from unchanged lib.contract_08) raises ValueError when value is falsy. This changes the contract of process() for empty inputs. Unless intentional (as suggested by PR title 'empty rejected'), this is a behavior change that may cause unhandled exceptions in existing callers.",
+            "suggestion": "If rejecting empty values is intentional, document the change and update callers accordingly. Otherwise, retain the None-returning behavior for falsy inputs or handle the ValueError explicitly."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "83eb304c953844b6937e38438725838b",
+            "title": "Empty input now raises ValueError instead of returning None",
+            "category": "edge_case",
+            "path": "src/case_08.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "When process() is called with a falsy value (e.g., empty list, None, empty string).",
+            "impact": "Function now raises ValueError('empty') instead of returning None, potentially breaking callers that expect None for empty input.",
+            "explanation": "The diff removes the conditional that returned None for falsy values. The imported check function (from unchanged lib.contract_08) raises ValueError when value is falsy. This changes the contract of process() for empty inputs. Unless intentional (as suggested by PR title 'empty rejected'), this is a behavior change that may cause unhandled exceptions in existing callers.",
+            "suggestion": "If rejecting empty values is intentional, document the change and update callers accordingly. Otherwise, retain the None-returning behavior for falsy inputs or handle the ValueError explicitly.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 45726.51,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 831,
+          "output_tokens": 2041,
+          "provider_latency_ms": 45722,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.9,
+                "reason": "Both describe the same defect at src/case_08.py:4: the removal of the empty/falsy-input guard means empty input is no longer handled by the caller and now propagates to the helper, raising ValueError instead of returning None. Same root cause, trigger (empty/falsy input), and impact (changed contract / unhandled exception for callers)."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.9,
+                "reason": "Both describe the same defect: the diff removes the empty/falsy-input handling in process() at src/case_08.py:4, so empty input is no longer handled (previously returned None) and instead the underlying check raises ValueError, potentially breaking callers. Same root cause, trigger (falsy/empty input), and impact (precondition no longer handled, callers may fail)."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "edge_case",
+              "path": "src/case_08.py",
+              "line": 4
+            }
+          ],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 1,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 26700.29,
+        "usage": {
+          "logical_invocations": 3,
+          "input_tokens": 7890,
+          "output_tokens": 1299,
+          "provider_latency_ms": 26691,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 2,
+        "tool_attempts": 2,
+        "successful_tools": 2,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Diff aligns process() with the unchanged helper contract: empty/falsy inputs now raise ValueError('empty') instead of returning None. Matches PR title \"empty rejected\"; no defect found.",
+            "candidate_count": 0,
+            "rounds": 3
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-09-one-based",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_09.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_09.py",
+              "line": 4,
+              "confidence": 0.65
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "dd3f3f1a600b47cdbb32af8d981b5dde",
+            "title": "Direct call to check(value) changes return semantics and throws for zero-based input",
+            "category": "correctness",
+            "path": "src/case_09.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Any caller invoking process(0) causes check(0) to raise ValueError; callers invoking process(n) for n >= 1 now receive n-1 instead of n.",
+            "impact": "Runtime exception for zero-based index 0 and off-by-one return values for all positive inputs, breaking existing callers that expect the previous identity-like behavior.",
+            "explanation": "The original code `return check(value + 1)` transformed a zero-based `value` to a one-based item number; because `check` returns `value - 1`, the result was `(value + 1) - 1 == value`, effectively preserving the input. The new code passes `value` directly to `check`, which expects a one-based item number and returns `value - 1`. This alters the return value for every valid positive input and raises an exception when `value` is 0, unless all callers have been migrated to the new one-based contract.",
+            "suggestion": "If the intended contract remains zero-based, keep the original `value + 1` adjustment. If the contract is intentionally changed to one-based, update all callers to handle the new semantics and add validation for `value < 1` before calling `check`."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "dd3f3f1a600b47cdbb32af8d981b5dde",
+            "title": "Direct call to check(value) changes return semantics and throws for zero-based input",
+            "category": "correctness",
+            "path": "src/case_09.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Any caller invoking process(0) causes check(0) to raise ValueError; callers invoking process(n) for n >= 1 now receive n-1 instead of n.",
+            "impact": "Runtime exception for zero-based index 0 and off-by-one return values for all positive inputs, breaking existing callers that expect the previous identity-like behavior.",
+            "explanation": "The original code `return check(value + 1)` transformed a zero-based `value` to a one-based item number; because `check` returns `value - 1`, the result was `(value + 1) - 1 == value`, effectively preserving the input. The new code passes `value` directly to `check`, which expects a one-based item number and returns `value - 1`. This alters the return value for every valid positive input and raises an exception when `value` is 0, unless all callers have been migrated to the new one-based contract.",
+            "suggestion": "If the intended contract remains zero-based, keep the original `value + 1` adjustment. If the contract is intentionally changed to one-based, update all callers to handle the new semantics and add validation for `value < 1` before calling `check`.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 62257.63,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 833,
+          "output_tokens": 2563,
+          "provider_latency_ms": 62254,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.97,
+                "reason": "Both describe the same defect: process passes a zero-based value directly to a one-based check helper, causing incorrect return semantics and a ValueError for input 0."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both describe the same bug: a zero-based value is passed directly to a one-based check helper, causing off-by-one return values and a ValueError for 0, exactly matching the expected note."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_09.py",
+              "line": 4
+            }
+          ],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 1,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 24023.91,
+        "usage": {
+          "logical_invocations": 3,
+          "input_tokens": 7938,
+          "output_tokens": 1324,
+          "provider_latency_ms": 24017,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 2,
+        "tool_attempts": 3,
+        "successful_tools": 2,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Diff changes process to pass value directly to check, matching the helper contract that accepts a one-based item number and returns value-1. No defect found.",
+            "candidate_count": 0,
+            "rounds": 3
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-10-negative-invalid",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "edge_case",
+              "path": "src/case_10.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_10.py",
+              "line": 4,
+              "confidence": 0.7
+            }
+          ],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": [
+            {
+              "path": "src/case_10.py",
+              "line": 4,
+              "expected": "edge_case",
+              "actual": "correctness"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "d075eb21f9844b8386340f4d48ef5773",
+            "title": "Removing clamping of negative input changes error behavior",
+            "category": "correctness",
+            "path": "src/case_10.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling process(value) with value < 0",
+            "impact": "Function behavior changes from returning 0 for negative inputs to propagating a ValueError. Callers relying on the previous non-negative return value will crash.",
+            "explanation": "The diff replaces max(value, 0) with value as the argument to check. According to the unchanged helper function, check raises ValueError for negative values. This transforms a previously safe clamping into an exception that may break existing callers.",
+            "suggestion": "If rejecting negative inputs is intended, document the new contract and ensure callers handle ValueError. Otherwise, restore clamping inside process or handle negative values explicitly."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "d075eb21f9844b8386340f4d48ef5773",
+            "title": "Removing clamping of negative input changes error behavior",
+            "category": "correctness",
+            "path": "src/case_10.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling process(value) with value < 0",
+            "impact": "Function behavior changes from returning 0 for negative inputs to propagating a ValueError. Callers relying on the previous non-negative return value will crash.",
+            "explanation": "The diff replaces max(value, 0) with value as the argument to check. According to the unchanged helper function, check raises ValueError for negative values. This transforms a previously safe clamping into an exception that may break existing callers.",
+            "suggestion": "If rejecting negative inputs is intended, document the new contract and ensure callers handle ValueError. Otherwise, restore clamping inside process or handle negative values explicitly.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 32865.71,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 828,
+          "output_tokens": 1328,
+          "provider_latency_ms": 32862,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.97,
+                "reason": "Both describe the same defect: removing the max(value, 0) clamp at src/case_10.py:4 causes negative inputs to reach the helper that raises ValueError, changing previously safe clamping into a propagated exception. Same trigger (value < 0) and same impact (callers now crash / error behavior change); the category label difference (edge_case vs correctness) is non-binding."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.95,
+                "reason": "Both describe the same defect: removing the max(value, 0) clamp lets negative inputs reach the helper that rejects them, turning a silent clamp into a propagated ValueError. Category label differs (edge_case vs correctness) but the trigger (negative input), location (src/case_10.py line 4), and impact (negative values now cause an error instead of being clamped) match."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "edge_case",
+              "path": "src/case_10.py",
+              "line": 4
+            }
+          ],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 1,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 21470.35,
+        "usage": {
+          "logical_invocations": 4,
+          "input_tokens": 9948,
+          "output_tokens": 1001,
+          "provider_latency_ms": 21461,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 2,
+        "tool_attempts": 3,
+        "successful_tools": 2,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "New code honors helper contract by rejecting negatives; old clamp silently hid negatives. No defect.",
+            "candidate_count": 0,
+            "rounds": 4
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-12-path-containment",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "security",
+              "path": "src/case_12.py",
+              "line": 4
+            }
+          ],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 1,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 150532.33,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 1785,
+          "output_tokens": 6000,
+          "provider_latency_ms": 150528,
+          "retries": 0,
+          "schema_repairs": 1
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 1,
+        "warnings": [
+          "src/case_12.py 部分块失败: src/case_12.py: StructuredOutputError: 结构化输出解析失败（修复重试后仍失败）"
+        ],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "security",
+              "path": "src/case_12.py",
+              "line": 4
+            }
+          ],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 1,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 64896.19,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 2042,
+          "output_tokens": 3000,
+          "provider_latency_ms": 64818,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 1,
+        "agent_sessions": [
+          {
+            "status": "partial",
+            "stop_reason": "model_error:HTTP 400: {\"error\":{\"message\":\"The `reasoning_content` in the thinking mode must be passed back to the API.\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":",
+            "candidate_count": 0,
+            "rounds": 2
+          }
+        ],
+        "task_failures": 1,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-14-sql-identifier",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "security",
+              "path": "src/case_14.py",
+              "line": 4
+            }
+          ],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 1,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 168389.78,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 1711,
+          "output_tokens": 4205,
+          "provider_latency_ms": 168385,
+          "retries": 1,
+          "schema_repairs": 1
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "security",
+              "path": "src/case_14.py",
+              "line": 4
+            }
+          ],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 1,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 12230.31,
+        "usage": {
+          "logical_invocations": 3,
+          "input_tokens": 7154,
+          "output_tokens": 550,
+          "provider_latency_ms": 12221,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 2,
+        "tool_attempts": 3,
+        "successful_tools": 2,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "check() 仍被强制执行（元组构造从左到右求值），校验逻辑未绕过，返回 value 等价于 check 的返回值，无缺陷。",
+            "candidate_count": 0,
+            "rounds": 3
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-18-blocking-helper",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "performance",
+              "path": "src/case_18.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "performance",
+              "path": "src/case_18.py",
+              "line": 4,
+              "confidence": 0.65
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "4c989552c1074947b2ba7554142399eb",
+            "title": "Blocking helper called synchronously may stall async event loop",
+            "category": "performance",
+            "path": "src/case_18.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "When `process` is invoked from an asyncio event loop or within code that expects non-blocking behavior; `check` performs blocking I/O.",
+            "impact": "The event loop is blocked for the duration of `check`, causing other async tasks to stall and potentially leading to timeouts.",
+            "explanation": "The diff replaces `asyncio.to_thread(check, value)` with a direct synchronous call to `check`. According to the imported definition, `check` performs a blocking network operation, and callers in async code must offload it. If `process` is used in an async context, this will block the event loop.",
+            "suggestion": "Keep the offloading (e.g., `await asyncio.to_thread(check, value)`). If `process` cannot be async because of the missing `async` keyword, consider making it `async def` or returning a coroutine/future."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "4c989552c1074947b2ba7554142399eb",
+            "title": "Blocking helper called synchronously may stall async event loop",
+            "category": "performance",
+            "path": "src/case_18.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "When `process` is invoked from an asyncio event loop or within code that expects non-blocking behavior; `check` performs blocking I/O.",
+            "impact": "The event loop is blocked for the duration of `check`, causing other async tasks to stall and potentially leading to timeouts.",
+            "explanation": "The diff replaces `asyncio.to_thread(check, value)` with a direct synchronous call to `check`. According to the imported definition, `check` performs a blocking network operation, and callers in async code must offload it. If `process` is used in an async context, this will block the event loop.",
+            "suggestion": "Keep the offloading (e.g., `await asyncio.to_thread(check, value)`). If `process` cannot be async because of the missing `async` keyword, consider making it `async def` or returning a coroutine/future.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 43996.57,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 829,
+          "output_tokens": 1978,
+          "provider_latency_ms": 43991,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both identify the same defect: a documented blocking helper (`check`) is called synchronously/directly on the event loop, blocking it instead of being offloaded to a thread."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both identify the same defect: a documented blocking helper is invoked synchronously/directly on the asyncio event loop instead of being offloaded, blocking the loop and stalling async tasks."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "performance",
+              "path": "src/case_18.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "performance",
+              "path": "src/case_18.py",
+              "line": 4,
+              "confidence": 0.9
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "18b732db119e4e408cef735e80a0cf07",
+            "title": "Removed asyncio.to_thread offload makes process call a blocking network operation inline",
+            "category": "performance",
+            "path": "src/case_18.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling process() from async code while the network operation is in flight.",
+            "impact": "",
+            "explanation": "The diff replaces `await asyncio.to_thread(check, value)` with a direct synchronous call `check(value)`. The imported helper `check` is documented as a blocking network operation whose async callers must offload it. Calling it inline means the blocking network I/O (`value.read()`) runs on the calling thread; if `process` is invoked from async code, this blocks the event loop and stalls all other coroutines. This directly violates the helper contract in lib/contract_18.py.",
+            "suggestion": "Keep the offload: make `process` async and use `return await asyncio.to_thread(check, value)`, or otherwise ensure `check` is never invoked on the event loop."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "18b732db119e4e408cef735e80a0cf07",
+            "title": "Removed asyncio.to_thread offload makes process call a blocking network operation inline",
+            "category": "performance",
+            "path": "src/case_18.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling process() from async code while the network operation is in flight.",
+            "impact": "",
+            "explanation": "The diff replaces `await asyncio.to_thread(check, value)` with a direct synchronous call `check(value)`. The imported helper `check` is documented as a blocking network operation whose async callers must offload it. Calling it inline means the blocking network I/O (`value.read()`) runs on the calling thread; if `process` is invoked from async code, this blocks the event loop and stalls all other coroutines. This directly violates the helper contract in lib/contract_18.py.",
+            "suggestion": "Keep the offload: make `process` async and use `return await asyncio.to_thread(check, value)`, or otherwise ensure `check` is never invoked on the event loop.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 69726.68,
+        "usage": {
+          "logical_invocations": 6,
+          "input_tokens": 22744,
+          "output_tokens": 3950,
+          "provider_latency_ms": 69714,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 3,
+        "tool_attempts": 4,
+        "successful_tools": 3,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Reviewed the diff and the helper contract; submitted one finding for the removed event-loop offload of a blocking network call.",
+            "candidate_count": 1,
+            "rounds": 6
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.97,
+                "reason": "Both describe the same defect at src/case_18.py:4: a documented blocking helper (the network operation `check`) is invoked synchronously/inline instead of being offloaded via `asyncio.to_thread`, so calling it from async code blocks the event loop. Trigger (async caller while the blocking network operation runs) and impact (event loop stall) match."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both describe the same defect: a documented blocking helper is invoked directly instead of being offloaded via asyncio.to_thread, causing event-loop blocking when called from async code."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-20-lock-required",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "concurrency",
+              "path": "src/case_20.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "concurrency",
+              "path": "src/case_20.py",
+              "line": 4,
+              "confidence": 0.7
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "5eed0419d60449b1b3e94636ae4ef4aa",
+            "title": "Call to check() without STATE_LOCK violates concurrency contract",
+            "category": "concurrency",
+            "path": "src/case_20.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "process() is invoked concurrently while STATE_LOCK is not held",
+            "impact": "Race condition on shared state: check() performs value['count'] += 1 non-atomically, leading to lost updates or data corruption",
+            "explanation": "The updated comment explicitly states that the lock is no longer held when check() is called. However, check() mutates shared state and its documented contract requires the caller to hold STATE_LOCK. The code still calls check() without acquiring the lock, violating that contract and introducing a concurrency bug.",
+            "suggestion": "Acquire STATE_LOCK before calling check(), or ensure the caller holds the lock; update the comment if the lock is actually held."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "5eed0419d60449b1b3e94636ae4ef4aa",
+            "title": "Call to check() without STATE_LOCK violates concurrency contract",
+            "category": "concurrency",
+            "path": "src/case_20.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "process() is invoked concurrently while STATE_LOCK is not held",
+            "impact": "Race condition on shared state: check() performs value['count'] += 1 non-atomically, leading to lost updates or data corruption",
+            "explanation": "The updated comment explicitly states that the lock is no longer held when check() is called. However, check() mutates shared state and its documented contract requires the caller to hold STATE_LOCK. The code still calls check() without acquiring the lock, violating that contract and introducing a concurrency bug.",
+            "suggestion": "Acquire STATE_LOCK before calling check(), or ensure the caller holds the lock; update the comment if the lock is actually held.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 46642.81,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 846,
+          "output_tokens": 2188,
+          "provider_latency_ms": 46639,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.95,
+                "reason": "Both identify the same concurrency defect: check() is called without STATE_LOCK even though it requires the caller to hold the lock, causing a race on shared state."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.96,
+                "reason": "Both describe the same defect: check() at src/case_20.py:4 mutates shared state but is called without holding STATE_LOCK, violating the helper's documented locking contract and causing a race/lost-update concurrency bug. Same trigger (concurrent process() call without the lock) and same impact."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "concurrency",
+              "path": "src/case_20.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "concurrency",
+              "path": "src/case_20.py",
+              "line": 4,
+              "confidence": 0.9
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "3a72dcd3d5da4242bdc491836819ebd7",
+            "title": "process() calls check() without holding STATE_LOCK, violating helper contract",
+            "category": "concurrency",
+            "path": "src/case_20.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Concurrent calls to process() sharing the same value dict while STATE_LOCK is not held.",
+            "impact": "",
+            "explanation": "The diff changes the comment to \"lock no longer held\", but process() still calls check(value). lib/contract_20.py:check mutates shared state (value['count'] += 1) and its docstring explicitly requires the caller to hold STATE_LOCK. Without the lock, concurrent callers can race on the shared count.",
+            "suggestion": "Acquire STATE_LOCK around the call to check(value), or restore the previous locking behavior."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "3a72dcd3d5da4242bdc491836819ebd7",
+            "title": "process() calls check() without holding STATE_LOCK, violating helper contract",
+            "category": "concurrency",
+            "path": "src/case_20.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Concurrent calls to process() sharing the same value dict while STATE_LOCK is not held.",
+            "impact": "",
+            "explanation": "The diff changes the comment to \"lock no longer held\", but process() still calls check(value). lib/contract_20.py:check mutates shared state (value['count'] += 1) and its docstring explicitly requires the caller to hold STATE_LOCK. Without the lock, concurrent callers can race on the shared count.",
+            "suggestion": "Acquire STATE_LOCK around the call to check(value), or restore the previous locking behavior.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 48411.43,
+        "usage": {
+          "logical_invocations": 7,
+          "input_tokens": 23684,
+          "output_tokens": 2794,
+          "provider_latency_ms": 48399,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 3,
+        "tool_attempts": 4,
+        "successful_tools": 3,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Found a concurrency defect: process() calls check() without holding STATE_LOCK despite the helper contract requiring it.",
+            "candidate_count": 1,
+            "rounds": 7
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.95,
+                "reason": "Both describe the same concurrency defect: process() calls check() without holding STATE_LOCK, violating check()'s documented locking contract and allowing races on shared state."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both findings identify that check() is called without holding STATE_LOCK despite the helper contract requiring the caller to hold it, leading to a shared-state race."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-26-negative-ms",
+      "kind": "negative",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 0,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 157185.61,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 1673,
+          "output_tokens": 6000,
+          "provider_latency_ms": 157182,
+          "retries": 0,
+          "schema_repairs": 1
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 1,
+        "warnings": [
+          "src/case_26.py 部分块失败: src/case_26.py: StructuredOutputError: 结构化输出解析失败（修复重试后仍失败）"
+        ],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 1.0,
+          "f1": 0.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 1
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [
+            {
+              "category": "edge_case",
+              "path": "src/case_26.py",
+              "line": 4,
+              "confidence": 0.7
+            }
+          ],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "8e531009d2f04a82bb9b73fc65449dc1",
+            "title": "Negative millisecond timeouts are silently accepted",
+            "category": "edge_case",
+            "path": "src/case_26.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "process is called with a negative number (e.g. process(-1)).",
+            "impact": "",
+            "explanation": "The changed line delegates to check(value * 1000), relying on the imported contract to validate the timeout. However, lib/contract_26.check only performs `return value / 1000` and never rejects negative input, even though a timeout in milliseconds must be non-negative. Because multiplication by 1000 preserves the sign, a negative argument flows through unchanged: process(-1) -> check(-1000) -> -1.0. The contract that \"Accept timeout in milliseconds\" is therefore not enforced, and invalid negative timeouts are silently returned instead of raising an error.",
+            "suggestion": "Reject negative values before they propagate, e.g. in check: `if value < 0: raise ValueError(\"timeout must be non-negative\")`, or validate `value >= 0` in process before calling check."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "8e531009d2f04a82bb9b73fc65449dc1",
+            "title": "Negative millisecond timeouts are silently accepted",
+            "category": "edge_case",
+            "path": "src/case_26.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "process is called with a negative number (e.g. process(-1)).",
+            "impact": "",
+            "explanation": "The changed line delegates to check(value * 1000), relying on the imported contract to validate the timeout. However, lib/contract_26.check only performs `return value / 1000` and never rejects negative input, even though a timeout in milliseconds must be non-negative. Because multiplication by 1000 preserves the sign, a negative argument flows through unchanged: process(-1) -> check(-1000) -> -1.0. The contract that \"Accept timeout in milliseconds\" is therefore not enforced, and invalid negative timeouts are silently returned instead of raising an error.",
+            "suggestion": "Reject negative values before they propagate, e.g. in check: `if value < 0: raise ValueError(\"timeout must be non-negative\")`, or validate `value >= 0` in process before calling check.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 0,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 164569.27,
+        "usage": {
+          "logical_invocations": 9,
+          "input_tokens": 42281,
+          "output_tokens": 7115,
+          "provider_latency_ms": 164550,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 6,
+        "tool_attempts": 8,
+        "successful_tools": 6,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Reviewed diff and helper; submitted one candidate finding on negative timeout acceptance.",
+            "candidate_count": 1,
+            "rounds": 9
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-27-negative-escape",
+      "kind": "negative",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 0,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 222147.26,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 1680,
+          "output_tokens": 6000,
+          "provider_latency_ms": 222143,
+          "retries": 1,
+          "schema_repairs": 1
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 1,
+        "warnings": [
+          "src/case_27.py 部分块失败: src/case_27.py: StructuredOutputError: 结构化输出解析失败（修复重试后仍失败）"
+        ],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 0,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 86336.97,
+        "usage": {
+          "logical_invocations": 5,
+          "input_tokens": 14112,
+          "output_tokens": 4232,
+          "provider_latency_ms": 86265,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 4,
+        "tool_attempts": 7,
+        "successful_tools": 4,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 1,
+        "agent_sessions": [
+          {
+            "status": "partial",
+            "stop_reason": "model_error:HTTP 400: {\"error\":{\"message\":\"The `reasoning_content` in the thinking mode must be passed back to the API.\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":",
+            "candidate_count": 0,
+            "rounds": 6
+          }
+        ],
+        "task_failures": 1,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-28-negative-await",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_28.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_28.py",
+              "line": 4,
+              "confidence": 0.99
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "98d89789adbf403d91e965157b9ca77f",
+            "title": "await used inside non-async function causes SyntaxError",
+            "category": "correctness",
+            "path": "src/case_28.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Importing or compiling src/case_28.py after applying the diff",
+            "impact": "The module cannot be imported or executed because Python raises SyntaxError at compile time, breaking the entire file.",
+            "explanation": "The diff changes the return statement to `return await check(value)`, but the enclosing function `process` is defined with `def` rather than `async def`. The `await` expression is only valid inside an asynchronous function, so this is a guaranteed SyntaxError.",
+            "suggestion": "Either change `def process(value):` to `async def process(value):` and update callers to await it, or if synchronous behavior is required, remove `await` and call `check` synchronously (or use `asyncio.run`/existing event loop appropriately)."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "98d89789adbf403d91e965157b9ca77f",
+            "title": "await used inside non-async function causes SyntaxError",
+            "category": "correctness",
+            "path": "src/case_28.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Importing or compiling src/case_28.py after applying the diff",
+            "impact": "The module cannot be imported or executed because Python raises SyntaxError at compile time, breaking the entire file.",
+            "explanation": "The diff changes the return statement to `return await check(value)`, but the enclosing function `process` is defined with `def` rather than `async def`. The `await` expression is only valid inside an asynchronous function, so this is a guaranteed SyntaxError.",
+            "suggestion": "Either change `def process(value):` to `async def process(value):` and update callers to await it, or if synchronous behavior is required, remove `await` and call `check` synchronously (or use `asyncio.run`/existing event loop appropriately).",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 27062.76,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 815,
+          "output_tokens": 1164,
+          "provider_latency_ms": 27058,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both describe the same defect: `await` used inside the synchronous function `process` in src/case_28.py line 4, producing a SyntaxError at import/compile time and breaking the module. Same root cause, trigger, and impact."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both describe the same defect: an `await` expression placed inside a non-async `def process` in src/case_28.py at line 4, causing a SyntaxError at compile/import time that breaks the module. Trigger (importing/compiling the file) and impact (module cannot be imported/executed) also align."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_28.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_28.py",
+              "line": 4,
+              "confidence": 0.97
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "64a2a4b02e8b40afb65ebaa71ba67e18",
+            "title": "`await` used inside synchronous `process` function causes SyntaxError",
+            "category": "correctness",
+            "path": "src/case_28.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Importing or executing `src/case_28.py` (compiling the module) with the current diff.",
+            "impact": "",
+            "explanation": "`process` is defined as a plain synchronous function (`def process(value)`), but its body now contains `return await check(value)`. The `await` expression is only valid inside an `async def` coroutine. Python will raise `SyntaxError` when the module is compiled/imported, so the module cannot run at all.",
+            "suggestion": "Declare `process` as `async def process(value)` and await its result at call sites, or drop the `await` and obtain the coroutine result synchronously if required."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "64a2a4b02e8b40afb65ebaa71ba67e18",
+            "title": "`await` used inside synchronous `process` function causes SyntaxError",
+            "category": "correctness",
+            "path": "src/case_28.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Importing or executing `src/case_28.py` (compiling the module) with the current diff.",
+            "impact": "",
+            "explanation": "`process` is defined as a plain synchronous function (`def process(value)`), but its body now contains `return await check(value)`. The `await` expression is only valid inside an `async def` coroutine. Python will raise `SyntaxError` when the module is compiled/imported, so the module cannot run at all.",
+            "suggestion": "Declare `process` as `async def process(value)` and await its result at call sites, or drop the `await` and obtain the coroutine result synchronously if required.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 35344.68,
+        "usage": {
+          "logical_invocations": 5,
+          "input_tokens": 14429,
+          "output_tokens": 2070,
+          "provider_latency_ms": 35331,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 2,
+        "tool_attempts": 3,
+        "successful_tools": 2,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Identified a SyntaxError: `await` used in a synchronous `process` function, confirmed against the async helper definition, and submitted the finding.",
+            "candidate_count": 1,
+            "rounds": 5
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both findings describe the same defect: an `await` expression used inside a plain synchronous `def process` function, which raises a SyntaxError at module compile/import time and prevents the module from running. Same path (src/case_28.py), same line (4), same trigger and impact."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both describe the same defect: `await` used inside the synchronous `process` function in src/case_28.py, causing a SyntaxError at module compile/import time, with identical trigger and impact."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-29-negative-iterator",
+      "kind": "negative",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 0,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 104424.83,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 814,
+          "output_tokens": 1555,
+          "provider_latency_ms": 104420,
+          "retries": 1,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [],
+        "expected_count": 0,
+        "candidate_count": 0,
+        "accepted_count": 0,
+        "elapsed_ms": 159121.26,
+        "usage": {
+          "logical_invocations": 11,
+          "input_tokens": 62521,
+          "output_tokens": 7099,
+          "provider_latency_ms": 159094,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 10,
+        "tool_attempts": 14,
+        "successful_tools": 10,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Diff 将 list(value) 改为 list(check(value))，其中 check 返回 iter(value)。对任意可迭代/迭代器输入，list(iter(value)) 与 list(value) 行为等价，无功能性缺陷。",
+            "candidate_count": 0,
+            "rounds": 11
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-30-negative-lock",
+      "kind": "negative",
+      "base": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 1.0,
+          "f1": 0.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 1
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [
+            {
+              "category": "concurrency",
+              "path": "src/case_30.py",
+              "line": 4,
+              "confidence": 0.6
+            }
+          ],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "7e7bf520c2fc40bcaf169c9a52faf547",
+            "title": "process now mutates shared state without acquiring STATE_LOCK, relying on caller-held lock",
+            "category": "concurrency",
+            "path": "src/case_30.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Any call to process(value) that occurs without the caller holding STATE_LOCK, especially when multiple threads concurrently invoke process on the same value dict.",
+            "impact": "Race condition on value['count'] may cause lost updates or undercounted results, leading to inconsistent shared state.",
+            "explanation": "The diff changes process from a pure read of value['count'] to a call to check(value), which performs a read-modify-write increment on the shared mutable state. The comment says STATE_LOCK is held by the caller, but process itself does not acquire or verify that lock. The locking contract is only a comment and not enforced; any caller that fails to acquire STATE_LOCK while holding the lock risk (or concurrent calls) will produce a data race.",
+            "suggestion": "Acquire STATE_LOCK inside process before calling check, or use a thread-safe atomic increment/locking structure. If the caller-held-lock pattern is intentional, document it in the function signature or docstring and add runtime assertion, e.g., assert lock.locked(), to prevent misuse."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "7e7bf520c2fc40bcaf169c9a52faf547",
+            "title": "process now mutates shared state without acquiring STATE_LOCK, relying on caller-held lock",
+            "category": "concurrency",
+            "path": "src/case_30.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Any call to process(value) that occurs without the caller holding STATE_LOCK, especially when multiple threads concurrently invoke process on the same value dict.",
+            "impact": "Race condition on value['count'] may cause lost updates or undercounted results, leading to inconsistent shared state.",
+            "explanation": "The diff changes process from a pure read of value['count'] to a call to check(value), which performs a read-modify-write increment on the shared mutable state. The comment says STATE_LOCK is held by the caller, but process itself does not acquire or verify that lock. The locking contract is only a comment and not enforced; any caller that fails to acquire STATE_LOCK while holding the lock risk (or concurrent calls) will produce a data race.",
+            "suggestion": "Acquire STATE_LOCK inside process before calling check, or use a thread-safe atomic increment/locking structure. If the caller-held-lock pattern is intentional, document it in the function signature or docstring and add runtime assertion, e.g., assert lock.locked(), to prevent misuse.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 0,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 47770.29,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 839,
+          "output_tokens": 2179,
+          "provider_latency_ms": 47765,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 1.0,
+          "f1": 0.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 1
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [
+            {
+              "category": "concurrency",
+              "path": "src/case_30.py",
+              "line": 4,
+              "confidence": 0.9
+            }
+          ],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "4723ccaea0d04cc684e1be303cec709d",
+            "title": "process() invokes check() without holding STATE_LOCK, causing a race on shared state",
+            "category": "concurrency",
+            "path": "src/case_30.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Two or more threads/coroutines call process() concurrently on the same mutable `value` mapping.",
+            "impact": "",
+            "explanation": "The diff replaces the read-only `return value['count']` with `return check(value)`. The unchanged helper `lib.contract_30.check` mutates shared state via `value['count'] += 1` and its contract states the caller must hold STATE_LOCK. However, `process` acquires no lock before calling `check`, despite the added comment claiming STATE_LOCK is held by the caller. Concurrent invocations on the same `value` dict can interleave the read-modify-write step and lose updates.",
+            "suggestion": "Acquire STATE_LOCK around the call to check(value) in process (or perform the locking inside check), so the documented contract is actually satisfied and the increment is not racy."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "4723ccaea0d04cc684e1be303cec709d",
+            "title": "process() invokes check() without holding STATE_LOCK, causing a race on shared state",
+            "category": "concurrency",
+            "path": "src/case_30.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Two or more threads/coroutines call process() concurrently on the same mutable `value` mapping.",
+            "impact": "",
+            "explanation": "The diff replaces the read-only `return value['count']` with `return check(value)`. The unchanged helper `lib.contract_30.check` mutates shared state via `value['count'] += 1` and its contract states the caller must hold STATE_LOCK. However, `process` acquires no lock before calling `check`, despite the added comment claiming STATE_LOCK is held by the caller. Concurrent invocations on the same `value` dict can interleave the read-modify-write step and lose updates.",
+            "suggestion": "Acquire STATE_LOCK around the call to check(value) in process (or perform the locking inside check), so the documented contract is actually satisfied and the increment is not racy.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 0,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 48342.14,
+        "usage": {
+          "logical_invocations": 5,
+          "input_tokens": 16434,
+          "output_tokens": 2364,
+          "provider_latency_ms": 48330,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 2,
+        "tool_attempts": 3,
+        "successful_tools": 2,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Diff and helper verified; concurrency defect submitted.",
+            "candidate_count": 1,
+            "rounds": 5
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    }
+  ],
+  "failures": [
+    {
+      "id": "l3-24-retry-safety",
+      "kind": "cross_file",
+      "fatal_error": {
+        "kind": "IntegrityError",
+        "detail": "UNIQUE constraint failed: findings.run_id, findings.fingerprint"
+      }
+    }
+  ]
+}

@@ -1,0 +1,205 @@
+{
+  "model": "deepseek-v4-pro",
+  "sample_ids": [
+    "l3-01-none-sentinel"
+  ],
+  "rows": [
+    {
+      "id": "l3-01-none-sentinel",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_01.py",
+              "line": 4
+            }
+          ],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "d6d6d2ddd5974647aded7951625f2ab2",
+            "title": "Change from `is None` to `not` breaks zero/empty/false sentinel semantics",
+            "category": "correctness",
+            "path": "src/case_01.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "When `value` is 0, False, an empty string, an empty list/dict, or any other falsey value but not None.",
+            "impact": "The function now returns True for valid falsey non-None values, incorrectly treating them as absent/None, violating the contract that zero is a valid result.",
+            "explanation": "The original `return check(value) is None` only returned True for the None sentinel. The new `return not check(value)` applies Python truthiness to the value returned by `check`. Since `check` returns the original value, `not 0` is True, `not False` is True, `not ''` is True, etc., even though these are not absent. The helper contract explicitly states zero is a valid result, so this change introduces a correctness regression.",
+            "suggestion": "Preserve sentinel semantics by using `return check(value) is None`, or if falsey values should also be treated as absent, update the helper contract and tests accordingly.",
+            "status": "suppressed",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 0,
+        "elapsed_ms": 26082.25,
+        "usage": {
+          "logical_invocations": 2,
+          "input_tokens": 1733,
+          "output_tokens": 1366,
+          "provider_latency_ms": 16477,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 1,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_01.py",
+              "line": 4
+            }
+          ],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "aace1937290a406c8add43a76a45c216",
+            "title": "`not check(value)` 将合法的零结果误判为 absent",
+            "category": "correctness",
+            "path": "src/case_01.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "调用 `process(0)` 或任何 `check` 返回 falsy（如 0）的合法输入。",
+            "impact": "",
+            "explanation": "合约模块 `lib/contract_01.py` 明确声明 `check` 仅在 `value is None` 时返回 None，零是合法结果（返回 0）。原实现 `check(value) is None` 只在真正缺省时返回 True。改为 `not check(value)` 后，当 `value == 0` 时 `check` 返回 0，`not 0` 为 True，导致 `process(0)` 被误判为缺省，违反合约语义。",
+            "suggestion": "保留基于 None 哨兵值的判断：`return check(value) is None`，避免用真值性判断取代 None 检查。",
+            "status": "suppressed",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 0,
+        "elapsed_ms": 64915.74,
+        "usage": {
+          "logical_invocations": 6,
+          "input_tokens": 16097,
+          "output_tokens": 4232,
+          "provider_latency_ms": 37419,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 1,
+        "tool_calls": 2,
+        "tool_attempts": 3,
+        "successful_tools": 2,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "已定位并提交一处正确性回归：`not check(value)` 将合法的零值误判为缺省。",
+            "candidate_count": 1,
+            "rounds": 5
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    }
+  ]
+}

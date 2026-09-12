@@ -1,0 +1,408 @@
+{
+  "dataset": "reposage/evals/datasets/resume_v123_40.yaml",
+  "model": "deepseek-v4-pro",
+  "completed_sample_ids": [
+    "r01-sql-injection",
+    "r02-path-traversal",
+    "r03-shell-injection",
+    "r04-unsafe-yaml",
+    "r05-weak-token",
+    "r06-timing-compare",
+    "r07-open-redirect",
+    "r08-log-secret",
+    "r09-zero-page-size",
+    "r10-empty-average",
+    "r11-off-by-one",
+    "r12-wrong-sort",
+    "r13-mutable-default",
+    "r14-finally-return",
+    "r15-swallow-timeout",
+    "r16-file-leak",
+    "r17-naive-quadratic",
+    "r18-blocking-async",
+    "r19-two-defects",
+    "r20-two-defects",
+    "r21-lock-and-await",
+    "r22-security-and-leak",
+    "r23-contract-none",
+    "r24-unit-mismatch",
+    "r25-auth-default",
+    "r26-sentinel-conflict",
+    "r27-config-string-bool",
+    "r28-key-normalization",
+    "r29-lock-copy",
+    "r30-retry-non-idempotent",
+    "r31-negative-rename",
+    "r32-negative-context-manager",
+    "r33-negative-parameterize",
+    "r34-negative-empty-guard",
+    "r35-negative-async-sleep",
+    "r36-negative-doc-string",
+    "r37-negative-test-fixture",
+    "r38-negative-lock",
+    "r39-negative-cache",
+    "r40-negative-cross-file"
+  ],
+  "results": [
+    {
+      "id": "r01-sql-injection",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r02-path-traversal",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r03-shell-injection",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r04-unsafe-yaml",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r05-weak-token",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r06-timing-compare",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r07-open-redirect",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r08-log-secret",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r09-zero-page-size",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r10-empty-average",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r11-off-by-one",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r12-wrong-sort",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r13-mutable-default",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r14-finally-return",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r15-swallow-timeout",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r16-file-leak",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r17-naive-quadratic",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r18-blocking-async",
+      "kind": "single_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r19-two-defects",
+      "kind": "multi_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r20-two-defects",
+      "kind": "multi_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r21-lock-and-await",
+      "kind": "multi_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r22-security-and-leak",
+      "kind": "multi_defect",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r23-contract-none",
+      "kind": "cross_file",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r24-unit-mismatch",
+      "kind": "cross_file",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r25-auth-default",
+      "kind": "cross_file",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r26-sentinel-conflict",
+      "kind": "cross_file",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r27-config-string-bool",
+      "kind": "cross_file",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r28-key-normalization",
+      "kind": "cross_file",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r29-lock-copy",
+      "kind": "cross_file",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r30-retry-non-idempotent",
+      "kind": "cross_file",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r31-negative-rename",
+      "kind": "negative",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r32-negative-context-manager",
+      "kind": "negative",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r33-negative-parameterize",
+      "kind": "negative",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r34-negative-empty-guard",
+      "kind": "negative",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r35-negative-async-sleep",
+      "kind": "negative",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r36-negative-doc-string",
+      "kind": "negative",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r37-negative-test-fixture",
+      "kind": "negative",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r38-negative-lock",
+      "kind": "negative",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r39-negative-cache",
+      "kind": "negative",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    },
+    {
+      "id": "r40-negative-cross-file",
+      "kind": "negative",
+      "fatal_error": {
+        "kind": "AttributeError",
+        "detail": "'RetrievalDiagnostics' object has no attribute 'model_dump'"
+      },
+      "failures": []
+    }
+  ]
+}

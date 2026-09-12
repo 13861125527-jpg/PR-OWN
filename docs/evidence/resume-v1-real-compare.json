@@ -1,0 +1,3519 @@
+{
+  "model": "deepseek-v4-pro",
+  "base_url": "https://api.deepseek.com",
+  "dataset": "reposage/evals/datasets/resume_v123_40.yaml",
+  "repeats": 1,
+  "temperature": 0.1,
+  "max_output_tokens": 3000,
+  "timestamp": "2026-09-10T01:59:30+0800",
+  "summary": {
+    "v1": {
+      "precision": 0.679,
+      "recall": 0.775,
+      "f1": 0.687,
+      "position_accuracy": 0.7,
+      "negative_noise": 4.0
+    },
+    "baseline": {
+      "precision": 0.758,
+      "recall": 0.9,
+      "f1": 0.765,
+      "position_accuracy": 0.867,
+      "negative_noise": 6.0
+    }
+  },
+  "paired_summary": {
+    "sample_ids": [
+      "r01-sql-injection",
+      "r02-path-traversal",
+      "r03-shell-injection",
+      "r04-unsafe-yaml",
+      "r05-weak-token",
+      "r06-timing-compare",
+      "r07-open-redirect",
+      "r08-log-secret",
+      "r09-zero-page-size",
+      "r10-empty-average",
+      "r11-off-by-one",
+      "r12-wrong-sort",
+      "r13-mutable-default",
+      "r14-finally-return",
+      "r15-swallow-timeout",
+      "r16-file-leak",
+      "r17-naive-quadratic",
+      "r18-blocking-async",
+      "r19-two-defects",
+      "r20-two-defects",
+      "r22-security-and-leak",
+      "r23-contract-none",
+      "r24-unit-mismatch",
+      "r25-auth-default",
+      "r26-sentinel-conflict",
+      "r27-config-string-bool",
+      "r28-key-normalization",
+      "r29-lock-copy",
+      "r30-retry-non-idempotent",
+      "r31-negative-rename",
+      "r32-negative-context-manager",
+      "r33-negative-parameterize",
+      "r35-negative-async-sleep",
+      "r36-negative-doc-string",
+      "r37-negative-test-fixture",
+      "r38-negative-lock",
+      "r40-negative-cross-file",
+      "r34-negative-empty-guard",
+      "r21-lock-and-await",
+      "r39-negative-cache"
+    ],
+    "sample_count": 40,
+    "v1": {
+      "precision": 0.679,
+      "recall": 0.775,
+      "f1": 0.687,
+      "position_accuracy": 0.7
+    },
+    "baseline": {
+      "precision": 0.758,
+      "recall": 0.9,
+      "f1": 0.765,
+      "position_accuracy": 0.867
+    }
+  },
+  "missing": {
+    "v1": [],
+    "baseline": []
+  },
+  "cost": {
+    "v1": {
+      "total_cost_usd": 0.0,
+      "avg_cost_per_invocation_usd": 0.0,
+      "pricing_status": "unknown",
+      "logical_invocations": 43,
+      "successful_logical_invocations": 43,
+      "failed_logical_invocations": 0,
+      "provider_requests": 48,
+      "input_tokens": 34978,
+      "output_tokens": 75822,
+      "retries": 0,
+      "schema_repairs": 5
+    },
+    "baseline": {
+      "total_cost_usd": 0.0,
+      "avg_cost_per_invocation_usd": 0.0,
+      "pricing_status": "unknown",
+      "logical_invocations": 40,
+      "successful_logical_invocations": 40,
+      "failed_logical_invocations": 0,
+      "provider_requests": 45,
+      "input_tokens": 25589,
+      "output_tokens": 71533,
+      "retries": 0,
+      "schema_repairs": 5
+    }
+  },
+  "latency": {
+    "v1": {
+      "run_latency": {
+        "success_total_ms": 1068394.97,
+        "success_count": 40,
+        "success_avg_ms": 26709.87,
+        "failed_total_ms": 0.0
+      },
+      "provider_latency": {
+        "total_ms": 1174500.0,
+        "invocation_count": 43,
+        "avg_ms": 27313.95
+      }
+    },
+    "baseline": {
+      "run_latency": {
+        "success_total_ms": 1172511.67,
+        "success_count": 40,
+        "success_avg_ms": 29312.79,
+        "failed_total_ms": 0.0
+      },
+      "provider_latency": {
+        "total_ms": 1172491.0,
+        "invocation_count": 40,
+        "avg_ms": 29312.28
+      }
+    }
+  },
+  "per_sample": [
+    {
+      "id": "r01-sql-injection",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 756,
+      "v1_output_tokens": 682,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 557,
+      "baseline_output_tokens": 1002,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/users.py",
+            "claimed_start_line": 2,
+            "confidence": 0.95
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/users.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/users.py",
+            "canonical_start_line": 2,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/users.py",
+            "line": 2
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/users.py",
+            "claimed_start_line": 2,
+            "confidence": 0.99
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/users.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/users.py",
+            "canonical_start_line": 2,
+            "confidence": 0.99,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r02-path-traversal",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 729,
+      "v1_output_tokens": 1306,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 565,
+      "baseline_output_tokens": 1067,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/downloads.py",
+            "claimed_start_line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/downloads.py",
+            "claimed_start_line": 4,
+            "canonical_path": "src/downloads.py",
+            "canonical_start_line": 4,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/downloads.py",
+            "line": 4
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/downloads.py",
+            "claimed_start_line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/downloads.py",
+            "claimed_start_line": 4,
+            "canonical_path": "src/downloads.py",
+            "canonical_start_line": 4,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r03-shell-injection",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 769,
+      "v1_output_tokens": 1156,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 574,
+      "baseline_output_tokens": 574,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/archive.py",
+            "claimed_start_line": 3,
+            "confidence": 0.95
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/archive.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/archive.py",
+            "canonical_start_line": 3,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/archive.py",
+            "line": 3
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/archive.py",
+            "claimed_start_line": 3,
+            "confidence": 0.9
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/archive.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/archive.py",
+            "canonical_start_line": 3,
+            "confidence": 0.9,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r04-unsafe-yaml",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 717,
+      "v1_output_tokens": 1046,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 552,
+      "baseline_output_tokens": 541,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/settings.py",
+            "claimed_start_line": 3,
+            "confidence": 0.95
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/settings.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/settings.py",
+            "canonical_start_line": 3,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/settings.py",
+            "line": 3
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/settings.py",
+            "claimed_start_line": 3,
+            "confidence": 0.95
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/settings.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/settings.py",
+            "canonical_start_line": 3,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r05-weak-token",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 718,
+      "v1_output_tokens": 776,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 554,
+      "baseline_output_tokens": 695,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/tokens.py",
+            "claimed_start_line": 3,
+            "confidence": 0.98
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/tokens.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/tokens.py",
+            "canonical_start_line": 3,
+            "confidence": 0.98,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/tokens.py",
+            "line": 3
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/tokens.py",
+            "claimed_start_line": 3,
+            "confidence": 0.97
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/tokens.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/tokens.py",
+            "canonical_start_line": 3,
+            "confidence": 0.97,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r06-timing-compare",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 716,
+      "v1_output_tokens": 712,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 552,
+      "baseline_output_tokens": 557,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/signing.py",
+            "claimed_start_line": 2,
+            "confidence": 0.95
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/signing.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/signing.py",
+            "canonical_start_line": 2,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/signing.py",
+            "line": 2
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/signing.py",
+            "claimed_start_line": 2,
+            "confidence": 0.95
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/signing.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/signing.py",
+            "canonical_start_line": 2,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r07-open-redirect",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 707,
+      "v1_output_tokens": 1418,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 540,
+      "baseline_output_tokens": 612,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/web.py",
+            "claimed_start_line": 2,
+            "confidence": 0.95
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/web.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/web.py",
+            "canonical_start_line": 2,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/web.py",
+            "line": 2
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/web.py",
+            "claimed_start_line": 2,
+            "confidence": 0.95
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/web.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/web.py",
+            "canonical_start_line": 2,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r08-log-secret",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 712,
+      "v1_output_tokens": 1328,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 545,
+      "baseline_output_tokens": 1008,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/client.py",
+            "claimed_start_line": 2,
+            "confidence": 0.8
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/client.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/client.py",
+            "canonical_start_line": 2,
+            "confidence": 0.8,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/client.py",
+            "line": 2
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/client.py",
+            "claimed_start_line": 2,
+            "confidence": 0.85
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/client.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/client.py",
+            "canonical_start_line": 2,
+            "confidence": 0.85,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r09-zero-page-size",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 725,
+      "v1_output_tokens": 1553,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 561,
+      "baseline_output_tokens": 1172,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "edge_case",
+            "claimed_path": "src/paging.py",
+            "claimed_start_line": 2,
+            "confidence": 0.95
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "edge_case",
+            "claimed_path": "src/paging.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/paging.py",
+            "canonical_start_line": 2,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "edge_case",
+            "path": "src/paging.py",
+            "line": 2
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "edge_case",
+            "claimed_path": "src/paging.py",
+            "claimed_start_line": 2,
+            "confidence": 0.9
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "edge_case",
+            "claimed_path": "src/paging.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/paging.py",
+            "canonical_start_line": 2,
+            "confidence": 0.9,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r10-empty-average",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 715,
+      "v1_output_tokens": 736,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 551,
+      "baseline_output_tokens": 1031,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "edge_case",
+            "claimed_path": "src/stats.py",
+            "claimed_start_line": 2,
+            "confidence": 0.95
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "edge_case",
+            "claimed_path": "src/stats.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/stats.py",
+            "canonical_start_line": 2,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "edge_case",
+            "path": "src/stats.py",
+            "line": 2
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/stats.py",
+            "claimed_start_line": 2,
+            "confidence": 1.0
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/stats.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/stats.py",
+            "canonical_start_line": 2,
+            "confidence": 1.0,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": []
+      },
+      "failures": []
+    },
+    {
+      "id": "r11-off-by-one",
+      "v1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 710,
+      "v1_output_tokens": 2682,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 547,
+      "baseline_output_tokens": 753,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "edge_case",
+            "claimed_path": "src/retry.py",
+            "claimed_start_line": 2,
+            "confidence": 0.35
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "edge_case",
+            "claimed_path": "src/retry.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/retry.py",
+            "canonical_start_line": 2,
+            "confidence": 0.35,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/retry.py",
+            "line": 2
+          }
+        ],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/retry.py",
+            "claimed_start_line": 2,
+            "confidence": 0.7
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/retry.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/retry.py",
+            "canonical_start_line": 2,
+            "confidence": 0.7,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r12-wrong-sort",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 721,
+      "v1_output_tokens": 606,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 557,
+      "baseline_output_tokens": 685,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/events.py",
+            "claimed_start_line": 2,
+            "confidence": 0.98
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/events.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/events.py",
+            "canonical_start_line": 2,
+            "confidence": 0.98,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/events.py",
+            "line": 2
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/events.py",
+            "claimed_start_line": 2,
+            "confidence": 0.95
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/events.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/events.py",
+            "canonical_start_line": 2,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r13-mutable-default",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 720,
+      "v1_output_tokens": 1700,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 556,
+      "baseline_output_tokens": 1181,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/validation.py",
+            "claimed_start_line": 1,
+            "confidence": 1.0
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/validation.py",
+            "claimed_start_line": 1,
+            "canonical_path": "src/validation.py",
+            "canonical_start_line": 1,
+            "confidence": 1.0,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/validation.py",
+            "line": 1
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/validation.py",
+            "claimed_start_line": 1,
+            "confidence": 0.99
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/validation.py",
+            "claimed_start_line": 1,
+            "canonical_path": "src/validation.py",
+            "canonical_start_line": 1,
+            "confidence": 0.99,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r14-finally-return",
+      "v1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 699,
+      "v1_output_tokens": 1699,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 532,
+      "baseline_output_tokens": 2092,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/work.py",
+            "claimed_start_line": 6,
+            "confidence": 0.97
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/work.py",
+            "claimed_start_line": 6,
+            "canonical_path": "src/work.py",
+            "canonical_start_line": 6,
+            "confidence": 0.97,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "silent_failure",
+            "path": "src/work.py",
+            "line": 6
+          }
+        ],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/work.py",
+            "claimed_start_line": 6,
+            "confidence": 0.95
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/work.py",
+            "claimed_start_line": 6,
+            "canonical_path": "src/work.py",
+            "canonical_start_line": 6,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": []
+      },
+      "failures": []
+    },
+    {
+      "id": "r15-swallow-timeout",
+      "v1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 717,
+      "v1_output_tokens": 846,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 553,
+      "baseline_output_tokens": 1377,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "silent_failure",
+            "claimed_path": "src/cache.py",
+            "claimed_start_line": 2,
+            "confidence": 0.9
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "silent_failure",
+            "claimed_path": "src/cache.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/cache.py",
+            "canonical_start_line": 2,
+            "confidence": 0.9,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "silent_failure",
+            "path": "src/cache.py",
+            "line": 4
+          }
+        ],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [
+          {
+            "category": "silent_failure",
+            "claimed_path": "src/cache.py",
+            "claimed_start_line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "silent_failure",
+            "claimed_path": "src/cache.py",
+            "claimed_start_line": 4,
+            "canonical_path": "src/cache.py",
+            "canonical_start_line": 4,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r16-file-leak",
+      "v1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 730,
+      "v1_output_tokens": 978,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 563,
+      "baseline_output_tokens": 912,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "performance",
+            "claimed_path": "src/files.py",
+            "claimed_start_line": 2,
+            "confidence": 0.95
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "performance",
+            "claimed_path": "src/files.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/files.py",
+            "canonical_start_line": 2,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/files.py",
+            "line": 2
+          }
+        ],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/files.py",
+            "claimed_start_line": 2,
+            "confidence": 0.95
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/files.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/files.py",
+            "canonical_start_line": 2,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r17-naive-quadratic",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 729,
+      "v1_output_tokens": 1690,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 564,
+      "baseline_output_tokens": 1926,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "performance",
+            "claimed_path": "src/ids.py",
+            "claimed_start_line": 4,
+            "confidence": 0.85
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "performance",
+            "claimed_path": "src/ids.py",
+            "claimed_start_line": 4,
+            "canonical_path": "src/ids.py",
+            "canonical_start_line": 4,
+            "confidence": 0.85,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "performance",
+            "path": "src/ids.py",
+            "line": 4
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "performance",
+            "claimed_path": "src/ids.py",
+            "claimed_start_line": 4,
+            "confidence": 0.9
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "performance",
+            "claimed_path": "src/ids.py",
+            "claimed_start_line": 4,
+            "canonical_path": "src/ids.py",
+            "canonical_start_line": 4,
+            "confidence": 0.9,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r18-blocking-async",
+      "v1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 714,
+      "v1_output_tokens": 1230,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 550,
+      "baseline_output_tokens": 1284,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "concurrency",
+            "claimed_path": "src/worker.py",
+            "claimed_start_line": 3,
+            "confidence": 0.95
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "concurrency",
+            "claimed_path": "src/worker.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/worker.py",
+            "canonical_start_line": 3,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "performance",
+            "path": "src/worker.py",
+            "line": 3
+          }
+        ],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [
+          {
+            "category": "performance",
+            "claimed_path": "src/worker.py",
+            "claimed_start_line": 3,
+            "confidence": 0.9
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "performance",
+            "claimed_path": "src/worker.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/worker.py",
+            "canonical_start_line": 3,
+            "confidence": 0.9,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r19-two-defects",
+      "v1": {
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 780,
+      "v1_output_tokens": 2468,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 584,
+      "baseline_output_tokens": 2399,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/importer.py",
+            "claimed_start_line": 2,
+            "confidence": 0.95
+          },
+          {
+            "category": "edge_case",
+            "claimed_path": "src/importer.py",
+            "claimed_start_line": 3,
+            "confidence": 0.8
+          },
+          {
+            "category": "correctness",
+            "claimed_path": "src/importer.py",
+            "claimed_start_line": 4,
+            "confidence": 0.6
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/importer.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/importer.py",
+            "canonical_start_line": 2,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          },
+          {
+            "category": "edge_case",
+            "claimed_path": "src/importer.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/importer.py",
+            "canonical_start_line": 3,
+            "confidence": 0.8,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          },
+          {
+            "category": "correctness",
+            "claimed_path": "src/importer.py",
+            "claimed_start_line": 4,
+            "canonical_path": "src/importer.py",
+            "canonical_start_line": 4,
+            "confidence": 0.6,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/importer.py",
+            "line": 2
+          },
+          {
+            "category": "edge_case",
+            "path": "src/importer.py",
+            "line": 3
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0,
+          1
+        ],
+        "base_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/importer.py",
+            "claimed_start_line": 2,
+            "confidence": 1.0
+          },
+          {
+            "category": "edge_case",
+            "claimed_path": "src/importer.py",
+            "claimed_start_line": 3,
+            "confidence": 0.95
+          },
+          {
+            "category": "correctness",
+            "claimed_path": "src/importer.py",
+            "claimed_start_line": 4,
+            "confidence": 0.8
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/importer.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/importer.py",
+            "canonical_start_line": 2,
+            "confidence": 1.0,
+            "status": "accepted",
+            "reason": ""
+          },
+          {
+            "category": "edge_case",
+            "claimed_path": "src/importer.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/importer.py",
+            "canonical_start_line": 3,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": ""
+          },
+          {
+            "category": "correctness",
+            "claimed_path": "src/importer.py",
+            "claimed_start_line": 4,
+            "canonical_path": "src/importer.py",
+            "canonical_start_line": 4,
+            "confidence": 0.8,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0,
+          1
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r20-two-defects",
+      "v1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 735,
+      "v1_output_tokens": 2534,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 1182,
+      "baseline_output_tokens": 5977,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 1,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/export.py",
+            "claimed_start_line": 2,
+            "confidence": 0.95
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/export.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/export.py",
+            "canonical_start_line": 2,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/export.py",
+            "line": 3
+          },
+          {
+            "category": "silent_failure",
+            "path": "src/export.py",
+            "line": 5
+          }
+        ],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/export.py",
+            "claimed_start_line": 3,
+            "confidence": 1.0
+          },
+          {
+            "category": "silent_failure",
+            "claimed_path": "src/export.py",
+            "claimed_start_line": 5,
+            "confidence": 1.0
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/export.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/export.py",
+            "canonical_start_line": 3,
+            "confidence": 1.0,
+            "status": "accepted",
+            "reason": ""
+          },
+          {
+            "category": "silent_failure",
+            "claimed_path": "src/export.py",
+            "claimed_start_line": 5,
+            "canonical_path": "src/export.py",
+            "canonical_start_line": 5,
+            "confidence": 1.0,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0,
+          1
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r22-security-and-leak",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 775,
+      "v1_output_tokens": 2782,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 583,
+      "baseline_output_tokens": 2140,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/migrate.py",
+            "claimed_start_line": 4,
+            "confidence": 0.95
+          },
+          {
+            "category": "security",
+            "claimed_path": "src/migrate.py",
+            "claimed_start_line": 3,
+            "confidence": 0.7
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/migrate.py",
+            "claimed_start_line": 4,
+            "canonical_path": "src/migrate.py",
+            "canonical_start_line": 4,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          },
+          {
+            "category": "security",
+            "claimed_path": "src/migrate.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/migrate.py",
+            "canonical_start_line": 3,
+            "confidence": 0.7,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/migrate.py",
+            "line": 3
+          },
+          {
+            "category": "security",
+            "path": "src/migrate.py",
+            "line": 4
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0,
+          1
+        ],
+        "base_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/migrate.py",
+            "claimed_start_line": 4,
+            "confidence": 0.95
+          },
+          {
+            "category": "security",
+            "claimed_path": "src/migrate.py",
+            "claimed_start_line": 3,
+            "confidence": 0.9
+          },
+          {
+            "category": "silent_failure",
+            "claimed_path": "src/migrate.py",
+            "claimed_start_line": 4,
+            "confidence": 0.7
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/migrate.py",
+            "claimed_start_line": 4,
+            "canonical_path": "src/migrate.py",
+            "canonical_start_line": 4,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": ""
+          },
+          {
+            "category": "security",
+            "claimed_path": "src/migrate.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/migrate.py",
+            "canonical_start_line": 3,
+            "confidence": 0.9,
+            "status": "accepted",
+            "reason": ""
+          },
+          {
+            "category": "silent_failure",
+            "claimed_path": "src/migrate.py",
+            "claimed_start_line": 4,
+            "canonical_path": "src/migrate.py",
+            "canonical_start_line": 4,
+            "confidence": 0.7,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0,
+          1
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r23-contract-none",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 717,
+      "v1_output_tokens": 2094,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 550,
+      "baseline_output_tokens": 1983,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/service.py",
+            "claimed_start_line": 4,
+            "confidence": 0.6
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/service.py",
+            "claimed_start_line": 4,
+            "canonical_path": "src/service.py",
+            "canonical_start_line": 4,
+            "confidence": 0.6,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/service.py",
+            "line": 4
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/service.py",
+            "claimed_start_line": 4,
+            "confidence": 0.5
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/service.py",
+            "claimed_start_line": 4,
+            "canonical_path": "src/service.py",
+            "canonical_start_line": 4,
+            "confidence": 0.5,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r24-unit-mismatch",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 726,
+      "v1_output_tokens": 1807,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 559,
+      "baseline_output_tokens": 1404,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/view.py",
+            "claimed_start_line": 3,
+            "confidence": 0.5
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/view.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/view.py",
+            "canonical_start_line": 3,
+            "confidence": 0.5,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/view.py",
+            "line": 3
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/view.py",
+            "claimed_start_line": 3,
+            "confidence": 0.85
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/view.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/view.py",
+            "canonical_start_line": 3,
+            "confidence": 0.85,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r25-auth-default",
+      "v1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 2,
+      "v1_input_tokens": 1447,
+      "v1_output_tokens": 3056,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 1311,
+      "baseline_output_tokens": 5213,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 1,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/auth.py",
+            "claimed_start_line": 2,
+            "confidence": 0.95
+          },
+          {
+            "category": "correctness",
+            "claimed_path": "src/routes.py",
+            "claimed_start_line": 3,
+            "confidence": 1.0
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/auth.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/auth.py",
+            "canonical_start_line": 2,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          },
+          {
+            "category": "correctness",
+            "claimed_path": "src/routes.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/routes.py",
+            "canonical_start_line": 3,
+            "confidence": 1.0,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/routes.py",
+            "line": 3
+          }
+        ],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/auth.py",
+            "claimed_start_line": 2,
+            "confidence": 0.9
+          },
+          {
+            "category": "silent_failure",
+            "claimed_path": "src/routes.py",
+            "claimed_start_line": 3,
+            "confidence": 0.95
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/auth.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/auth.py",
+            "canonical_start_line": 2,
+            "confidence": 0.9,
+            "status": "accepted",
+            "reason": ""
+          },
+          {
+            "category": "silent_failure",
+            "claimed_path": "src/routes.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/routes.py",
+            "canonical_start_line": 3,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": []
+      },
+      "failures": []
+    },
+    {
+      "id": "r26-sentinel-conflict",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 729,
+      "v1_output_tokens": 1074,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 562,
+      "baseline_output_tokens": 1489,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/profile.py",
+            "claimed_start_line": 3,
+            "confidence": 0.85
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/profile.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/profile.py",
+            "canonical_start_line": 3,
+            "confidence": 0.85,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/profile.py",
+            "line": 3
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/profile.py",
+            "claimed_start_line": 3,
+            "confidence": 0.7
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/profile.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/profile.py",
+            "canonical_start_line": 3,
+            "confidence": 0.7,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r27-config-string-bool",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 710,
+      "v1_output_tokens": 1178,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 542,
+      "baseline_output_tokens": 1317,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/config.py",
+            "claimed_start_line": 2,
+            "confidence": 0.9
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/config.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/config.py",
+            "canonical_start_line": 2,
+            "confidence": 0.9,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/config.py",
+            "line": 2
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/config.py",
+            "claimed_start_line": 2,
+            "confidence": 0.95
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/config.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/config.py",
+            "canonical_start_line": 2,
+            "confidence": 0.95,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r28-key-normalization",
+      "v1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 706,
+      "v1_output_tokens": 1471,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 542,
+      "baseline_output_tokens": 956,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "security",
+            "claimed_path": "src/keys.py",
+            "claimed_start_line": 2,
+            "confidence": 0.6
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "security",
+            "claimed_path": "src/keys.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/keys.py",
+            "canonical_start_line": 2,
+            "confidence": 0.6,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/keys.py",
+            "line": 2
+          }
+        ],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/keys.py",
+            "claimed_start_line": 2,
+            "confidence": 0.6
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/keys.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/keys.py",
+            "canonical_start_line": 2,
+            "confidence": 0.6,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r29-lock-copy",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 722,
+      "v1_output_tokens": 688,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 558,
+      "baseline_output_tokens": 1278,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "concurrency",
+            "claimed_path": "src/accounts.py",
+            "claimed_start_line": 3,
+            "confidence": 0.9
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "concurrency",
+            "claimed_path": "src/accounts.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/accounts.py",
+            "canonical_start_line": 3,
+            "confidence": 0.9,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "concurrency",
+            "path": "src/accounts.py",
+            "line": 3
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "concurrency",
+            "claimed_path": "src/accounts.py",
+            "claimed_start_line": 3,
+            "confidence": 0.92
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "concurrency",
+            "claimed_path": "src/accounts.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/accounts.py",
+            "canonical_start_line": 3,
+            "confidence": 0.92,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r30-retry-non-idempotent",
+      "v1": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 2,
+      "v1_input_tokens": 2975,
+      "v1_output_tokens": 9880,
+      "v1_retries": 0,
+      "v1_schema_repairs": 2,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 644,
+      "baseline_output_tokens": 2876,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/checkout.py",
+            "claimed_start_line": 3,
+            "confidence": 0.8
+          },
+          {
+            "category": "correctness",
+            "claimed_path": "src/retry.py",
+            "claimed_start_line": 4,
+            "confidence": 0.7
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/checkout.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/checkout.py",
+            "canonical_start_line": 3,
+            "confidence": 0.8,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          },
+          {
+            "category": "correctness",
+            "claimed_path": "src/retry.py",
+            "claimed_start_line": 4,
+            "canonical_path": "src/retry.py",
+            "canonical_start_line": 4,
+            "confidence": 0.7,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/checkout.py",
+            "line": 3
+          }
+        ],
+        "v1_matched_expected_ids": [
+          0
+        ],
+        "base_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/checkout.py",
+            "claimed_start_line": 3,
+            "confidence": 0.75
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/checkout.py",
+            "claimed_start_line": 3,
+            "canonical_path": "src/checkout.py",
+            "canonical_start_line": 3,
+            "confidence": 0.75,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": [
+          0
+        ]
+      },
+      "failures": []
+    },
+    {
+      "id": "r31-negative-rename",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 729,
+      "v1_output_tokens": 389,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 566,
+      "baseline_output_tokens": 182,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [],
+        "v1_findings": [],
+        "expected": [],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [],
+        "base_findings": [],
+        "base_matched_expected_ids": []
+      },
+      "failures": []
+    },
+    {
+      "id": "r32-negative-context-manager",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 737,
+      "v1_output_tokens": 1204,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 573,
+      "baseline_output_tokens": 408,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [],
+        "v1_findings": [],
+        "expected": [],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [],
+        "base_findings": [],
+        "base_matched_expected_ids": []
+      },
+      "failures": []
+    },
+    {
+      "id": "r33-negative-parameterize",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 1
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 1492,
+      "v1_output_tokens": 4348,
+      "v1_retries": 0,
+      "v1_schema_repairs": 1,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 1161,
+      "baseline_output_tokens": 5847,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 1,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [],
+        "v1_findings": [],
+        "expected": [],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [
+          {
+            "category": "edge_case",
+            "claimed_path": "src/db.py",
+            "claimed_start_line": 2,
+            "confidence": 0.7
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "edge_case",
+            "claimed_path": "src/db.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/db.py",
+            "canonical_start_line": 2,
+            "confidence": 0.7,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": []
+      },
+      "failures": []
+    },
+    {
+      "id": "r35-negative-async-sleep",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 714,
+      "v1_output_tokens": 588,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 550,
+      "baseline_output_tokens": 532,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [],
+        "v1_findings": [],
+        "expected": [],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [],
+        "base_findings": [],
+        "base_matched_expected_ids": []
+      },
+      "failures": []
+    },
+    {
+      "id": "r36-negative-doc-string",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 731,
+      "v1_output_tokens": 199,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 537,
+      "baseline_output_tokens": 252,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [],
+        "v1_findings": [],
+        "expected": [],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [],
+        "base_findings": [],
+        "base_matched_expected_ids": []
+      },
+      "failures": []
+    },
+    {
+      "id": "r37-negative-test-fixture",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 2
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 759,
+      "v1_output_tokens": 1522,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 574,
+      "baseline_output_tokens": 2365,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [],
+        "v1_findings": [],
+        "expected": [],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "tests/test_auth.py",
+            "claimed_start_line": 3,
+            "confidence": 0.7
+          },
+          {
+            "category": "security",
+            "claimed_path": "tests/test_auth.py",
+            "claimed_start_line": 1,
+            "confidence": 0.8
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "tests/test_auth.py",
+            "claimed_start_line": 3,
+            "canonical_path": "tests/test_auth.py",
+            "canonical_start_line": 3,
+            "confidence": 0.7,
+            "status": "accepted",
+            "reason": ""
+          },
+          {
+            "category": "security",
+            "claimed_path": "tests/test_auth.py",
+            "claimed_start_line": 1,
+            "canonical_path": "tests/test_auth.py",
+            "canonical_start_line": 1,
+            "confidence": 0.8,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": []
+      },
+      "failures": []
+    },
+    {
+      "id": "r38-negative-lock",
+      "v1": {
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 1
+      },
+      "baseline": {
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 1
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 727,
+      "v1_output_tokens": 2804,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 562,
+      "baseline_output_tokens": 2929,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "test_gap",
+            "claimed_path": "src/count.py",
+            "claimed_start_line": 6,
+            "confidence": 0.7
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "test_gap",
+            "claimed_path": "src/count.py",
+            "claimed_start_line": 6,
+            "canonical_path": "src/count.py",
+            "canonical_start_line": 6,
+            "confidence": 0.7,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [
+          {
+            "category": "test_gap",
+            "claimed_path": "src/count.py",
+            "claimed_start_line": 6,
+            "confidence": 0.7
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "test_gap",
+            "claimed_path": "src/count.py",
+            "claimed_start_line": 6,
+            "canonical_path": "src/count.py",
+            "canonical_start_line": 6,
+            "confidence": 0.7,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": []
+      },
+      "failures": []
+    },
+    {
+      "id": "r40-negative-cross-file",
+      "v1": {
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 2
+      },
+      "baseline": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 2,
+      "v1_input_tokens": 2140,
+      "v1_output_tokens": 6120,
+      "v1_retries": 0,
+      "v1_schema_repairs": 1,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 1225,
+      "baseline_output_tokens": 3317,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 1,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/app.py",
+            "claimed_start_line": 1,
+            "confidence": 0.4
+          },
+          {
+            "category": "correctness",
+            "claimed_path": "src/util.py",
+            "claimed_start_line": 1,
+            "confidence": 0.35
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/app.py",
+            "claimed_start_line": 1,
+            "canonical_path": "src/app.py",
+            "canonical_start_line": 1,
+            "confidence": 0.4,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          },
+          {
+            "category": "correctness",
+            "claimed_path": "src/util.py",
+            "claimed_start_line": 1,
+            "canonical_path": "src/util.py",
+            "canonical_start_line": 1,
+            "confidence": 0.35,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [],
+        "base_findings": [],
+        "base_matched_expected_ids": []
+      },
+      "failures": []
+    },
+    {
+      "id": "r34-negative-empty-guard",
+      "v1": {
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 1
+      },
+      "baseline": {
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 1
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 720,
+      "v1_output_tokens": 2169,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 556,
+      "baseline_output_tokens": 2766,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/mean.py",
+            "claimed_start_line": 2,
+            "confidence": 0.7
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "correctness",
+            "claimed_path": "src/mean.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/mean.py",
+            "canonical_start_line": 2,
+            "confidence": 0.7,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [
+          {
+            "category": "edge_case",
+            "claimed_path": "src/mean.py",
+            "claimed_start_line": 2,
+            "confidence": 0.6
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "edge_case",
+            "claimed_path": "src/mean.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/mean.py",
+            "canonical_start_line": 2,
+            "confidence": 0.6,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": []
+      },
+      "failures": []
+    },
+    {
+      "id": "r21-lock-and-await",
+      "v1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 1488,
+      "v1_output_tokens": 4716,
+      "v1_retries": 0,
+      "v1_schema_repairs": 1,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 560,
+      "baseline_output_tokens": 1673,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 0,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [
+          {
+            "category": "performance",
+            "claimed_path": "src/shared.py",
+            "claimed_start_line": 4,
+            "confidence": 0.75
+          }
+        ],
+        "v1_findings": [
+          {
+            "category": "performance",
+            "claimed_path": "src/shared.py",
+            "claimed_start_line": 4,
+            "canonical_path": "src/shared.py",
+            "canonical_start_line": 4,
+            "confidence": 0.75,
+            "status": "accepted",
+            "reason": "置信度门槛"
+          }
+        ],
+        "expected": [
+          {
+            "category": "concurrency",
+            "path": "src/shared.py",
+            "line": 3
+          },
+          {
+            "category": "correctness",
+            "path": "src/shared.py",
+            "line": 4
+          }
+        ],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [
+          {
+            "category": "concurrency",
+            "claimed_path": "src/shared.py",
+            "claimed_start_line": 2,
+            "confidence": 0.85
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "concurrency",
+            "claimed_path": "src/shared.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/shared.py",
+            "canonical_start_line": 2,
+            "confidence": 0.85,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": []
+      },
+      "failures": []
+    },
+    {
+      "id": "r39-negative-cache",
+      "v1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "baseline": {
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 1
+      },
+      "v1_model_calls": 1,
+      "v1_input_tokens": 715,
+      "v1_output_tokens": 587,
+      "v1_retries": 0,
+      "v1_schema_repairs": 0,
+      "v1_cost_total_usd": 0.0,
+      "baseline_model_calls": 1,
+      "baseline_input_tokens": 1135,
+      "baseline_output_tokens": 5761,
+      "baseline_retries": 0,
+      "baseline_schema_repairs": 1,
+      "baseline_cost_total_usd": 0.0,
+      "v1_pricing_status": "unknown",
+      "base_pricing_status": "unknown",
+      "diagnostics": {
+        "v1_candidates": [],
+        "v1_findings": [],
+        "expected": [],
+        "v1_matched_expected_ids": [],
+        "base_candidates": [
+          {
+            "category": "edge_case",
+            "claimed_path": "src/format.py",
+            "claimed_start_line": 2,
+            "confidence": 0.6
+          }
+        ],
+        "base_findings": [
+          {
+            "category": "edge_case",
+            "claimed_path": "src/format.py",
+            "claimed_start_line": 2,
+            "canonical_path": "src/format.py",
+            "canonical_start_line": 2,
+            "confidence": 0.6,
+            "status": "accepted",
+            "reason": ""
+          }
+        ],
+        "base_matched_expected_ids": []
+      },
+      "failures": []
+    }
+  ],
+  "failures": [],
+  "execution_completed": true,
+  "quality_gate_passed": false,
+  "comparison_result": "degraded"
+}

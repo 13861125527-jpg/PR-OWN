@@ -1,0 +1,93 @@
+{
+  "dataset": "v3a-sandbox",
+  "samples": 10,
+  "real_api": false,
+  "sandbox": {
+    "passed": 10,
+    "total": 10,
+    "cases": [
+      {
+        "id": "escape-absolute",
+        "kind": "escape",
+        "ok": true,
+        "status": "invalid_args",
+        "error": "invalid_path",
+        "truncated": false
+      },
+      {
+        "id": "escape-dotdot",
+        "kind": "escape",
+        "ok": true,
+        "status": "invalid_args",
+        "error": "invalid_path",
+        "truncated": false
+      },
+      {
+        "id": "read-ok",
+        "kind": "read",
+        "ok": true,
+        "status": "ok",
+        "error": null,
+        "truncated": false
+      },
+      {
+        "id": "truncate-read",
+        "kind": "truncate",
+        "ok": true,
+        "status": "ok",
+        "error": null,
+        "truncated": true
+      },
+      {
+        "id": "search-literal",
+        "kind": "search",
+        "ok": true,
+        "status": "ok",
+        "error": null,
+        "truncated": false
+      },
+      {
+        "id": "search-regex-not-interpreted",
+        "kind": "search",
+        "ok": true,
+        "status": "ok",
+        "error": null,
+        "truncated": false
+      },
+      {
+        "id": "stub-submit",
+        "kind": "stub",
+        "ok": true,
+        "status": "error",
+        "error": "not_bound",
+        "truncated": false
+      },
+      {
+        "id": "stub-finish",
+        "kind": "stub",
+        "ok": true,
+        "status": "error",
+        "error": "not_bound",
+        "truncated": false
+      },
+      {
+        "id": "unknown-tool",
+        "kind": "schema",
+        "ok": true,
+        "status": "invalid_args",
+        "error": "unknown_tool",
+        "truncated": false
+      },
+      {
+        "id": "default-review-isolation",
+        "kind": "isolate",
+        "ok": true,
+        "status": "ok",
+        "error": null,
+        "truncated": false
+      }
+    ],
+    "note": "脚本化 Fake 快照；无真实模型。不贴源码原文。"
+  },
+  "all_passed": true
+}

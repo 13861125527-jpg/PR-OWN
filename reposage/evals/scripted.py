@@ -76,6 +76,10 @@ def scripted_candidates(sample_id: str) -> list[FindingCandidate]:
         "s18-invalid-command": [],  # 无缺陷 → 空候选（noise=0）
         "s19-deadlock-risk": [_cand("src/lock.py", 4, FindingCategory.CONCURRENCY, "lock.acquire()")],
         "s20-wide-format": [_cand("src/out.py", 2, FindingCategory.SECURITY, "secret in f-string")],
+        "v2b-cross-eval": [_cand("src/app.py", 4, FindingCategory.SECURITY, "eval(x)")],
+        "v2b-consume": [_cand("src/app.py", 3, FindingCategory.CORRECTNESS, "helper(x)")],
+        "v2b-alias": [_cand("src/app.py", 3, FindingCategory.CORRECTNESS, "u.helper")],
+        "v2b-relative": [_cand("src/pkg/app.py", 3, FindingCategory.CORRECTNESS, "Foo()")],
     }
     return [c for c in table.get(sample_id, [])]
 

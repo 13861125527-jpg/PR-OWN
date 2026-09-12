@@ -1,0 +1,5232 @@
+{
+  "dataset": "reposage/evals/datasets/resume_l3_context_30.yaml",
+  "model": "deepseek-v4-pro",
+  "sample_ids": [
+    "l3-01-none-sentinel",
+    "l3-02-milliseconds",
+    "l3-03-inclusive-bound",
+    "l3-04-tuple-order",
+    "l3-05-mutates-input",
+    "l3-06-bytes-output",
+    "l3-07-raises-missing",
+    "l3-08-empty-rejected",
+    "l3-09-one-based",
+    "l3-10-negative-invalid",
+    "l3-11-raw-html",
+    "l3-12-path-containment",
+    "l3-13-auth-result",
+    "l3-14-sql-identifier",
+    "l3-15-redaction",
+    "l3-16-signature-bool",
+    "l3-17-async-required",
+    "l3-18-blocking-helper",
+    "l3-19-iterator-once",
+    "l3-20-lock-required",
+    "l3-21-transaction-required",
+    "l3-22-consumes-stream",
+    "l3-23-cache-key",
+    "l3-24-retry-safety",
+    "l3-25-negative-none",
+    "l3-26-negative-ms",
+    "l3-27-negative-escape",
+    "l3-28-negative-await",
+    "l3-29-negative-iterator",
+    "l3-30-negative-lock"
+  ],
+  "symbol_retrieval": true,
+  "completed_sample_ids": [
+    "l3-08-empty-rejected",
+    "l3-10-negative-invalid",
+    "l3-14-sql-identifier",
+    "l3-25-negative-none",
+    "l3-27-negative-escape",
+    "l3-28-negative-await",
+    "l3-29-negative-iterator",
+    "l3-01-none-sentinel",
+    "l3-07-raises-missing",
+    "l3-13-auth-result",
+    "l3-16-signature-bool",
+    "l3-21-transaction-required",
+    "l3-22-consumes-stream",
+    "l3-23-cache-key",
+    "l3-02-milliseconds",
+    "l3-04-tuple-order",
+    "l3-05-mutates-input",
+    "l3-06-bytes-output",
+    "l3-11-raw-html",
+    "l3-17-async-required",
+    "l3-18-blocking-helper",
+    "l3-20-lock-required",
+    "l3-26-negative-ms",
+    "l3-03-inclusive-bound",
+    "l3-09-one-based",
+    "l3-15-redaction",
+    "l3-19-iterator-once",
+    "l3-12-path-containment",
+    "l3-24-retry-safety",
+    "l3-30-negative-lock"
+  ],
+  "results": [
+    {
+      "id": "l3-08-empty-rejected",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 45314.46,
+      "expected_count": 1,
+      "accepted_count": 0,
+      "candidate_count": 0,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-08-empty-rejected",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_08.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_08.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_08.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_08.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-08-empty-rejected:src/case_08.py::general",
+          "run_id": "v2-l3-08-empty-rejected",
+          "kind": "role_review",
+          "target": "src/case_08.py::general",
+          "status": "completed",
+          "input_tokens": 901,
+          "output_tokens": 1316,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-08-empty-rejected:src/case_08.py::correctness",
+          "run_id": "v2-l3-08-empty-rejected",
+          "kind": "role_review",
+          "target": "src/case_08.py::correctness",
+          "status": "completed",
+          "input_tokens": 886,
+          "output_tokens": 1633,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1787,
+        "output_tokens": 2949,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 45311,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "edge_case",
+            "path": "src/case_08.py",
+            "line": 4
+          }
+        ],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [],
+      "semantic_metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "matched": 0,
+        "expected": 1,
+        "reported": 0,
+        "category_agreement": 0.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": [],
+        "raw_reported": 0,
+        "duplicates_suppressed": 0
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-10-negative-invalid",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 24771.28,
+      "expected_count": 1,
+      "accepted_count": 0,
+      "candidate_count": 0,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-10-negative-invalid",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_10.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_10.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_10.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_10.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-10-negative-invalid:src/case_10.py::general",
+          "run_id": "v2-l3-10-negative-invalid",
+          "kind": "role_review",
+          "target": "src/case_10.py::general",
+          "status": "completed",
+          "input_tokens": 898,
+          "output_tokens": 504,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-10-negative-invalid:src/case_10.py::correctness",
+          "run_id": "v2-l3-10-negative-invalid",
+          "kind": "role_review",
+          "target": "src/case_10.py::correctness",
+          "status": "completed",
+          "input_tokens": 883,
+          "output_tokens": 972,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1781,
+        "output_tokens": 1476,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 24768,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "edge_case",
+            "path": "src/case_10.py",
+            "line": 4
+          }
+        ],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [],
+      "semantic_metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "matched": 0,
+        "expected": 1,
+        "reported": 0,
+        "category_agreement": 0.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": [],
+        "raw_reported": 0,
+        "duplicates_suppressed": 0
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-14-sql-identifier",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 14635.57,
+      "expected_count": 1,
+      "accepted_count": 0,
+      "candidate_count": 0,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-14-sql-identifier",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_14.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_14.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_14.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_14.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-14-sql-identifier:src/case_14.py::general",
+          "run_id": "v2-l3-14-sql-identifier",
+          "kind": "role_review",
+          "target": "src/case_14.py::general",
+          "status": "completed",
+          "input_tokens": 907,
+          "output_tokens": 314,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-14-sql-identifier:src/case_14.py::correctness",
+          "run_id": "v2-l3-14-sql-identifier",
+          "kind": "role_review",
+          "target": "src/case_14.py::correctness",
+          "status": "completed",
+          "input_tokens": 892,
+          "output_tokens": 576,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1799,
+        "output_tokens": 890,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 14632,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/case_14.py",
+            "line": 4
+          }
+        ],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [],
+      "semantic_metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "matched": 0,
+        "expected": 1,
+        "reported": 0,
+        "category_agreement": 0.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": [],
+        "raw_reported": 0,
+        "duplicates_suppressed": 0
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-25-negative-none",
+      "kind": "negative",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 11262.34,
+      "expected_count": 0,
+      "accepted_count": 0,
+      "candidate_count": 0,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-25-negative-none",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_25.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_25.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_25.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_25.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-25-negative-none:src/case_25.py::general",
+          "run_id": "v2-l3-25-negative-none",
+          "kind": "role_review",
+          "target": "src/case_25.py::general",
+          "status": "completed",
+          "input_tokens": 892,
+          "output_tokens": 404,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-25-negative-none:src/case_25.py::correctness",
+          "run_id": "v2-l3-25-negative-none",
+          "kind": "role_review",
+          "target": "src/case_25.py::correctness",
+          "status": "completed",
+          "input_tokens": 877,
+          "output_tokens": 322,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1769,
+        "output_tokens": 726,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 11259,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 0,
+        "expected": 0,
+        "reported": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": [],
+        "raw_reported": 0,
+        "duplicates_suppressed": 0
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-27-negative-escape",
+      "kind": "negative",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 121237.66,
+      "expected_count": 0,
+      "accepted_count": 0,
+      "candidate_count": 1,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-27-negative-escape",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_27.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_27.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_27.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_27.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-27-negative-escape:src/case_27.py::general",
+          "run_id": "v2-l3-27-negative-escape",
+          "kind": "role_review",
+          "target": "src/case_27.py::general",
+          "status": "completed",
+          "input_tokens": 1815,
+          "output_tokens": 5908,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-27-negative-escape:src/case_27.py::correctness",
+          "run_id": "v2-l3-27-negative-escape",
+          "kind": "role_review",
+          "target": "src/case_27.py::correctness",
+          "status": "completed",
+          "input_tokens": 874,
+          "output_tokens": 2173,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-00fd7f1a1e66",
+          "run_id": "v2-l3-27-negative-escape",
+          "kind": "judge_adjudicate",
+          "target": "src/case_27.py",
+          "status": "completed",
+          "input_tokens": 844,
+          "output_tokens": 729,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 4,
+        "input_tokens": 3533,
+        "output_tokens": 8810,
+        "retries": 0,
+        "schema_repairs": 1,
+        "provider_latency_ms": 111743,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 0,
+        "expected": 0,
+        "reported": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": [],
+        "raw_reported": 0,
+        "duplicates_suppressed": 0
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-28-negative-await",
+      "kind": "negative",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 1
+      },
+      "elapsed_ms": 44481.5,
+      "expected_count": 0,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-28-negative-await",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_28.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_28.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_28.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_28.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-28-negative-await:src/case_28.py::general",
+          "run_id": "v2-l3-28-negative-await",
+          "kind": "role_review",
+          "target": "src/case_28.py::general",
+          "status": "completed",
+          "input_tokens": 885,
+          "output_tokens": 998,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-28-negative-await:src/case_28.py::correctness",
+          "run_id": "v2-l3-28-negative-await",
+          "kind": "role_review",
+          "target": "src/case_28.py::correctness",
+          "status": "completed",
+          "input_tokens": 870,
+          "output_tokens": 2127,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-4f2d37c829b6",
+          "run_id": "v2-l3-28-negative-await",
+          "kind": "judge_adjudicate",
+          "target": "src/case_28.py",
+          "status": "completed",
+          "input_tokens": 1169,
+          "output_tokens": 465,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2924,
+        "output_tokens": 3590,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 37951,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_28.py",
+            "line": 4,
+            "confidence": 0.99
+          }
+        ],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "5cdd8adf1c6b44a0884cdc347325dd5f",
+          "title": "`await` used in non-async function `process` causes SyntaxError",
+          "category": "correctness",
+          "path": "src/case_28.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "Importing or running src/case_28.py triggers a SyntaxError before execution.",
+          "impact": "The module cannot be loaded or executed; the application fails immediately, breaking all callers of `process`.",
+          "explanation": "The diff changes `return value` to `return await check(value)` inside the function `process`, which is defined with `def` (not `async def`). In Python, `await` is only valid inside coroutine functions declared with `async def`. Since `check` is an async function (from the unchanged helper module), the author attempted to await it, but did not make `process` async. This is a compile-time SyntaxError.",
+          "suggestion": "Change the definition of `process` to `async def process(value):` and ensure all callers of `process` properly await it, or if `process` must remain synchronous, use `asyncio.run(check(value))` to bridge the async call."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "matched": 0,
+        "expected": 0,
+        "reported": 1,
+        "category_agreement": 1.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": [],
+        "raw_reported": 1,
+        "duplicates_suppressed": 0
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-29-negative-iterator",
+      "kind": "negative",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 36035.51,
+      "expected_count": 0,
+      "accepted_count": 0,
+      "candidate_count": 0,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-29-negative-iterator",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_29.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_29.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_29.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_29.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-29-negative-iterator:src/case_29.py::general",
+          "run_id": "v2-l3-29-negative-iterator",
+          "kind": "role_review",
+          "target": "src/case_29.py::general",
+          "status": "completed",
+          "input_tokens": 884,
+          "output_tokens": 2107,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-29-negative-iterator:src/case_29.py::correctness",
+          "run_id": "v2-l3-29-negative-iterator",
+          "kind": "role_review",
+          "target": "src/case_29.py::correctness",
+          "status": "completed",
+          "input_tokens": 869,
+          "output_tokens": 439,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1753,
+        "output_tokens": 2546,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 36031,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 0,
+        "expected": 0,
+        "reported": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": [],
+        "raw_reported": 0,
+        "duplicates_suppressed": 0
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-01-none-sentinel",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 46970.54,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-01-none-sentinel",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_01.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_01.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_01.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_01.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-01-none-sentinel:src/case_01.py::general",
+          "run_id": "v2-l3-01-none-sentinel",
+          "kind": "role_review",
+          "target": "src/case_01.py::general",
+          "status": "completed",
+          "input_tokens": 900,
+          "output_tokens": 1147,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-01-none-sentinel:src/case_01.py::correctness",
+          "run_id": "v2-l3-01-none-sentinel",
+          "kind": "role_review",
+          "target": "src/case_01.py::correctness",
+          "status": "completed",
+          "input_tokens": 885,
+          "output_tokens": 1839,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-6e8d043695f1",
+          "run_id": "v2-l3-01-none-sentinel",
+          "kind": "judge_adjudicate",
+          "target": "src/case_01.py",
+          "status": "completed",
+          "input_tokens": 1154,
+          "output_tokens": 953,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2939,
+        "output_tokens": 3939,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 33547,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_01.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_01.py",
+            "line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "aa409a5f60f14eae8a6d7de5755742bd",
+          "title": "not check(value) treats zero (and other falsey non-None values) as absent, violating the helper contract",
+          "category": "correctness",
+          "path": "src/case_01.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "check(value) returns 0, False, empty string, empty list, or any falsey non-None value",
+          "impact": "process() now returns True for valid non-None values that are falsey (especially zero), causing callers to misinterpret the value as absent",
+          "explanation": "The old code used explicit None sentinel checking: `check(value) is None`. The imported contract says zero is a valid result and returns None only when value is None. Using `not check(value)` conflates the None sentinel with all falsey values, so a legitimate 0 result becomes `True` instead of `False`.",
+          "suggestion": "Restore explicit None comparison: `return check(value) is None`."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.99,
+            "reason": "Both describe the same defect: using `not check(value)` conflates falsey valid values like zero with the documented None sentinel, causing valid falsey results to be treated as absent."
+          }
+        ],
+        "raw_reported": 1,
+        "duplicates_suppressed": 0
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-07-raises-missing",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 51491.08,
+      "expected_count": 1,
+      "accepted_count": 0,
+      "candidate_count": 1,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-07-raises-missing",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_07.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_07.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_07.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_07.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-07-raises-missing:src/case_07.py::general",
+          "run_id": "v2-l3-07-raises-missing",
+          "kind": "role_review",
+          "target": "src/case_07.py::general",
+          "status": "completed",
+          "input_tokens": 907,
+          "output_tokens": 1322,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-07-raises-missing:src/case_07.py::correctness",
+          "run_id": "v2-l3-07-raises-missing",
+          "kind": "role_review",
+          "target": "src/case_07.py::correctness",
+          "status": "completed",
+          "input_tokens": 892,
+          "output_tokens": 1976,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-3a2b8b625fde",
+          "run_id": "v2-l3-07-raises-missing",
+          "kind": "judge_adjudicate",
+          "target": "src/case_07.py",
+          "status": "completed",
+          "input_tokens": 832,
+          "output_tokens": 733,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2631,
+        "output_tokens": 4031,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 41375,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "edge_case",
+            "path": "src/case_07.py",
+            "line": 4
+          }
+        ],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [],
+      "semantic_metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "matched": 0,
+        "expected": 1,
+        "reported": 0,
+        "category_agreement": 0.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": [],
+        "raw_reported": 0,
+        "duplicates_suppressed": 0
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-13-auth-result",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 45993.88,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-13-auth-result",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_13.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_13.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_13.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_13.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-13-auth-result:src/case_13.py::general",
+          "run_id": "v2-l3-13-auth-result",
+          "kind": "role_review",
+          "target": "src/case_13.py::general",
+          "status": "completed",
+          "input_tokens": 902,
+          "output_tokens": 1242,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-13-auth-result:src/case_13.py::correctness",
+          "run_id": "v2-l3-13-auth-result",
+          "kind": "role_review",
+          "target": "src/case_13.py::correctness",
+          "status": "completed",
+          "input_tokens": 887,
+          "output_tokens": 1608,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-e4b4dd6314d4",
+          "run_id": "v2-l3-13-auth-result",
+          "kind": "judge_adjudicate",
+          "target": "src/case_13.py",
+          "status": "completed",
+          "input_tokens": 1177,
+          "output_tokens": 710,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2966,
+        "output_tokens": 3560,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 33903,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/case_13.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "security",
+            "path": "src/case_13.py",
+            "line": 4,
+            "confidence": 0.98
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "bf4ec91bb70f48b6ab002e159177b964",
+          "title": "process() 不再返回认证结果，返回 value is not None，导致认证绕过",
+          "category": "security",
+          "path": "src/case_13.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "调用 process(value) 且 value 不为 None，无论 value 是否以 'signed:' 开头",
+          "impact": "调用方将收到 True，可能将未认证的值视为已认证，导致越权访问或业务逻辑错误",
+          "explanation": "原 process() 返回 check(value)，现在改为返回元组第二个元素 value is not None，完全忽略了 check() 的认证逻辑。表达式 (check(value), value is not None)[1] 先计算两个元素，但只返回 value is not None 的结果。因此只要 value 不是 None 就返回 True，认证检查形同虚设。",
+          "suggestion": "改回 return check(value)，或明确返回预期结果（如同时需要 check 和 is not None，应使用逻辑运算符而不是元组索引）。"
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.97,
+            "reason": "Both describe the same defect at src/case_13.py line 4: process() now computes the tuple (check(value), value is not None)[1], so it returns presence (value is not None) instead of the authentication result check(value). Same trigger (calling process with a non-None value) and same impact (callers treat unauthenticated values as authenticated, enabling auth bypass)."
+          }
+        ],
+        "raw_reported": 1,
+        "duplicates_suppressed": 0
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-16-signature-bool",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 50064.23,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-16-signature-bool",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_16.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_16.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_16.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_16.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-16-signature-bool:src/case_16.py::general",
+          "run_id": "v2-l3-16-signature-bool",
+          "kind": "role_review",
+          "target": "src/case_16.py::general",
+          "status": "completed",
+          "input_tokens": 898,
+          "output_tokens": 1535,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-16-signature-bool:src/case_16.py::correctness",
+          "run_id": "v2-l3-16-signature-bool",
+          "kind": "role_review",
+          "target": "src/case_16.py::correctness",
+          "status": "completed",
+          "input_tokens": 883,
+          "output_tokens": 1495,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-667857fa1123",
+          "run_id": "v2-l3-16-signature-bool",
+          "kind": "judge_adjudicate",
+          "target": "src/case_16.py",
+          "status": "completed",
+          "input_tokens": 1243,
+          "output_tokens": 903,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 3024,
+        "output_tokens": 3933,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 37978,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/case_16.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "security",
+            "path": "src/case_16.py",
+            "line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "c9e4eb41ffba4643a9214cd9b1a61747",
+          "title": "Signature verification result is discarded, allowing any non-empty token to pass",
+          "category": "security",
+          "path": "src/case_16.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "When value is any non-empty string that does not equal 'signed:ok', bool(value) returns True, causing the function to return True even though the token is invalid.",
+          "impact": "The signature check is completely bypassed. An attacker can supply an arbitrary non-empty value and the process function will treat it as a valid signed token, potentially leading to authentication bypass and unauthorized access.",
+          "explanation": "The modified return statement creates a tuple (check(value), bool(value)) and returns its second element, bool(value). This ignores the result of check(value) entirely. The original code returned check(value), which validated the token against 'signed:ok'. The new code returns True for any non-empty string, regardless of the token's actual validity, making the signature verification ineffective.",
+          "suggestion": "Change the return statement back to `return check(value)` to correctly return the result of the signature verification. If the intent was to return both the check result and a boolean, use the first element of the tuple, e.g., `return (check(value), bool(value))[0]`, but based on the original behavior, `return check(value)` is the appropriate fix."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.98,
+            "reason": "Both describe the same defect at src/case_16.py line 4: the return statement discards the result of check(value) and instead returns bool(value), so any non-empty token is accepted as valid, bypassing signature verification. Matching trigger (arbitrary non-empty token) and impact (authentication bypass)."
+          }
+        ],
+        "raw_reported": 1,
+        "duplicates_suppressed": 0
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-21-transaction-required",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 38161.69,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-21-transaction-required",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_21.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_21.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_21.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_21.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-21-transaction-required:src/case_21.py::general",
+          "run_id": "v2-l3-21-transaction-required",
+          "kind": "role_review",
+          "target": "src/case_21.py::general",
+          "status": "completed",
+          "input_tokens": 892,
+          "output_tokens": 1237,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-21-transaction-required:src/case_21.py::correctness",
+          "run_id": "v2-l3-21-transaction-required",
+          "kind": "role_review",
+          "target": "src/case_21.py::correctness",
+          "status": "completed",
+          "input_tokens": 877,
+          "output_tokens": 943,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-4952354088e9",
+          "run_id": "v2-l3-21-transaction-required",
+          "kind": "judge_adjudicate",
+          "target": "src/case_21.py",
+          "status": "completed",
+          "input_tokens": 1130,
+          "output_tokens": 606,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2899,
+        "output_tokens": 2786,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 28792,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_21.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_21.py",
+            "line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "4bf4847308a34cb1b78ed115b953d42f",
+          "title": "Transaction context removed from helper contract call",
+          "category": "correctness",
+          "path": "src/case_21.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "process(value) is called without an active transaction",
+          "impact": "The helper contract check(value) expects to run inside an active transaction; calling it directly may cause save() to fail or write outside the intended transaction boundary.",
+          "explanation": "The diff removes the transaction.run(lambda: check(value)) wrapper and replaces it with a direct check(value) call. The imported helper function's contract (docstring in unchanged lib/contract_21.py) states the caller must execute inside an active transaction. This change violates that contract.",
+          "suggestion": "Restore the transaction wrapper or ensure the caller establishes a transaction context before invoking process(value)."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.97,
+            "reason": "Both describe the same defect: the persistence/helper call was changed to run outside its required transaction context, violating the helper contract and risking failure or writes outside the intended transaction boundary."
+          }
+        ],
+        "raw_reported": 1,
+        "duplicates_suppressed": 0
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-22-consumes-stream",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 42051.6,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-22-consumes-stream",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_22.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_22.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_22.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_22.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-22-consumes-stream:src/case_22.py::general",
+          "run_id": "v2-l3-22-consumes-stream",
+          "kind": "role_review",
+          "target": "src/case_22.py::general",
+          "status": "completed",
+          "input_tokens": 899,
+          "output_tokens": 1498,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-22-consumes-stream:src/case_22.py::correctness",
+          "run_id": "v2-l3-22-consumes-stream",
+          "kind": "role_review",
+          "target": "src/case_22.py::correctness",
+          "status": "completed",
+          "input_tokens": 884,
+          "output_tokens": 1113,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-8df10f917bde",
+          "run_id": "v2-l3-22-consumes-stream",
+          "kind": "judge_adjudicate",
+          "target": "src/case_22.py",
+          "status": "completed",
+          "input_tokens": 1152,
+          "output_tokens": 672,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2935,
+        "output_tokens": 3283,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 31577,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_22.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_22.py",
+            "line": 4,
+            "confidence": 0.98
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "de12173aa1264a83b0c927a502cb59c5",
+          "title": "value.read() called after check() already closed the stream",
+          "category": "correctness",
+          "path": "src/case_22.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "`process` is called with a stream-like object; `check(value)` reads and closes it, then the expression attempts `value.read()` on the closed stream.",
+          "impact": "Raises `ValueError: I/O operation on closed file` or returns empty/incorrect data, breaking the caller.",
+          "explanation": "The new expression evaluates `check(value)` first, which reads from `value` and closes it in a finally block. Then it evaluates `value.read()`, but the stream is already closed, causing a runtime error or unexpected behavior.",
+          "suggestion": "Avoid calling `value.read()` after `check()` has closed the stream. Either return `check(value)` directly, save its result before performing any additional logic, or refactor `check` to not close the stream if further reads are needed."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.98,
+            "reason": "Both describe the same defect: process/caller invokes value.read() after check(value) has already read and closed the stream, causing an error or incorrect result."
+          }
+        ],
+        "raw_reported": 1,
+        "duplicates_suppressed": 0
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-23-cache-key",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 41912.44,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-23-cache-key",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_23.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_23.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_23.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_23.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-23-cache-key:src/case_23.py::general",
+          "run_id": "v2-l3-23-cache-key",
+          "kind": "role_review",
+          "target": "src/case_23.py::general",
+          "status": "completed",
+          "input_tokens": 894,
+          "output_tokens": 1075,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-23-cache-key:src/case_23.py::correctness",
+          "run_id": "v2-l3-23-cache-key",
+          "kind": "role_review",
+          "target": "src/case_23.py::correctness",
+          "status": "completed",
+          "input_tokens": 879,
+          "output_tokens": 1106,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-e2af59e40fa4",
+          "run_id": "v2-l3-23-cache-key",
+          "kind": "judge_adjudicate",
+          "target": "src/case_23.py",
+          "status": "completed",
+          "input_tokens": 1113,
+          "output_tokens": 875,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2886,
+        "output_tokens": 3056,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 28656,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_23.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_23.py",
+            "line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "7b9bd626bfa34b0292c45ce9ca789e70",
+          "title": "process returns unnormalized value due to tuple indexing",
+          "category": "correctness",
+          "path": "src/case_23.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "Any call to process(value) where the caller expects the normalized lowercase cache key.",
+          "impact": "Callers receive str(value) instead of check(value).lower(), so cache keys are no longer normalized to lowercase. This can cause case-sensitive cache misses, duplicate keys, or incorrect lookup behavior.",
+          "explanation": "The new expression `(check(value), str(value))[1]` evaluates `check(value)` but discards the result, returning the second tuple element `str(value)`. The imported helper `check` is intended to normalize cache keys to lowercase strings; this change bypasses that contract.",
+          "suggestion": "Restore the direct call: `return check(value)`."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.95,
+            "reason": "Both describe the same defect: process() discards the normalization from check() and returns raw str(value), so cache keys are no longer lowercased, causing case-sensitive duplicate/missed cache entries. Same root cause, trigger, and impact."
+          }
+        ],
+        "raw_reported": 1,
+        "duplicates_suppressed": 0
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-02-milliseconds",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 71553.63,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-02-milliseconds",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_02.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_02.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_02.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_02.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-02-milliseconds:src/case_02.py::general",
+          "run_id": "v2-l3-02-milliseconds",
+          "kind": "role_review",
+          "target": "src/case_02.py::general",
+          "status": "completed",
+          "input_tokens": 889,
+          "output_tokens": 779,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-02-milliseconds:src/case_02.py::correctness",
+          "run_id": "v2-l3-02-milliseconds",
+          "kind": "role_review",
+          "target": "src/case_02.py::correctness",
+          "status": "completed",
+          "input_tokens": 1788,
+          "output_tokens": 4022,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-592998235aa0",
+          "run_id": "v2-l3-02-milliseconds",
+          "kind": "judge_adjudicate",
+          "target": "src/case_02.py",
+          "status": "completed",
+          "input_tokens": 1138,
+          "output_tokens": 662,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 4,
+        "input_tokens": 3815,
+        "output_tokens": 5463,
+        "retries": 0,
+        "schema_repairs": 1,
+        "provider_latency_ms": 62002,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_02.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_02.py",
+            "line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "b06e578b7931434680374bcacc4bf706",
+          "title": "Unit mismatch after removing multiplication by 1000",
+          "category": "correctness",
+          "path": "src/case_02.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "process() called with a value representing seconds (or any unit where the caller expects seconds output).",
+          "impact": "Returned timeout is 1000x too small, causing callers to treat milliseconds as seconds, leading to premature timeouts or incorrect behavior.",
+          "explanation": "The helper check() accepts milliseconds and returns seconds. Originally process() converted its input to milliseconds before calling check, preserving seconds output. The diff removes *1000, so an input like 2 (seconds) is passed as 2 ms and returns 0.002 seconds. The function now returns an incorrect result.",
+          "suggestion": "Restore check(value * 1000), or rename/document process to accept milliseconds and update callers accordingly."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "raw_reported": 1,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.98,
+            "reason": "Both describe the same unit mismatch: removing *1000 causes process() to pass seconds to a helper expecting milliseconds, yielding a 1000x too-small returned timeout/result."
+          }
+        ]
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-04-tuple-order",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 41267.29,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-04-tuple-order",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_04.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_04.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_04.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_04.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-04-tuple-order:src/case_04.py::general",
+          "run_id": "v2-l3-04-tuple-order",
+          "kind": "role_review",
+          "target": "src/case_04.py::general",
+          "status": "completed",
+          "input_tokens": 895,
+          "output_tokens": 585,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-04-tuple-order:src/case_04.py::correctness",
+          "run_id": "v2-l3-04-tuple-order",
+          "kind": "role_review",
+          "target": "src/case_04.py::correctness",
+          "status": "completed",
+          "input_tokens": 880,
+          "output_tokens": 838,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-41d7ae48f552",
+          "run_id": "v2-l3-04-tuple-order",
+          "kind": "judge_adjudicate",
+          "target": "src/case_04.py",
+          "status": "completed",
+          "input_tokens": 1082,
+          "output_tokens": 1672,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2857,
+        "output_tokens": 3095,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 16612,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_04.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_04.py",
+            "line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "694ed574f5984c4486526c3bc5cfeb3a",
+          "title": "Returning error element instead of payload breaks caller contract",
+          "category": "correctness",
+          "path": "src/case_04.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "Any call to process(value) when check returns a successful tuple (payload, None)",
+          "impact": "process returns None instead of the actual payload, breaking all callers that expect the value",
+          "explanation": "The imported helper check(value) returns (payload, error) with error None on success. The diff changes the index from 0 (payload) to 1 (error), so successful inputs now return None instead of the payload.",
+          "suggestion": "Revert the index to 0: return check(value)[0], or explicitly handle both payload and error if error handling is desired."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "raw_reported": 1,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.97,
+            "reason": "Both describe the same defect: the diff changes the return index from the payload slot (0) to the error slot (1), so successful calls return None instead of the payload, breaking callers. Same trigger (successful check tuple) and same impact (callers get None)."
+          }
+        ]
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-05-mutates-input",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 56785.06,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-05-mutates-input",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_05.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_05.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_05.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_05.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-05-mutates-input:src/case_05.py::general",
+          "run_id": "v2-l3-05-mutates-input",
+          "kind": "role_review",
+          "target": "src/case_05.py::general",
+          "status": "completed",
+          "input_tokens": 890,
+          "output_tokens": 644,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-05-mutates-input:src/case_05.py::correctness",
+          "run_id": "v2-l3-05-mutates-input",
+          "kind": "role_review",
+          "target": "src/case_05.py::correctness",
+          "status": "completed",
+          "input_tokens": 875,
+          "output_tokens": 1380,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-5229a2f46be6",
+          "run_id": "v2-l3-05-mutates-input",
+          "kind": "judge_adjudicate",
+          "target": "src/case_05.py",
+          "status": "completed",
+          "input_tokens": 1085,
+          "output_tokens": 1669,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2850,
+        "output_tokens": 3693,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 26956,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_05.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_05.py",
+            "line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "b6fbbb31163d4d7b8abd48fd0b5d36ac",
+          "title": "process() now returns None instead of the sorted input list",
+          "category": "correctness",
+          "path": "src/case_05.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "Any caller invokes process(value) with a list.",
+          "impact": "The function returns None instead of the sorted list, breaking callers that expect the previous return value of the sorted list.",
+          "explanation": "The helper check(value) sorts value in place and returns None. The new return statement returns check(value) directly, so process() returns None. Previously the tuple expression (check(value), value)[1] returned the mutated sorted list.",
+          "suggestion": "Restore the previous behavior, for example: check(value); return value."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "raw_reported": 1,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.97,
+            "reason": "Both describe the same defect: check() sorts in place and returns None, but process() now returns check(value) directly, so callers receive None instead of the sorted list; same trigger (any call to process) and same impact (broken callers)."
+          }
+        ]
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-06-bytes-output",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 49669.09,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-06-bytes-output",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_06.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_06.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_06.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_06.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-06-bytes-output:src/case_06.py::general",
+          "run_id": "v2-l3-06-bytes-output",
+          "kind": "role_review",
+          "target": "src/case_06.py::general",
+          "status": "completed",
+          "input_tokens": 898,
+          "output_tokens": 848,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-06-bytes-output:src/case_06.py::correctness",
+          "run_id": "v2-l3-06-bytes-output",
+          "kind": "role_review",
+          "target": "src/case_06.py::correctness",
+          "status": "completed",
+          "input_tokens": 883,
+          "output_tokens": 1521,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-4f15768ef5d9",
+          "run_id": "v2-l3-06-bytes-output",
+          "kind": "judge_adjudicate",
+          "target": "src/case_06.py",
+          "status": "completed",
+          "input_tokens": 1138,
+          "output_tokens": 1170,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2919,
+        "output_tokens": 3539,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 31924,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_06.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_06.py",
+            "line": 4,
+            "confidence": 1.0
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "d1d682d203e243eb854574882b3d6192",
+          "title": "bytes与str直接拼接导致TypeError",
+          "category": "correctness",
+          "path": "src/case_06.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "调用process(value)时，check(value)返回bytes，随后执行bytes + str",
+          "impact": "函数总是抛出TypeError，导致process无法正常工作，可能使上层调用失败",
+          "explanation": "check()返回bytes（来自value.encode('utf-8')）。新代码直接执行check(value) + '!'，在Python中bytes对象不能与str对象相加，会抛出TypeError: can't concat str to bytes。原代码通过.decode('utf-8')先转为str，因此正确。",
+          "suggestion": "改为：return check(value).decode('utf-8') + '!' 或者使用bytes字面量：return check(value) + b'!'（如果调用方期望bytes）。"
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "raw_reported": 1,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.99,
+            "reason": "Both describe the same defect: the unchanged check helper returns bytes, and concatenating it with a str in process raises TypeError."
+          }
+        ]
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-11-raw-html",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 64354.28,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-11-raw-html",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_11.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_11.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_11.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_11.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-11-raw-html:src/case_11.py::general",
+          "run_id": "v2-l3-11-raw-html",
+          "kind": "role_review",
+          "target": "src/case_11.py::general",
+          "status": "completed",
+          "input_tokens": 897,
+          "output_tokens": 1474,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-11-raw-html:src/case_11.py::correctness",
+          "run_id": "v2-l3-11-raw-html",
+          "kind": "role_review",
+          "target": "src/case_11.py::correctness",
+          "status": "completed",
+          "input_tokens": 882,
+          "output_tokens": 1522,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-b254d4f4f70f",
+          "run_id": "v2-l3-11-raw-html",
+          "kind": "judge_adjudicate",
+          "target": "src/case_11.py",
+          "status": "completed",
+          "input_tokens": 1164,
+          "output_tokens": 766,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2943,
+        "output_tokens": 3762,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 49184,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/case_11.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "security",
+            "path": "src/case_11.py",
+            "line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "b2d087946b9a4e8782de7cd4b92f8267",
+          "title": "process() returns unescaped raw value, defeating HTML escaping",
+          "category": "security",
+          "path": "src/case_11.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "When process(value) is called, it returns the original value instead of the escaped result from check(value).",
+          "impact": "Callers expecting sanitized HTML output will receive unsanitized user input, potentially leading to cross-site scripting (XSS) or HTML injection.",
+          "explanation": "The diff changes the return statement from 'return check(value)' to 'return (check(value), value)[1]'. Although check(value) is evaluated, its result is discarded, and the raw 'value' is returned. According to the helper contract, check is supposed to return HTML-escaped text, so this change reintroduces the raw unsanitized text.",
+          "suggestion": "Restore 'return check(value)' to ensure the function returns the sanitized output."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "raw_reported": 1,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.99,
+            "reason": "Both describe the same defect: process() discards the result of the escaping helper and returns the raw value, defeating HTML escaping and potentially enabling XSS."
+          }
+        ]
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-17-async-required",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 79307.16,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-17-async-required",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_17.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_17.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_17.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_17.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-17-async-required:src/case_17.py::general",
+          "run_id": "v2-l3-17-async-required",
+          "kind": "role_review",
+          "target": "src/case_17.py::general",
+          "status": "completed",
+          "input_tokens": 890,
+          "output_tokens": 1535,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-17-async-required:src/case_17.py::correctness",
+          "run_id": "v2-l3-17-async-required",
+          "kind": "role_review",
+          "target": "src/case_17.py::correctness",
+          "status": "completed",
+          "input_tokens": 1787,
+          "output_tokens": 2508,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-13d5b602020f",
+          "run_id": "v2-l3-17-async-required",
+          "kind": "judge_adjudicate",
+          "target": "src/case_17.py",
+          "status": "completed",
+          "input_tokens": 1184,
+          "output_tokens": 781,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 4,
+        "input_tokens": 3861,
+        "output_tokens": 4824,
+        "retries": 0,
+        "schema_repairs": 1,
+        "provider_latency_ms": 66270,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_17.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_17.py",
+            "line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "20726697a75a45a89e0edee7d728efa2",
+          "title": "Async check result not awaited, returns coroutine instead of bool",
+          "category": "correctness",
+          "path": "src/case_17.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "Calling process(value) expects a boolean validation result. Without await, the returned value is a coroutine object (if process is async) or the coroutine is never executed (if process is sync), leading to wrong type or skipped validation.",
+          "impact": "Callers receive a coroutine object instead of a boolean, causing type errors, broken business logic, or silent bypass of validation.",
+          "explanation": "The diff changes `return await check(value)` to `return check(value)`. Since `check` is defined as `async def check(value)`, invoking it returns a coroutine object, not the boolean `value > 0`. This breaks the contract of `process` and will fail at call sites expecting a boolean.",
+          "suggestion": "Restore `return await check(value)` and ensure `process` is declared as `async def process(value)`."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "raw_reported": 1,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.99,
+            "reason": "Both identify the same defect: an async check coroutine is returned without awaiting, so callers receive a coroutine instead of the expected boolean result."
+          }
+        ]
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-18-blocking-helper",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 131704.78,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-18-blocking-helper",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_18.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_18.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_18.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_18.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-18-blocking-helper:src/case_18.py::general",
+          "run_id": "v2-l3-18-blocking-helper",
+          "kind": "role_review",
+          "target": "src/case_18.py::general",
+          "status": "completed",
+          "input_tokens": 899,
+          "output_tokens": 2079,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-18-blocking-helper:src/case_18.py::correctness",
+          "run_id": "v2-l3-18-blocking-helper",
+          "kind": "role_review",
+          "target": "src/case_18.py::correctness",
+          "status": "completed",
+          "input_tokens": 1805,
+          "output_tokens": 4330,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-4672a55db0fe",
+          "run_id": "v2-l3-18-blocking-helper",
+          "kind": "judge_adjudicate",
+          "target": "src/case_18.py",
+          "status": "completed",
+          "input_tokens": 1146,
+          "output_tokens": 1074,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 4,
+        "input_tokens": 3850,
+        "output_tokens": 7483,
+        "retries": 0,
+        "schema_repairs": 1,
+        "provider_latency_ms": 113940,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "performance",
+            "path": "src/case_18.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "concurrency",
+            "path": "src/case_18.py",
+            "line": 4,
+            "confidence": 0.9
+          }
+        ],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": [
+          {
+            "path": "src/case_18.py",
+            "line": 4,
+            "expected": "performance",
+            "actual": "concurrency"
+          }
+        ]
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "1ab8cd13a20347e992aaa3a6fbe70988",
+          "title": "Blocking network call executes directly inside async context",
+          "category": "concurrency",
+          "path": "src/case_18.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "When process() is called from an asynchronous event loop and check() performs its blocking network operation.",
+          "impact": "The event loop is blocked for the duration of check(), preventing all other coroutines from running and causing degraded concurrency, potential timeouts, and possible unresponsiveness of the whole async application.",
+          "explanation": "The diff replaces `await asyncio.to_thread(check, value)` with a direct synchronous call `check(value)`. Given the original `await`, process() is an async function. The imported `check` is documented as a blocking network operation that must be offloaded from async callers. Running it inline defeats the async/event-loop model.",
+          "suggestion": "Restore offloading, e.g., `return await asyncio.to_thread(check, value)` or use `loop.run_in_executor(None, check, value)`, to keep the event loop responsive."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "raw_reported": 1,
+        "duplicates_suppressed": 0,
+        "category_agreement": 0.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.95,
+            "reason": "Both describe the same defect at the same location: a documented blocking helper being invoked directly on the async event loop instead of being offloaded (await asyncio.to_thread), causing the loop to block. The differing category labels (performance vs concurrency) are non-binding since the trigger, root cause, and impact match."
+          }
+        ]
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-20-lock-required",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 77387.71,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-20-lock-required",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_20.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_20.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_20.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_20.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-20-lock-required:src/case_20.py::general",
+          "run_id": "v2-l3-20-lock-required",
+          "kind": "role_review",
+          "target": "src/case_20.py::general",
+          "status": "completed",
+          "input_tokens": 916,
+          "output_tokens": 1682,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-20-lock-required:src/case_20.py::correctness",
+          "run_id": "v2-l3-20-lock-required",
+          "kind": "role_review",
+          "target": "src/case_20.py::correctness",
+          "status": "completed",
+          "input_tokens": 901,
+          "output_tokens": 2019,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-1751afb7dddb",
+          "run_id": "v2-l3-20-lock-required",
+          "kind": "judge_adjudicate",
+          "target": "src/case_20.py",
+          "status": "completed",
+          "input_tokens": 1121,
+          "output_tokens": 955,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2938,
+        "output_tokens": 4656,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 60327,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "concurrency",
+            "path": "src/case_20.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "concurrency",
+            "path": "src/case_20.py",
+            "line": 4,
+            "confidence": 0.85
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "abd1e4a7d5b14364be532ecae4e6910f",
+          "title": "check() called without required STATE_LOCK, risking race condition",
+          "category": "concurrency",
+          "path": "src/case_20.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "Multiple threads call process() concurrently with a shared mutable value dict; check increments value['count'] without holding STATE_LOCK.",
+          "impact": "Lost updates or inconsistent value['count'] due to unsynchronized read-modify-write.",
+          "explanation": "The updated comment on the call line states that STATE_LOCK is no longer held, while the imported check() contract explicitly requires the caller to hold STATE_LOCK before mutating shared state. No lock acquisition is present in the process() function as shown.",
+          "suggestion": "Acquire STATE_LOCK around the call to check(value) (or ensure process is only invoked while the lock is already held by the caller)."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "raw_reported": 1,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.95,
+            "reason": "Both identify the same concurrency defect: check() is called without the required STATE_LOCK, violating the helper's locking contract and risking unsynchronized shared-state mutation/race conditions."
+          }
+        ]
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-26-negative-ms",
+      "kind": "negative",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 130357.62,
+      "expected_count": 0,
+      "accepted_count": 0,
+      "candidate_count": 1,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-26-negative-ms",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_26.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_26.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_26.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_26.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-26-negative-ms:src/case_26.py::general",
+          "run_id": "v2-l3-26-negative-ms",
+          "kind": "role_review",
+          "target": "src/case_26.py::general",
+          "status": "completed",
+          "input_tokens": 1813,
+          "output_tokens": 4816,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-26-negative-ms:src/case_26.py::correctness",
+          "run_id": "v2-l3-26-negative-ms",
+          "kind": "role_review",
+          "target": "src/case_26.py::correctness",
+          "status": "completed",
+          "input_tokens": 873,
+          "output_tokens": 1029,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-580250a71b13",
+          "run_id": "v2-l3-26-negative-ms",
+          "kind": "judge_adjudicate",
+          "target": "src/case_26.py",
+          "status": "completed",
+          "input_tokens": 843,
+          "output_tokens": 1685,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 4,
+        "input_tokens": 3529,
+        "output_tokens": 7530,
+        "retries": 0,
+        "schema_repairs": 1,
+        "provider_latency_ms": 103420,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 0,
+        "expected": 0,
+        "reported": 0,
+        "raw_reported": 0,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": []
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-03-inclusive-bound",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 68361.14,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-03-inclusive-bound",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_03.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_03.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_03.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_03.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-03-inclusive-bound:src/case_03.py::general",
+          "run_id": "v2-l3-03-inclusive-bound",
+          "kind": "role_review",
+          "target": "src/case_03.py::general",
+          "status": "completed",
+          "input_tokens": 898,
+          "output_tokens": 1530,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-03-inclusive-bound:src/case_03.py::correctness",
+          "run_id": "v2-l3-03-inclusive-bound",
+          "kind": "role_review",
+          "target": "src/case_03.py::correctness",
+          "status": "completed",
+          "input_tokens": 883,
+          "output_tokens": 1526,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-8975affdc658",
+          "run_id": "v2-l3-03-inclusive-bound",
+          "kind": "judge_adjudicate",
+          "target": "src/case_03.py",
+          "status": "completed",
+          "input_tokens": 1178,
+          "output_tokens": 1201,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2959,
+        "output_tokens": 4257,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 47236,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_03.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_03.py",
+            "line": 4,
+            "confidence": 0.9
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "1148b892cca5416bb342bece7530d5a8",
+          "title": "Off-by-one shift in process boundary check",
+          "category": "correctness",
+          "path": "src/case_03.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "Calling process(value) with value=0 or value=101 (or any boundary-adjacent input).",
+          "impact": "process now rejects the formerly valid input 0 and accepts the formerly invalid input 101, violating the helper's inclusive 0..100 contract and breaking callers that rely on the original boundary semantics.",
+          "explanation": "The helper check(value) returns true exactly when 0 <= value <= 100. By changing the call to check(value - 1), process returns true when 0 <= value - 1 <= 100, i.e., 1 <= value <= 101. This shifts the accepted interval by +1: valid value 0 becomes false and invalid value 101 becomes true.",
+          "suggestion": "Restore the direct call check(value) unless the intended contract for process explicitly requires the shifted interval; if a different contract is desired, document and update all callers accordingly."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "raw_reported": 1,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.97,
+            "reason": "Both describe the same root cause: the call passes value-1 to check(), shifting the accepted interval from the inclusive 0..100 contract to 1..101, so boundary input 0 is rejected and 101 accepted. Same file, line, trigger (boundary inputs), and impact (violated inclusive-bound contract)."
+          }
+        ]
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-09-one-based",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 214869.72,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 1,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-09-one-based",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_09.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_09.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_09.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_09.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-09-one-based:src/case_09.py::general",
+          "run_id": "v2-l3-09-one-based",
+          "kind": "role_review",
+          "target": "src/case_09.py::general",
+          "status": "completed",
+          "input_tokens": 1843,
+          "output_tokens": 4051,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-09-one-based:src/case_09.py::correctness",
+          "run_id": "v2-l3-09-one-based",
+          "kind": "role_review",
+          "target": "src/case_09.py::correctness",
+          "status": "completed",
+          "input_tokens": 1813,
+          "output_tokens": 5266,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-f67921a24c60",
+          "run_id": "v2-l3-09-one-based",
+          "kind": "judge_adjudicate",
+          "target": "src/case_09.py",
+          "status": "completed",
+          "input_tokens": 899,
+          "output_tokens": 1877,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 5,
+        "input_tokens": 4555,
+        "output_tokens": 11194,
+        "retries": 0,
+        "schema_repairs": 2,
+        "provider_latency_ms": 178188,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_09.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_09.py",
+            "line": 4,
+            "confidence": 0.92
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "3477959582264113b970b6e412b13d26",
+          "title": "process() changes contract from zero-based to one-based and silently shifts results",
+          "category": "correctness",
+          "path": "src/case_09.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "Any existing caller invoking process(0) or expecting process(n) to return n rather than n-1.",
+          "impact": "process(0) now raises ValueError('one based') instead of returning 0; for valid one-based inputs process(n) now returns n-1 instead of n, breaking caller expectations and potentially corrupting downstream state.",
+          "explanation": "The diff changed process(value) from returning check(value + 1) to check(value). The imported check requires a one-based value (value >= 1) and returns value - 1. Previously process accepted zero-based inputs and returned the same numeric value: process(0) -> check(1) -> 0, process(1) -> check(2) -> 1. After the change, process requires one-based input and returns input - 1: process(1) -> 0, process(0) -> ValueError. Unless all callers were simultaneously migrated to the new semantics, this is a behavioral break.",
+          "suggestion": "If process must expose the helper's one-based contract directly, document and migrate all callers; otherwise restore check(value + 1) to preserve the previous zero-based return-identity behavior."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "raw_reported": 1,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.86,
+            "reason": "Both describe the same root cause at src/case_09.py line 4: process() passes its (zero-based) argument directly to the imported one-based check helper instead of value+1. The finding's framing as a 'contract change' is just an alternative description of the same off-by-one defect, with the same trigger (process(0) -> ValueError, other callers shifted by one) and the same impact (wrong result / failure downstream)."
+          }
+        ]
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-15-redaction",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 67260.64,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-15-redaction",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_15.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_15.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_15.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_15.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-15-redaction:src/case_15.py::general",
+          "run_id": "v2-l3-15-redaction",
+          "kind": "role_review",
+          "target": "src/case_15.py::general",
+          "status": "completed",
+          "input_tokens": 909,
+          "output_tokens": 1186,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-15-redaction:src/case_15.py::correctness",
+          "run_id": "v2-l3-15-redaction",
+          "kind": "role_review",
+          "target": "src/case_15.py::correctness",
+          "status": "completed",
+          "input_tokens": 894,
+          "output_tokens": 1336,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-8980f6ca6f00",
+          "run_id": "v2-l3-15-redaction",
+          "kind": "judge_adjudicate",
+          "target": "src/case_15.py",
+          "status": "completed",
+          "input_tokens": 1082,
+          "output_tokens": 935,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2885,
+        "output_tokens": 3457,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 49549,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/case_15.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "security",
+            "path": "src/case_15.py",
+            "line": 4,
+            "confidence": 0.98
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "a3933869a1a6400ebf963448b16341cd",
+          "title": "Redaction bypass: process returns original secret instead of redacted value",
+          "category": "security",
+          "path": "src/case_15.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "Any call to process(value) after this change.",
+          "impact": "Callers receive the sensitive value unredacted, defeating the redaction contract and leaking secrets.",
+          "explanation": "The diff changes `return check(value)` to `return (check(value), value)[1]`. The tuple indexes value (original input) instead of check(value), so process returns the unreduced secret. check(value) is computed but discarded.",
+          "suggestion": "Restore `return check(value)` or return the redacted output."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "raw_reported": 1,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 1.0,
+            "reason": "Both describe the same defect at src/case_15.py:4: the caller/return discards the helper's redacted result (check(value)) and returns the raw value, exposing the unredacted secret. Same root cause, trigger (any call to process), and impact (secret leakage)."
+          }
+        ]
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-19-iterator-once",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 57031.79,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-19-iterator-once",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_19.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_19.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_19.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_19.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-19-iterator-once:src/case_19.py::general",
+          "run_id": "v2-l3-19-iterator-once",
+          "kind": "role_review",
+          "target": "src/case_19.py::general",
+          "status": "completed",
+          "input_tokens": 894,
+          "output_tokens": 873,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-19-iterator-once:src/case_19.py::correctness",
+          "run_id": "v2-l3-19-iterator-once",
+          "kind": "role_review",
+          "target": "src/case_19.py::correctness",
+          "status": "completed",
+          "input_tokens": 879,
+          "output_tokens": 1054,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-e14620115f79",
+          "run_id": "v2-l3-19-iterator-once",
+          "kind": "judge_adjudicate",
+          "target": "src/case_19.py",
+          "status": "completed",
+          "input_tokens": 1157,
+          "output_tokens": 1158,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 3,
+        "provider_requests": 3,
+        "input_tokens": 2930,
+        "output_tokens": 3085,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 35550,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_19.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_19.py",
+            "line": 4,
+            "confidence": 0.98
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "0fffd404018c4c189509b2cee7dd0dfd",
+          "title": "len() called on generator returned by check()",
+          "category": "correctness",
+          "path": "src/case_19.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "Any call to process(value) because check() returns a generator expression, which has no __len__.",
+          "impact": "process() raises TypeError: object of type 'generator' has no len() at runtime, breaking all callers.",
+          "explanation": "The change from list(check(value)) to len(check(value)) attempts to get the length of a generator object. Python generators/iterators do not support len(); only sequences or collections do. The imported check() returns a generator expression, so this will fail unconditionally.",
+          "suggestion": "Convert to a list or count elements explicitly, e.g. return len(list(check(value))) or return sum(1 for _ in check(value))."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "raw_reported": 1,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 1,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": true,
+            "confidence": 0.98,
+            "reason": "Both describe the same defect: len() is called on the iterator/generator returned by check() at src/case_19.py line 4, which has no length, raising TypeError. Same root cause, trigger (any call to process/check returning a generator), and impact (runtime failure)."
+          }
+        ]
+      },
+      "semantic_error": null,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-12-path-containment",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 335751.8,
+      "expected_count": 1,
+      "accepted_count": 0,
+      "candidate_count": 1,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-12-path-containment",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_12.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_12.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_12.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_12.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-12-path-containment:src/case_12.py::general",
+          "run_id": "v2-l3-12-path-containment",
+          "kind": "role_review",
+          "target": "src/case_12.py::general",
+          "status": "completed",
+          "input_tokens": 1925,
+          "output_tokens": 5587,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-12-path-containment:src/case_12.py::correctness",
+          "run_id": "v2-l3-12-path-containment",
+          "kind": "role_review",
+          "target": "src/case_12.py::correctness",
+          "status": "failed",
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0.0,
+          "error": "src/case_12.py: LLMRequestError: 重试耗尽（2 次）: 网络错误: ReadTimeout: "
+        },
+        {
+          "task_id": "judge-3389211f701c",
+          "run_id": "v2-l3-12-path-containment",
+          "kind": "judge_adjudicate",
+          "target": "src/case_12.py",
+          "status": "completed",
+          "input_tokens": 844,
+          "output_tokens": 1522,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 1,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 3,
+        "input_tokens": 2769,
+        "output_tokens": 7109,
+        "retries": 0,
+        "schema_repairs": 1,
+        "provider_latency_ms": 122030,
+        "cost_usd": 0.0,
+        "by_role": {
+          "general": 1,
+          "judge": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/case_12.py",
+            "line": 4
+          }
+        ],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [],
+      "semantic_metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "matched": 0,
+        "expected": 1,
+        "reported": 0,
+        "raw_reported": 0,
+        "duplicates_suppressed": 0,
+        "category_agreement": 0.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": []
+      },
+      "semantic_error": null,
+      "warnings": [
+        "src/case_12.py::correctness optional 失败: src/case_12.py: LLMRequestError: 重试耗尽（2 次）: 网络错误: ReadTimeout: "
+      ],
+      "failures": [
+        {
+          "target": "src/case_12.py::correctness",
+          "detail": "src/case_12.py: LLMRequestError: 重试耗尽（2 次）: 网络错误: ReadTimeout: "
+        }
+      ]
+    },
+    {
+      "id": "l3-24-retry-safety",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.3333333333333333,
+        "recall": 1.0,
+        "f1": 0.5,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 178229.24,
+      "expected_count": 1,
+      "accepted_count": 3,
+      "candidate_count": 3,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-24-retry-safety",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_24.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_24.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_24.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_24.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-24-retry-safety:src/case_24.py::general",
+          "run_id": "v2-l3-24-retry-safety",
+          "kind": "role_review",
+          "target": "src/case_24.py::general",
+          "status": "completed",
+          "input_tokens": 898,
+          "output_tokens": 2893,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-24-retry-safety:src/case_24.py::correctness",
+          "run_id": "v2-l3-24-retry-safety",
+          "kind": "role_review",
+          "target": "src/case_24.py::correctness",
+          "status": "completed",
+          "input_tokens": 883,
+          "output_tokens": 2110,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-a3565d8337cd",
+          "run_id": "v2-l3-24-retry-safety",
+          "kind": "judge_adjudicate",
+          "target": "src/case_24.py",
+          "status": "failed",
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0.0,
+          "error": "StructuredOutputError"
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1781,
+        "output_tokens": 5003,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 101675,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_24.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_24.py",
+            "line": 4,
+            "confidence": 0.98
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_24.py",
+            "line": 4,
+            "confidence": 0.9
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_24.py",
+            "line": 4,
+            "confidence": 0.75
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "ee6e0655fb89426093481151bcb333a9",
+          "title": "Undefined `retry` function in modified code",
+          "category": "correctness",
+          "path": "src/case_24.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "Any call to `process(value)`",
+          "impact": "Raises `NameError: name 'retry' is not defined`, causing the function to crash for every input.",
+          "explanation": "The diff replaces the existing `return check(value)` with `return retry(lambda: check(value), attempts=3)`, but `retry` is neither imported nor defined in `src/case_24.py`. The only import is `from lib.contract_24 import check`. Therefore, `retry` is an undefined symbol.",
+          "suggestion": "Import `retry` from its defining module (or define it) before use, or avoid using `retry` if not intended."
+        },
+        {
+          "finding_occurrence_id": "3d613bca192e444d96b5afeb61624b65",
+          "title": "Retry on non-idempotent charge can cause duplicate charges",
+          "category": "correctness",
+          "path": "src/case_24.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "check(value) raises an exception after the charge has already been performed (e.g., timeout after remote commit). retry then invokes check again.",
+          "impact": "Duplicate charges and violation of exactly-once contract, leading to financial inconsistency.",
+          "explanation": "The added retry wrapper re-executes a non-idempotent operation on failure. If the charge side effect completes before an error is raised, subsequent attempts cause repeated charges.",
+          "suggestion": "Do not naively retry non-idempotent operations. Use idempotency keys or verify charge status before retrying; otherwise retry only idempotent operations."
+        },
+        {
+          "finding_occurrence_id": "755e212a83c04f1f9ed8b2be3cadabec",
+          "title": "Retry applied to non-idempotent `check` may violate exactly-once contract",
+          "category": "correctness",
+          "path": "src/case_24.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "If `retry` is properly defined/imported and `check(value)` raises an exception after performing the charge (or on any retryable failure), the retry mechanism will call `check` again.",
+          "impact": "Potential duplicate charges or partial state corruption because `check` is non-idempotent and designed to be executed exactly once.",
+          "explanation": "The diff wraps `check(value)` in a retry loop with 3 attempts. However, the contract of `check` (from L3) explicitly states it performs a non-idempotent charge exactly once. Retrying a non-idempotent operation can lead to multiple charges if the first attempt partially succeeds and then raises an exception. Even without partial failure, the intention to retry conflicts with the documented 'exactly once' guarantee.",
+          "suggestion": "Do not retry `check` unless it is guaranteed to be idempotent or the retry logic explicitly handles idempotency (e.g., via idempotency keys). If retry is necessary, redesign `check` to be idempotent or use a safer retry strategy that verifies whether the charge already occurred."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "matched": 1,
+        "expected": 1,
+        "reported": 2,
+        "raw_reported": 3,
+        "duplicates_suppressed": 1,
+        "category_agreement": 1.0,
+        "category_agreement_count": 1,
+        "eligible_pairs": 3,
+        "decisions": [
+          {
+            "pair_id": "e0-f0",
+            "semantically_equivalent": false,
+            "confidence": 0.98,
+            "reason": "Finding describes an undefined retry symbol causing NameError, not the expected non-idempotent retry loop defect."
+          },
+          {
+            "pair_id": "e0-f1",
+            "semantically_equivalent": true,
+            "confidence": 0.96,
+            "reason": "Both identify retrying a non-idempotent operation as the root cause and duplicate charges/exactly-once violation as impact."
+          },
+          {
+            "pair_id": "e0-f2",
+            "semantically_equivalent": true,
+            "confidence": 0.95,
+            "reason": "Both describe wrapping non-idempotent check in retry, risking duplicate charges and violating exactly-once contract."
+          }
+        ]
+      },
+      "semantic_error": null,
+      "warnings": [
+        "judge_skipped:schema"
+      ],
+      "failures": [
+        {
+          "target": "src/case_24.py",
+          "detail": "StructuredOutputError"
+        }
+      ]
+    },
+    {
+      "id": "l3-30-negative-lock",
+      "kind": "negative",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 2
+      },
+      "elapsed_ms": 237415.39,
+      "expected_count": 0,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-30-negative-lock",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_30.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_30.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_30.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_30.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-30-negative-lock:src/case_30.py::general",
+          "run_id": "v2-l3-30-negative-lock",
+          "kind": "role_review",
+          "target": "src/case_30.py::general",
+          "status": "completed",
+          "input_tokens": 909,
+          "output_tokens": 2628,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-30-negative-lock:src/case_30.py::correctness",
+          "run_id": "v2-l3-30-negative-lock",
+          "kind": "role_review",
+          "target": "src/case_30.py::correctness",
+          "status": "completed",
+          "input_tokens": 894,
+          "output_tokens": 2544,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "judge-a65f2824eac7",
+          "run_id": "v2-l3-30-negative-lock",
+          "kind": "judge_adjudicate",
+          "target": "src/case_30.py",
+          "status": "failed",
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0.0,
+          "error": "StructuredOutputError"
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 3,
+        "input_tokens": 1803,
+        "output_tokens": 5172,
+        "retries": 1,
+        "schema_repairs": 0,
+        "provider_latency_ms": 171157,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_30.py",
+            "line": 4,
+            "confidence": 0.9
+          },
+          {
+            "category": "concurrency",
+            "path": "src/case_30.py",
+            "line": 4,
+            "confidence": 0.7
+          }
+        ],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "finding_details": [
+        {
+          "finding_occurrence_id": "8d0d4708542241ef98c7d6863ce509f9",
+          "title": "process now mutates its input and returns incremented count, breaking existing callers",
+          "category": "correctness",
+          "path": "src/case_30.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "Any call to process() with a value dict; the dict's count is incremented and the new count returned instead of the current count",
+          "impact": "Callers expecting a read-only retrieval of count will observe off-by-one results and unintentional mutation of shared state, potentially corrupting application data or causing race conditions if the lock assumption is violated.",
+          "explanation": "The diff replaces a direct field read with a call to check(value). The imported check function increments value['count'] before returning it, so process now has a side effect and returns the incremented value. This is a behavior change that breaks any existing caller that relies on process being a pure getter.",
+          "suggestion": "If the intent was to increment and return, rename the function and ensure locking is explicit; otherwise keep the original direct access or call a non-mutating helper. If locking is required, acquire STATE_LOCK inside process rather than assuming the caller holds it."
+        },
+        {
+          "finding_occurrence_id": "52d3a23537a74489a1ff329295eecde7",
+          "title": "Concurrent increment without lock verification in process()",
+          "category": "concurrency",
+          "path": "src/case_30.py",
+          "start_line": 4,
+          "end_line": 4,
+          "trigger_condition": "Multiple threads call process(value) on the same mutable dict without the caller holding STATE_LOCK, or a caller invokes process expecting a read-only operation.",
+          "impact": "value['count'] may be incremented non-atomically leading to lost updates, or process may mutate state that callers considered read-only, causing unexpected data changes.",
+          "explanation": "The diff replaces a direct read of value['count'] with a call to check(value). The imported check function (seen in L3) performs value['count'] += 1, which mutates shared state. The comment asserts STATE_LOCK is held by caller, but process() itself neither acquires nor verifies the lock. If any caller fails to hold the lock (e.g., process exposed as a general API), concurrent increments can race and lose updates; moreover, any caller expecting a pure getter now gets a side effect.",
+          "suggestion": "Either acquire STATE_LOCK inside process/check if it must be safe, or clearly document and enforce via assertion (not just comment) that callers must hold STATE_LOCK; alternatively rename process to reflect mutation and ensure callers understand non-idempotent behavior."
+        }
+      ],
+      "semantic_metrics": {
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "matched": 0,
+        "expected": 0,
+        "reported": 2,
+        "raw_reported": 2,
+        "duplicates_suppressed": 0,
+        "category_agreement": 1.0,
+        "category_agreement_count": 0,
+        "eligible_pairs": 0,
+        "decisions": []
+      },
+      "semantic_error": null,
+      "warnings": [
+        "judge_skipped:schema"
+      ],
+      "failures": [
+        {
+          "target": "src/case_30.py",
+          "detail": "StructuredOutputError"
+        }
+      ]
+    }
+  ]
+}

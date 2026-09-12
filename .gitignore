@@ -17,10 +17,18 @@ venv/
 .mypy_cache/
 .ruff_cache/
 .pytest_cache/
+.tmp-pytest/
+.tmp-study-pytest-venv/
+
+# 外部评测资料缓存
+.benchmark/
 
 # IDE
 .idea/
 .vscode/
+
+# 本地评测 Judge 凭据
+config/semantic_judge.local.json
 
 # Reasonix 会话附件/元数据（不入库）
 .reasonix/

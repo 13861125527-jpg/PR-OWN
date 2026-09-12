@@ -12,7 +12,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from .enums import FindingCategory, FindingStatus, Severity
+from .enums import FindingCategory, FindingSourceKind, FindingStatus, Severity
 from .models import Evidence, FindingSource, utcnow
 
 
@@ -37,6 +37,11 @@ class FindingCandidate(BaseModel):
     evidence: list[Evidence] = Field(default_factory=list)
     suggestion: str = ""
     is_outside_diff: bool = False
+    # 来源事实：由 Strategy / 静态转换器程序盖戳，不信任模型自报（V2-A / V2-C）
+    role_id: str | None = None
+    source_kind: FindingSourceKind | None = None
+    rule_id: str | None = None
+    analyzer_id: str | None = None
 
 
 class FindingVersion(BaseModel):
@@ -97,6 +102,8 @@ class Finding(BaseModel):
     suggestion: str = ""
     sources: list[FindingSource] = Field(default_factory=list)
     is_outside_diff: bool = False
+    rule_id: str | None = None
+    needs_evidence: bool = False
     status: FindingStatus = FindingStatus.CANDIDATE
     versions: list[FindingVersion] = Field(default_factory=list)
 

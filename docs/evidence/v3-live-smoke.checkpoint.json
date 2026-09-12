@@ -1,0 +1,232 @@
+{
+  "model": "deepseek-v4-pro",
+  "sample_ids": [
+    "l3-01-none-sentinel"
+  ],
+  "rows": [
+    {
+      "id": "l3-01-none-sentinel",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_01.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_01.py",
+              "line": 4,
+              "confidence": 0.95
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "0692d91df43c417f937f87bab88ae451",
+            "title": "Boolean negation misclassifies falsy values as absent",
+            "category": "correctness",
+            "path": "src/case_01.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling process(0) or any value for which check(value) is falsy but not None.",
+            "impact": "process incorrectly returns True for valid falsy values, violating the contract that zero is a valid result. Downstream logic treating True as absence may discard or mishandle valid data.",
+            "explanation": "The diff replaces `return check(value) is None` with `return not check(value)`. According to the provided L3 source for `check`, it returns None only when value is None; otherwise it returns value itself. Therefore the original code correctly identified absence only for None. The new code applies Python truthiness: `not 0` is True, so process(0) now incorrectly reports absence. This also affects False, empty strings, empty lists, and other falsy values.",
+            "suggestion": "Restore the explicit None sentinel comparison: `return check(value) is None`. Keep the None check to preserve the contract that zero is a valid result."
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 38681.76,
+        "usage": {
+          "logical_invocations": 2,
+          "input_tokens": 1701,
+          "output_tokens": 2265,
+          "provider_latency_ms": 28433,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 1,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.99,
+                "reason": "Both describe the same defect: replacing an explicit `is None` sentinel check with `not check(value)` causes falsy valid values like 0 to be misclassified as absent, violating the contract that zero is valid."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both findings describe the same defect at the same location: replacing the explicit None sentinel check (`check(value) is None`) with truthiness negation (`not check(value)`) causes valid falsy values such as 0 to be misclassified as absent, violating the documented contract that zero is valid."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_01.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_01.py",
+              "line": 4,
+              "confidence": 0.9
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "1c1241de35274c8ea3cf3af6d9ada7d8",
+            "title": "`not check(value)` misclassifies valid falsy results (e.g. zero) as absent",
+            "category": "correctness",
+            "path": "src/case_01.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling `process(0)` now returns True instead of False.",
+            "impact": "",
+            "explanation": "The diff replaces `return check(value) is None` with `return not check(value)`. Per lib/contract_01.py, `check` returns None only when value is None, and otherwise returns the value itself; its docstring states \"zero is a valid result.\" The original code returned True only for an absent value. The new code returns True for any falsy return value of check, including 0, so `process(0)` now returns True and misclassifies a valid zero as absent.",
+            "suggestion": "Restore the explicit absence check: `return check(value) is None`."
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 80471.09,
+        "usage": {
+          "logical_invocations": 7,
+          "input_tokens": 24238,
+          "output_tokens": 5954,
+          "provider_latency_ms": 66685,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 1,
+        "tool_calls": 2,
+        "tool_attempts": 3,
+        "successful_tools": 2,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 1.0,
+                "reason": "Both findings identify the same defect: replacing an explicit `is None` check with `not check(value)` causes valid falsy values such as 0 to be misclassified as absent."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.99,
+                "reason": "Both identify the same regression: replacing the explicit `is None` absence check with `not check(value)` treats valid falsy results like zero as absent, causing process(0) to be misclassified."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      }
+    }
+  ]
+}

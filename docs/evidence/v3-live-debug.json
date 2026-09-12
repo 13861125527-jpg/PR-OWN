@@ -1,0 +1,266 @@
+{
+  "version": "V3-live",
+  "model": "deepseek-v4-pro",
+  "judge_model": "deepseek-v4-flash",
+  "dataset": "reposage/evals/datasets/resume_l3_context_30.yaml",
+  "sample_count": 1,
+  "execution_completed": true,
+  "arms": {
+    "base": {
+      "judge_1": {
+        "matched": 0,
+        "expected": 1,
+        "reported": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "perfect_samples": 0
+      },
+      "judge_2": {
+        "matched": 0,
+        "expected": 1,
+        "reported": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "perfect_samples": 0
+      },
+      "judge_agreement_samples": 1,
+      "avg_latency_ms": 42305.0,
+      "total_calls": 2,
+      "input_tokens": 1697,
+      "output_tokens": 2717,
+      "product_judge_calls": 1,
+      "tool_calls": 0,
+      "agent_failures": 0
+    },
+    "v3": {
+      "judge_1": {
+        "matched": 0,
+        "expected": 1,
+        "reported": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "perfect_samples": 0
+      },
+      "judge_2": {
+        "matched": 0,
+        "expected": 1,
+        "reported": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "perfect_samples": 0
+      },
+      "judge_agreement_samples": 1,
+      "avg_latency_ms": 25049.08,
+      "total_calls": 5,
+      "input_tokens": 14895,
+      "output_tokens": 1808,
+      "product_judge_calls": 0,
+      "tool_calls": 3,
+      "agent_failures": 0
+    }
+  },
+  "per_sample": [
+    {
+      "id": "l3-01-none-sentinel",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_01.py",
+              "line": 4
+            }
+          ],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "6994d80e44b84d9eb96b70aea9d34e1b",
+            "title": "`not check(value)` incorrectly treats zero as absent",
+            "category": "correctness",
+            "path": "src/case_01.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "value is 0",
+            "impact": "The process function returns True for value=0, treating it as absent, although the contract states zero is a valid result. This may cause incorrect business logic downstream.",
+            "explanation": "The diff changes the return expression from `check(value) is None` to `not check(value)`. According to the referenced L3 definition, `check` returns None only when value is None, and returns value otherwise (including 0). The original code correctly returned True only when value was None. The new code returns True when check(value) is falsy, such as 0, which contradicts the contract that zero is a valid result.",
+            "suggestion": "Revert to `return check(value) is None` or use an explicit sentinel check that distinguishes None from 0, e.g., `return check(value) is None`.",
+            "status": "suppressed",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 0,
+        "elapsed_ms": 42305.0,
+        "usage": {
+          "logical_invocations": 2,
+          "input_tokens": 1697,
+          "output_tokens": 2717,
+          "provider_latency_ms": 23289,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 1,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_01.py",
+              "line": 4
+            }
+          ],
+          "accepted": [],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "87aecd92611f402d91cb05d54c84b88a",
+            "title": "process() now treats falsy non-None values (e.g., 0) as absent",
+            "category": "correctness",
+            "path": "src/case_01.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling process(0) (or any falsy non-None value) returns True instead of False.",
+            "impact": "",
+            "explanation": "The contract in lib/contract_01.py states check() returns None only when value is absent, and zero is a valid result. The original `return check(value) is None` returned True only for None. The changed `return not check(value)` returns True for any falsy return: check(0) returns 0, and `not 0` is True, so process(0) now incorrectly reports absent. Other falsy non-None values (empty string, empty list, False) are also misclassified.",
+            "suggestion": "Restore the identity check: `return check(value) is None`.",
+            "status": "body_only",
+            "needs_evidence": true
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 0,
+        "elapsed_ms": 25049.08,
+        "usage": {
+          "logical_invocations": 5,
+          "input_tokens": 14895,
+          "output_tokens": 1808,
+          "provider_latency_ms": 25039,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 3,
+        "tool_attempts": 4,
+        "successful_tools": 3,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Verified the diff and both files; submitted the correctness finding about falsy-value misclassification.",
+            "candidate_count": 1,
+            "rounds": 5
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 0,
+            "raw_reported": 0,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    }
+  ],
+  "failures": []
+}

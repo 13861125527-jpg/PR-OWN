@@ -1,0 +1,187 @@
+# V2-C 转换/去重标注（程序指标；不是 Fake LLM 质量）
+name: v2c-static
+cases:
+  - id: convert-b006
+    kind: convert
+    diagnostic:
+      analyzer_id: ruff
+      rule_id: B006
+      path: src/app.py
+      start_line: 3
+      message: mutable default
+    diff: |
+      diff --git a/src/app.py b/src/app.py
+      --- a/src/app.py
+      +++ b/src/app.py
+      @@ -1,2 +1,4 @@
+       def f():
+           return 1
+      +def g(x=[]):
+      +    return x
+    expect_candidate: true
+    expect_rule_id: ruff:B006
+    expect_category: correctness
+  - id: reject-traversal
+    kind: convert
+    diagnostic:
+      analyzer_id: ruff
+      rule_id: B006
+      path: ../secret.py
+      start_line: 1
+      message: x
+    diff: |
+      diff --git a/src/app.py b/src/app.py
+      --- a/src/app.py
+      +++ b/src/app.py
+      @@ -1,1 +1,2 @@
+       x
+      +y
+    expect_candidate: false
+  - id: reject-old-line
+    kind: convert
+    diagnostic:
+      analyzer_id: ruff
+      rule_id: B006
+      path: src/app.py
+      start_line: 1
+      message: old
+    diff: |
+      diff --git a/src/app.py b/src/app.py
+      --- a/src/app.py
+      +++ b/src/app.py
+      @@ -1,2 +1,4 @@
+       def f():
+           return 1
+      +def g(x=[]):
+      +    return x
+    expect_candidate: false
+  - id: dedup-same-rule
+    kind: dedup
+    diagnostics:
+      - analyzer_id: ruff
+        rule_id: B006
+        path: src/app.py
+        start_line: 3
+        message: a
+      - analyzer_id: ruff
+        rule_id: B006
+        path: src/app.py
+        start_line: 3
+        message: b
+    diff: |
+      diff --git a/src/app.py b/src/app.py
+      --- a/src/app.py
+      +++ b/src/app.py
+      @@ -1,2 +1,4 @@
+       def f():
+           return 1
+      +def g(x=[]):
+      +    return x
+    expect_findings: 1
+  - id: distinct-rules
+    kind: dedup
+    diagnostics:
+      - analyzer_id: ruff
+        rule_id: B006
+        path: src/app.py
+        start_line: 3
+        message: b006
+      - analyzer_id: ruff
+        rule_id: S110
+        path: src/app.py
+        start_line: 3
+        message: s110
+    diff: |
+      diff --git a/src/app.py b/src/app.py
+      --- a/src/app.py
+      +++ b/src/app.py
+      @@ -1,2 +1,4 @@
+       def f():
+           return 1
+      +def g(x=[]):
+      +    return x
+    expect_findings: 2
+  - id: fuse-llm-static
+    kind: fuse
+    llm:
+      title: eval
+      category: security
+      start_line: 5
+      trigger: eval(x)
+      confidence: 1.0
+    diagnostic:
+      analyzer_id: ruff
+      rule_id: S307
+      path: src/a.py
+      start_line: 5
+      message: eval
+    diff: |
+      diff --git a/src/a.py b/src/a.py
+      --- a/src/a.py
+      +++ b/src/a.py
+      @@ -1,2 +1,6 @@
+       def f():
+           return 1
+      +
+      +def g():
+      +    return eval(x)
+      +    return 2
+    expect_findings: 1
+    expect_source_kinds: [llm_general, static_analyzer]
+  - id: no-fuse-different-category
+    kind: no_fuse
+    llm:
+      title: eval
+      category: security
+      start_line: 5
+      trigger: eval(x)
+      confidence: 1.0
+    diagnostic:
+      analyzer_id: ruff
+      rule_id: B006
+      path: src/a.py
+      start_line: 5
+      message: mutable
+    diff: |
+      diff --git a/src/a.py b/src/a.py
+      --- a/src/a.py
+      +++ b/src/a.py
+      @@ -1,2 +1,6 @@
+       def f():
+           return 1
+      +
+      +def g():
+      +    return eval(x)
+      +    return 2
+    expect_findings: 2
+  - id: no-fuse-two-static-via-llm
+    kind: no_fuse
+    llm:
+      title: eval
+      category: security
+      start_line: 5
+      trigger: eval(x)
+      confidence: 1.0
+    diagnostics:
+      - analyzer_id: ruff
+        rule_id: S307
+        path: src/a.py
+        start_line: 5
+        message: eval
+      - analyzer_id: ruff
+        rule_id: S110
+        path: src/a.py
+        start_line: 4
+        message: assert
+    diff: |
+      diff --git a/src/a.py b/src/a.py
+      --- a/src/a.py
+      +++ b/src/a.py
+      @@ -1,2 +1,6 @@
+       def f():
+           return 1
+      +
+      +def g():
+      +    return eval(x)
+      +    return 2
+    expect_findings: 2

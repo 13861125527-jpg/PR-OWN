@@ -1,0 +1,69 @@
+{
+  "dataset": "v3c_compact",
+  "samples": 8,
+  "real_api": false,
+  "compact": {
+    "passed": 8,
+    "total": 8,
+    "cases": [
+      {
+        "id": "compact-keeps-min-l3",
+        "kind": "compact",
+        "ok": true,
+        "status": "kept",
+        "detail": ""
+      },
+      {
+        "id": "compact-keeps-evidence-ids",
+        "kind": "compact",
+        "ok": true,
+        "status": "completed",
+        "detail": ""
+      },
+      {
+        "id": "compact-not-a-round",
+        "kind": "compact",
+        "ok": true,
+        "status": "calls=3",
+        "detail": ""
+      },
+      {
+        "id": "compact-native-pairing",
+        "kind": "compact",
+        "ok": true,
+        "status": "paired",
+        "detail": ""
+      },
+      {
+        "id": "compact-recompact-keeps-old-facts",
+        "kind": "compact",
+        "ok": true,
+        "status": "merged",
+        "detail": ""
+      },
+      {
+        "id": "compact-json-repair-keeps-repair-instruction",
+        "kind": "compact",
+        "ok": true,
+        "status": "completed",
+        "detail": ""
+      },
+      {
+        "id": "overflow-after-compact",
+        "kind": "compact",
+        "ok": true,
+        "status": "partial",
+        "detail": ""
+      },
+      {
+        "id": "default-agent-off",
+        "kind": "isolate",
+        "ok": true,
+        "status": "ok",
+        "detail": ""
+      }
+    ],
+    "note": "脚本化 Fake；压缩为程序生成。agent.enabled 默认 false。"
+  },
+  "all_passed": true
+}

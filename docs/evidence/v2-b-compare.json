@@ -1,0 +1,75 @@
+{
+  "mode": "scripted_fake",
+  "dataset": "reposage/evals/datasets/v2b_compare.yaml",
+  "samples": 4,
+  "real_api": "not_run",
+  "quality": {
+    "precision": {
+      "off": 0.75,
+      "on": 1.0
+    },
+    "recall": {
+      "off": 0.75,
+      "on": 1.0
+    },
+    "f1": {
+      "off": 0.75,
+      "on": 1.0
+    },
+    "position_accuracy": {
+      "off": 0.75,
+      "on": 1.0
+    },
+    "note": "脚本化 Fake 把候选放在 L3-off/on；v2b-consume 仅当消息含 helper 定义才吐 Finding，证明管道吃到 L3，不代表真实模型增益。"
+  },
+  "cost": {
+    "model_calls": {
+      "off": 4,
+      "on": 4
+    },
+    "input_tokens": {
+      "off": 645,
+      "on": 808
+    },
+    "output_tokens": {
+      "off": 200,
+      "on": 200
+    },
+    "l3_chunks": {
+      "off": 0,
+      "on": 4
+    },
+    "budget_rejects": {
+      "off": 0,
+      "on": 0
+    },
+    "note": "input tokens 来自 ReviewUnit 消息的 estimate_tokens，不是 Fake 固定 100。"
+  },
+  "latency": {
+    "repeats": 3,
+    "total_ms": {
+      "off": 0.6,
+      "on": 0.58
+    },
+    "p50_ms": {
+      "off": 0.58,
+      "on": 0.55
+    },
+    "p95_ms": {
+      "off": 0.73,
+      "on": 0.62
+    },
+    "note": "全数据集墙钟，repeats=3；Fake 延迟不代表真实模型"
+  },
+  "retrieval": {
+    "dataset": "reposage/evals/datasets/v2b_l3.yaml",
+    "hit_rate": 1.0,
+    "false_rate": 0.0,
+    "tp": 9,
+    "fn": 0,
+    "fp": 0,
+    "expected_total": 9,
+    "forbidden_total": 6,
+    "note": "按 expected/forbidden symbol 计数，不是按样本。"
+  }
+}

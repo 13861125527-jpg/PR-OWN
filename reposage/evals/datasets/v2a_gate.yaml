@@ -1,0 +1,234 @@
+# V2-A 门控标注集（规则 ID / 期望角色，不含密钥明文）。
+# expected_roles 不含 general（always 门，不计入 Precision）。
+name: v2a-gate
+samples:
+  - id: g-eval
+    expected_roles: [security]
+    diff: |
+      diff --git a/src/app.py b/src/app.py
+      --- a/src/app.py
+      +++ b/src/app.py
+      @@ -1,1 +1,2 @@
+       def f(x):
+      +    return eval(x)
+  - id: g-pickle
+    expected_roles: [security]
+    diff: |
+      diff --git a/src/ser.py b/src/ser.py
+      --- a/src/ser.py
+      +++ b/src/ser.py
+      @@ -1,1 +1,2 @@
+       def load(raw):
+      +    return pickle.loads(raw)
+  - id: g-system
+    expected_roles: [security]
+    diff: |
+      diff --git a/src/sh.py b/src/sh.py
+      --- a/src/sh.py
+      +++ b/src/sh.py
+      @@ -1,1 +1,2 @@
+       def run(cmd):
+      +    os.system(cmd)
+  - id: g-sql
+    expected_roles: [security]
+    diff: |
+      diff --git a/src/db.py b/src/db.py
+      --- a/src/db.py
+      +++ b/src/db.py
+      @@ -1,1 +1,2 @@
+       def q(user):
+      +    db.execute(f"SELECT * FROM t WHERE id={user}")
+  - id: g-secret
+    expected_roles: [security]
+    diff: |
+      diff --git a/src/cfg.py b/src/cfg.py
+      --- a/src/cfg.py
+      +++ b/src/cfg.py
+      @@ -1,1 +1,2 @@
+       def cfg():
+      +    password="placeholder1"
+  - id: g-upload-open
+    expected_roles: [security]
+    diff: |
+      diff --git a/src/views.py b/src/views.py
+      --- a/src/views.py
+      +++ b/src/views.py
+      @@ -1,1 +1,3 @@
+       def save(upload):
+      +    filename = upload.filename
+      +    open(filename, "wb").write(upload.read())
+  - id: g-open-only
+    expected_roles: []
+    diff: |
+      diff --git a/src/io_util.py b/src/io_util.py
+      --- a/src/io_util.py
+      +++ b/src/io_util.py
+      @@ -1,1 +1,2 @@
+       from pathlib import Path
+      +cfg = Path("config.json").read_text()
+  - id: g-except
+    expected_roles: [correctness]
+    diff: |
+      diff --git a/src/h.py b/src/h.py
+      --- a/src/h.py
+      +++ b/src/h.py
+      @@ -1,1 +1,4 @@
+       def g():
+      +    try:
+      +        f()
+      +    except Exception: pass
+  - id: g-assert
+    expected_roles: [correctness]
+    diff: |
+      diff --git a/src/chk.py b/src/chk.py
+      --- a/src/chk.py
+      +++ b/src/chk.py
+      @@ -1,1 +1,2 @@
+       def g(x):
+      +    assert x is not None
+  - id: g-create-task
+    expected_roles: [correctness]
+    diff: |
+      diff --git a/src/async_job.py b/src/async_job.py
+      --- a/src/async_job.py
+      +++ b/src/async_job.py
+      @@ -1,1 +1,2 @@
+       def g():
+      +    asyncio.create_task(work())
+  - id: g-nested
+    expected_roles: [performance]
+    diff: |
+      diff --git a/src/batch/job.py b/src/batch/job.py
+      --- a/src/batch/job.py
+      +++ b/src/batch/job.py
+      @@ -1,1 +1,4 @@
+       def run(items):
+      +    for a in items:
+      +        for b in a:
+      +            consume(b)
+  - id: g-single-loop
+    expected_roles: []
+    diff: |
+      diff --git a/src/walk.py b/src/walk.py
+      --- a/src/walk.py
+      +++ b/src/walk.py
+      @@ -1,1 +1,3 @@
+       def run(items):
+      +    for x in items:
+      +        consume(x)
+  - id: g-harmless
+    expected_roles: []
+    diff: |
+      diff --git a/src/ok.py b/src/ok.py
+      --- a/src/ok.py
+      +++ b/src/ok.py
+      @@ -1,1 +1,2 @@
+       def f(x):
+      +    return x + 1
+  - id: g-comment-eval
+    expected_roles: []
+    diff: |
+      diff --git a/src/docs.py b/src/docs.py
+      --- a/src/docs.py
+      +++ b/src/docs.py
+      @@ -1,1 +1,2 @@
+       x = 1
+      +# never call eval(user)
+  - id: g-docstring
+    expected_roles: []
+    diff: |
+      diff --git a/src/mod.py b/src/mod.py
+      --- a/src/mod.py
+      +++ b/src/mod.py
+      @@ -1,1 +1,2 @@
+       x = 1
+      +    """never eval(user)"""
+  - id: g-auth-path
+    expected_roles: [security]
+    diff: |
+      diff --git a/src/auth/session.py b/src/auth/session.py
+      --- a/src/auth/session.py
+      +++ b/src/auth/session.py
+      @@ -1,1 +1,2 @@
+       def login():
+      +    return True
+  - id: g-deleted
+    expected_roles: []
+    diff: |
+      diff --git a/src/oldmod.py b/src/oldmod.py
+      deleted file mode 100644
+      --- a/src/oldmod.py
+      +++ /dev/null
+      @@ -1,3 +0,0 @@
+      -import sys
+      -def gone():
+      -    pass
+  - id: g-multiline-docstring
+    expected_roles: []
+    diff: |
+      diff --git a/src/doc.py b/src/doc.py
+      --- a/src/doc.py
+      +++ b/src/doc.py
+      @@ -1,2 +1,5 @@
+       def f():
+      +    """
+      +    never call eval(user)
+      +    """
+           return 1
+  - id: g-except-multiline
+    expected_roles: [correctness]
+    diff: |
+      diff --git a/src/swallow.py b/src/swallow.py
+      --- a/src/swallow.py
+      +++ b/src/swallow.py
+      @@ -1,1 +1,5 @@
+       def g():
+      +    try:
+      +        f()
+      +    except Exception:
+      +        pass
+  - id: g-seq-loops
+    expected_roles: []
+    diff: |
+      diff --git a/src/seq.py b/src/seq.py
+      --- a/src/seq.py
+      +++ b/src/seq.py
+      @@ -1,1 +1,5 @@
+       def run(a, b):
+      +    for x in a:
+      +        consume(x)
+      +    for y in b:
+      +        consume(y)
+  - id: g-product
+    expected_roles: [performance]
+    diff: |
+      diff --git a/src/prod.py b/src/prod.py
+      --- a/src/prod.py
+      +++ b/src/prod.py
+      @@ -1,1 +1,3 @@
+       def run(a, b):
+      +    for x in itertools.product(a, b):
+      +        consume(x)
+  - id: g-docstring-context
+    expected_roles: []
+    diff: |
+      diff --git a/src/doc.py b/src/doc.py
+      --- a/src/doc.py
+      +++ b/src/doc.py
+      @@ -1,4 +1,5 @@
+       def f():
+           """docs
+      +    never call eval(user)
+           """
+           return 1
+  - id: g-nested-context
+    expected_roles: [performance]
+    diff: |
+      diff --git a/src/nest.py b/src/nest.py
+      --- a/src/nest.py
+      +++ b/src/nest.py
+      @@ -1,3 +1,4 @@
+       def f(xs):
+           for x in xs:
+      +        for y in x:
+               use(y)

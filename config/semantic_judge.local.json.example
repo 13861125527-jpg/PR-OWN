@@ -1,0 +1,9 @@
+{
+  "model": "deepseek-v4-flash",
+  "api_key": "在这里填写V4 FLASH的API KEY",
+  "base_url": "在这里填写OpenAI兼容接口地址",
+  "temperature": 0.0,
+  "timeout_seconds": 90,
+  "max_retries": 2,
+  "max_output_tokens": 3000
+}

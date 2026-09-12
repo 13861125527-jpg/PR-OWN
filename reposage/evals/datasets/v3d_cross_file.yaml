@@ -1,0 +1,162 @@
+# V3-D 跨文件对照集（脚本化 Fake，不代表真实模型收益）。
+# notes：l3_expected / anchor / evidence_path / quality=include|exclude
+name: v3d_cross_file
+samples:
+  - id: xf-l3-hit
+    kind: cross_file
+    notes: "l3_expected: hit anchor=ANCHOR_xf_l3_hit evidence_path=src/util.py quality=include"
+    pr_title: "call helper then eval"
+    base_files:
+      src/app.py: |
+        from src.util import helper
+        def run(x):
+            return x
+      src/util.py: |
+        def helper(x):  # ANCHOR_xf_l3_hit
+            return x
+    head_files:
+      src/app.py: |
+        from src.util import helper
+        def run(x):
+            helper(x)
+            return eval(x)
+      src/util.py: |
+        def helper(x):  # ANCHOR_xf_l3_hit
+            return x
+    expected:
+      - category: security
+        path: src/app.py
+        line: 4
+
+  - id: xf-l3-miss
+    kind: cross_file
+    notes: "l3_expected: miss anchor=ANCHOR_xf_l3_miss evidence_path=src/util.py quality=include"
+    pr_title: "eval without importing helper"
+    base_files:
+      src/app.py: |
+        def run(x):
+            return x
+      src/util.py: |
+        def helper(x):  # ANCHOR_xf_l3_miss
+            return x
+    head_files:
+      src/app.py: |
+        def run(x):
+            return eval(x)
+      src/util.py: |
+        def helper(x):  # ANCHOR_xf_l3_miss
+            return x
+    expected:
+      - category: security
+        path: src/app.py
+        line: 2
+
+  - id: xf-l3-miss-search
+    kind: cross_file
+    notes: "l3_expected: miss anchor=ANCHOR_xf_search evidence_path=vendor/payloads.py quality=include"
+    pr_title: "eval; helper only findable by search"
+    base_files:
+      src/app.py: |
+        def run(x):
+            return x
+      vendor/payloads.py: |
+        TOKEN = "ANCHOR_xf_search"
+    head_files:
+      src/app.py: |
+        def run(x):
+            return eval(x)
+      vendor/payloads.py: |
+        TOKEN = "ANCHOR_xf_search"
+    expected:
+      - category: security
+        path: src/app.py
+        line: 2
+
+  - id: xf-negative
+    kind: negative
+    notes: "l3_expected: n/a anchor=ANCHOR_xf_negative evidence_path=src/util.py quality=include"
+    pr_title: "rename local helper"
+    base_files:
+      src/app.py: |
+        def run(x):
+            return x
+      src/util.py: |
+        def helper(x):  # ANCHOR_xf_negative
+            return x
+    head_files:
+      src/app.py: |
+        def run(x):
+            return x + 1
+      src/util.py: |
+        def helper(x):  # ANCHOR_xf_negative
+            return x
+    expected: []
+
+  - id: xf-grounded
+    kind: cross_file
+    notes: "l3_expected: miss anchor=ANCHOR_xf_grounded evidence_path=src/util.py quality=include"
+    pr_title: "eval; V3 cites find_references tool id"
+    base_files:
+      src/app.py: |
+        def run(x):
+            return x
+      src/util.py: |
+        def helper(x):  # ANCHOR_xf_grounded
+            return x
+    head_files:
+      src/app.py: |
+        def run(x):
+            return eval(x)
+      src/util.py: |
+        def helper(x):  # ANCHOR_xf_grounded
+            return x
+    expected:
+      - category: security
+        path: src/app.py
+        line: 2
+
+  - id: xf-spam-tools
+    kind: cross_file
+    notes: "l3_expected: miss anchor=ANCHOR_xf_spam evidence_path=src/util.py quality=exclude"
+    pr_title: "eval with repeated reads"
+    base_files:
+      src/app.py: |
+        def run(x):
+            return x
+      src/util.py: |
+        def helper(x):  # ANCHOR_xf_spam
+            return x
+    head_files:
+      src/app.py: |
+        def run(x):
+            return eval(x)
+      src/util.py: |
+        def helper(x):  # ANCHOR_xf_spam
+            return x
+    expected:
+      - category: security
+        path: src/app.py
+        line: 2
+
+  - id: xf-ungrounded
+    kind: cross_file
+    notes: "l3_expected: miss anchor=ANCHOR_xf_ungrounded evidence_path=src/util.py quality=exclude"
+    pr_title: "eval; submit without tool id"
+    base_files:
+      src/app.py: |
+        def run(x):
+            return x
+      src/util.py: |
+        def helper(x):  # ANCHOR_xf_ungrounded
+            return x
+    head_files:
+      src/app.py: |
+        def run(x):
+            return eval(x)
+      src/util.py: |
+        def helper(x):  # ANCHOR_xf_ungrounded
+            return x
+    expected:
+      - category: security
+        path: src/app.py
+        line: 2

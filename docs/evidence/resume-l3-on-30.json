@@ -1,0 +1,4180 @@
+{
+  "version": "V2",
+  "configuration": {
+    "strategy": "multi_role",
+    "roles": [
+      "general",
+      "security",
+      "correctness",
+      "performance"
+    ],
+    "symbol_retrieval": true,
+    "static": false,
+    "judge": false,
+    "feedback": false,
+    "pipeline_min_confidence": 0.0,
+    "correctness_gate": "added_lines"
+  },
+  "model": "deepseek-v4-pro",
+  "dataset": "reposage/evals/datasets/resume_l3_context_30.yaml",
+  "timestamp": "2026-09-10T21:17:39+0800",
+  "sample_count": 30,
+  "successful_samples": 30,
+  "execution_completed": false,
+  "summary": {
+    "precision_macro": 0.394,
+    "recall_macro": 0.833,
+    "f1_macro": 0.494,
+    "position_accuracy_macro_positive": 0.792,
+    "negative_noise": 6,
+    "strict_defect_recall": 0.792,
+    "exact_location_recall_ignoring_category": 0.917,
+    "within_5_lines_recall_ignoring_category": 0.917,
+    "perfect_samples": 3
+  },
+  "original_v2_same_samples": null,
+  "delta_vs_original_v2": null,
+  "latency": {
+    "total_ms": 1432619.56,
+    "avg_ms": 47753.99,
+    "median_ms": 38952.85
+  },
+  "usage": {
+    "logical_invocations": 60,
+    "provider_requests": 66,
+    "input_tokens": 59094,
+    "output_tokens": 108712,
+    "retries": 0,
+    "schema_repairs": 6,
+    "provider_latency_ms": 1432477,
+    "cost_usd": 0.0
+  },
+  "roles": {
+    "general": 30,
+    "security": 0,
+    "correctness": 30,
+    "performance": 0
+  },
+  "l3": {
+    "total_hits": 30,
+    "samples_with_hits": 30
+  },
+  "category_confusions_at_exact_location": [
+    {
+      "path": "src/case_07.py",
+      "line": 4,
+      "expected": "edge_case",
+      "actual": "correctness",
+      "sample_id": "l3-07-raises-missing"
+    },
+    {
+      "path": "src/case_08.py",
+      "line": 4,
+      "expected": "edge_case",
+      "actual": "correctness",
+      "sample_id": "l3-08-empty-rejected"
+    },
+    {
+      "path": "src/case_12.py",
+      "line": 4,
+      "expected": "security",
+      "actual": "correctness",
+      "sample_id": "l3-12-path-containment"
+    }
+  ],
+  "per_sample": [
+    {
+      "id": "l3-01-none-sentinel",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 26356.86,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-01-none-sentinel",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_01.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_01.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_01.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_01.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-01-none-sentinel:src/case_01.py::general",
+          "run_id": "v2-l3-01-none-sentinel",
+          "kind": "role_review",
+          "target": "src/case_01.py::general",
+          "status": "completed",
+          "input_tokens": 900,
+          "output_tokens": 836,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-01-none-sentinel:src/case_01.py::correctness",
+          "run_id": "v2-l3-01-none-sentinel",
+          "kind": "role_review",
+          "target": "src/case_01.py::correctness",
+          "status": "completed",
+          "input_tokens": 885,
+          "output_tokens": 1182,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1785,
+        "output_tokens": 2018,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 26352,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_01.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_01.py",
+            "line": 4,
+            "confidence": 0.95
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_01.py",
+            "line": 4,
+            "confidence": 0.9
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-02-milliseconds",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 73425.47,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-02-milliseconds",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_02.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_02.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_02.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_02.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-02-milliseconds:src/case_02.py::general",
+          "run_id": "v2-l3-02-milliseconds",
+          "kind": "role_review",
+          "target": "src/case_02.py::general",
+          "status": "completed",
+          "input_tokens": 889,
+          "output_tokens": 1188,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-02-milliseconds:src/case_02.py::correctness",
+          "run_id": "v2-l3-02-milliseconds",
+          "kind": "role_review",
+          "target": "src/case_02.py::correctness",
+          "status": "completed",
+          "input_tokens": 1785,
+          "output_tokens": 4205,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 3,
+        "input_tokens": 2674,
+        "output_tokens": 5393,
+        "retries": 0,
+        "schema_repairs": 1,
+        "provider_latency_ms": 73420,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_02.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_02.py",
+            "line": 4,
+            "confidence": 0.9
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_02.py",
+            "line": 4,
+            "confidence": 0.8
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-03-inclusive-bound",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 39437.37,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-03-inclusive-bound",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_03.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_03.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_03.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_03.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-03-inclusive-bound:src/case_03.py::general",
+          "run_id": "v2-l3-03-inclusive-bound",
+          "kind": "role_review",
+          "target": "src/case_03.py::general",
+          "status": "completed",
+          "input_tokens": 898,
+          "output_tokens": 959,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-03-inclusive-bound:src/case_03.py::correctness",
+          "run_id": "v2-l3-03-inclusive-bound",
+          "kind": "role_review",
+          "target": "src/case_03.py::correctness",
+          "status": "completed",
+          "input_tokens": 883,
+          "output_tokens": 2308,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1781,
+        "output_tokens": 3267,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 39432,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_03.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_03.py",
+            "line": 4,
+            "confidence": 0.9
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_03.py",
+            "line": 4,
+            "confidence": 0.7
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-04-tuple-order",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 28119.71,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-04-tuple-order",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_04.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_04.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_04.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_04.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-04-tuple-order:src/case_04.py::general",
+          "run_id": "v2-l3-04-tuple-order",
+          "kind": "role_review",
+          "target": "src/case_04.py::general",
+          "status": "completed",
+          "input_tokens": 895,
+          "output_tokens": 702,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-04-tuple-order:src/case_04.py::correctness",
+          "run_id": "v2-l3-04-tuple-order",
+          "kind": "role_review",
+          "target": "src/case_04.py::correctness",
+          "status": "completed",
+          "input_tokens": 880,
+          "output_tokens": 1501,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1775,
+        "output_tokens": 2203,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 28115,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_04.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_04.py",
+            "line": 4,
+            "confidence": 0.95
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_04.py",
+            "line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-05-mutates-input",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 32306.24,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-05-mutates-input",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_05.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_05.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_05.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_05.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-05-mutates-input:src/case_05.py::general",
+          "run_id": "v2-l3-05-mutates-input",
+          "kind": "role_review",
+          "target": "src/case_05.py::general",
+          "status": "completed",
+          "input_tokens": 890,
+          "output_tokens": 1315,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-05-mutates-input:src/case_05.py::correctness",
+          "run_id": "v2-l3-05-mutates-input",
+          "kind": "role_review",
+          "target": "src/case_05.py::correctness",
+          "status": "completed",
+          "input_tokens": 875,
+          "output_tokens": 1345,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1765,
+        "output_tokens": 2660,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 32302,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_05.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_05.py",
+            "line": 4,
+            "confidence": 0.95
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_05.py",
+            "line": 4,
+            "confidence": 0.9
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-06-bytes-output",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 23740.69,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-06-bytes-output",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_06.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_06.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_06.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_06.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-06-bytes-output:src/case_06.py::general",
+          "run_id": "v2-l3-06-bytes-output",
+          "kind": "role_review",
+          "target": "src/case_06.py::general",
+          "status": "completed",
+          "input_tokens": 898,
+          "output_tokens": 1036,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-06-bytes-output:src/case_06.py::correctness",
+          "run_id": "v2-l3-06-bytes-output",
+          "kind": "role_review",
+          "target": "src/case_06.py::correctness",
+          "status": "completed",
+          "input_tokens": 883,
+          "output_tokens": 928,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1781,
+        "output_tokens": 1964,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 23736,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_06.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_06.py",
+            "line": 4,
+            "confidence": 0.95
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_06.py",
+            "line": 4,
+            "confidence": 0.9
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-07-raises-missing",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 25461.43,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-07-raises-missing",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_07.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_07.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_07.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_07.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-07-raises-missing:src/case_07.py::general",
+          "run_id": "v2-l3-07-raises-missing",
+          "kind": "role_review",
+          "target": "src/case_07.py::general",
+          "status": "completed",
+          "input_tokens": 907,
+          "output_tokens": 1250,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-07-raises-missing:src/case_07.py::correctness",
+          "run_id": "v2-l3-07-raises-missing",
+          "kind": "role_review",
+          "target": "src/case_07.py::correctness",
+          "status": "completed",
+          "input_tokens": 892,
+          "output_tokens": 753,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1799,
+        "output_tokens": 2003,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 25456,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "edge_case",
+            "path": "src/case_07.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_07.py",
+            "line": 4,
+            "confidence": 0.7
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_07.py",
+            "line": 4,
+            "confidence": 0.9
+          }
+        ],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": [
+          {
+            "path": "src/case_07.py",
+            "line": 4,
+            "expected": "edge_case",
+            "actual": "correctness"
+          }
+        ]
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-08-empty-rejected",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 43178.68,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 1,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-08-empty-rejected",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_08.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_08.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_08.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_08.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-08-empty-rejected:src/case_08.py::general",
+          "run_id": "v2-l3-08-empty-rejected",
+          "kind": "role_review",
+          "target": "src/case_08.py::general",
+          "status": "completed",
+          "input_tokens": 901,
+          "output_tokens": 1648,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-08-empty-rejected:src/case_08.py::correctness",
+          "run_id": "v2-l3-08-empty-rejected",
+          "kind": "role_review",
+          "target": "src/case_08.py::correctness",
+          "status": "completed",
+          "input_tokens": 886,
+          "output_tokens": 1500,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1787,
+        "output_tokens": 3148,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 43174,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "edge_case",
+            "path": "src/case_08.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_08.py",
+            "line": 4,
+            "confidence": 0.85
+          }
+        ],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": [
+          {
+            "path": "src/case_08.py",
+            "line": 4,
+            "expected": "edge_case",
+            "actual": "correctness"
+          }
+        ]
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-09-one-based",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 63074.41,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 1,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-09-one-based",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_09.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_09.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_09.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_09.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-09-one-based:src/case_09.py::general",
+          "run_id": "v2-l3-09-one-based",
+          "kind": "role_review",
+          "target": "src/case_09.py::general",
+          "status": "completed",
+          "input_tokens": 903,
+          "output_tokens": 2776,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-09-one-based:src/case_09.py::correctness",
+          "run_id": "v2-l3-09-one-based",
+          "kind": "role_review",
+          "target": "src/case_09.py::correctness",
+          "status": "completed",
+          "input_tokens": 888,
+          "output_tokens": 1901,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1791,
+        "output_tokens": 4677,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 63070,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_09.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_09.py",
+            "line": 4,
+            "confidence": 0.85
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-10-negative-invalid",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 24907.12,
+      "expected_count": 1,
+      "accepted_count": 0,
+      "candidate_count": 0,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-10-negative-invalid",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_10.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_10.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_10.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_10.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-10-negative-invalid:src/case_10.py::general",
+          "run_id": "v2-l3-10-negative-invalid",
+          "kind": "role_review",
+          "target": "src/case_10.py::general",
+          "status": "completed",
+          "input_tokens": 898,
+          "output_tokens": 904,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-10-negative-invalid:src/case_10.py::correctness",
+          "run_id": "v2-l3-10-negative-invalid",
+          "kind": "role_review",
+          "target": "src/case_10.py::correctness",
+          "status": "completed",
+          "input_tokens": 883,
+          "output_tokens": 657,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1781,
+        "output_tokens": 1561,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 24903,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "edge_case",
+            "path": "src/case_10.py",
+            "line": 4
+          }
+        ],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-11-raw-html",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 31740.17,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-11-raw-html",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_11.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_11.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_11.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_11.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-11-raw-html:src/case_11.py::general",
+          "run_id": "v2-l3-11-raw-html",
+          "kind": "role_review",
+          "target": "src/case_11.py::general",
+          "status": "completed",
+          "input_tokens": 897,
+          "output_tokens": 1437,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-11-raw-html:src/case_11.py::correctness",
+          "run_id": "v2-l3-11-raw-html",
+          "kind": "role_review",
+          "target": "src/case_11.py::correctness",
+          "status": "completed",
+          "input_tokens": 882,
+          "output_tokens": 1028,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1779,
+        "output_tokens": 2465,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 31736,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/case_11.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "security",
+            "path": "src/case_11.py",
+            "line": 4,
+            "confidence": 0.98
+          },
+          {
+            "category": "security",
+            "path": "src/case_11.py",
+            "line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-13-auth-result",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 50566.18,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-13-auth-result",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_13.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_13.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_13.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_13.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-13-auth-result:src/case_13.py::general",
+          "run_id": "v2-l3-13-auth-result",
+          "kind": "role_review",
+          "target": "src/case_13.py::general",
+          "status": "completed",
+          "input_tokens": 902,
+          "output_tokens": 1390,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-13-auth-result:src/case_13.py::correctness",
+          "run_id": "v2-l3-13-auth-result",
+          "kind": "role_review",
+          "target": "src/case_13.py::correctness",
+          "status": "completed",
+          "input_tokens": 887,
+          "output_tokens": 2405,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1789,
+        "output_tokens": 3795,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 50561,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/case_13.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "security",
+            "path": "src/case_13.py",
+            "line": 4,
+            "confidence": 0.99
+          },
+          {
+            "category": "security",
+            "path": "src/case_13.py",
+            "line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-14-sql-identifier",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 8429.29,
+      "expected_count": 1,
+      "accepted_count": 0,
+      "candidate_count": 0,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-14-sql-identifier",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_14.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_14.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_14.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_14.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-14-sql-identifier:src/case_14.py::general",
+          "run_id": "v2-l3-14-sql-identifier",
+          "kind": "role_review",
+          "target": "src/case_14.py::general",
+          "status": "completed",
+          "input_tokens": 907,
+          "output_tokens": 214,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-14-sql-identifier:src/case_14.py::correctness",
+          "run_id": "v2-l3-14-sql-identifier",
+          "kind": "role_review",
+          "target": "src/case_14.py::correctness",
+          "status": "completed",
+          "input_tokens": 892,
+          "output_tokens": 230,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1799,
+        "output_tokens": 444,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 8425,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/case_14.py",
+            "line": 4
+          }
+        ],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-15-redaction",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 30421.51,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-15-redaction",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_15.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_15.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_15.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_15.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-15-redaction:src/case_15.py::general",
+          "run_id": "v2-l3-15-redaction",
+          "kind": "role_review",
+          "target": "src/case_15.py::general",
+          "status": "completed",
+          "input_tokens": 909,
+          "output_tokens": 1052,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-15-redaction:src/case_15.py::correctness",
+          "run_id": "v2-l3-15-redaction",
+          "kind": "role_review",
+          "target": "src/case_15.py::correctness",
+          "status": "completed",
+          "input_tokens": 894,
+          "output_tokens": 1336,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1803,
+        "output_tokens": 2388,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 30417,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/case_15.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "security",
+            "path": "src/case_15.py",
+            "line": 4,
+            "confidence": 0.95
+          },
+          {
+            "category": "security",
+            "path": "src/case_15.py",
+            "line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-16-signature-bool",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 47073.48,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-16-signature-bool",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_16.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_16.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_16.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_16.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-16-signature-bool:src/case_16.py::general",
+          "run_id": "v2-l3-16-signature-bool",
+          "kind": "role_review",
+          "target": "src/case_16.py::general",
+          "status": "completed",
+          "input_tokens": 898,
+          "output_tokens": 2568,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-16-signature-bool:src/case_16.py::correctness",
+          "run_id": "v2-l3-16-signature-bool",
+          "kind": "role_review",
+          "target": "src/case_16.py::correctness",
+          "status": "completed",
+          "input_tokens": 883,
+          "output_tokens": 1042,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1781,
+        "output_tokens": 3610,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 47069,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/case_16.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "security",
+            "path": "src/case_16.py",
+            "line": 4,
+            "confidence": 0.95
+          },
+          {
+            "category": "security",
+            "path": "src/case_16.py",
+            "line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-17-async-required",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 44276.46,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-17-async-required",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_17.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_17.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_17.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_17.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-17-async-required:src/case_17.py::general",
+          "run_id": "v2-l3-17-async-required",
+          "kind": "role_review",
+          "target": "src/case_17.py::general",
+          "status": "completed",
+          "input_tokens": 890,
+          "output_tokens": 1527,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-17-async-required:src/case_17.py::correctness",
+          "run_id": "v2-l3-17-async-required",
+          "kind": "role_review",
+          "target": "src/case_17.py::correctness",
+          "status": "completed",
+          "input_tokens": 875,
+          "output_tokens": 1950,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1765,
+        "output_tokens": 3477,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 44272,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_17.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_17.py",
+            "line": 4,
+            "confidence": 0.95
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_17.py",
+            "line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-18-blocking-helper",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 40134.27,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-18-blocking-helper",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_18.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_18.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_18.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_18.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-18-blocking-helper:src/case_18.py::general",
+          "run_id": "v2-l3-18-blocking-helper",
+          "kind": "role_review",
+          "target": "src/case_18.py::general",
+          "status": "completed",
+          "input_tokens": 899,
+          "output_tokens": 1463,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-18-blocking-helper:src/case_18.py::correctness",
+          "run_id": "v2-l3-18-blocking-helper",
+          "kind": "role_review",
+          "target": "src/case_18.py::correctness",
+          "status": "completed",
+          "input_tokens": 884,
+          "output_tokens": 1702,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1783,
+        "output_tokens": 3165,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 40130,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "performance",
+            "path": "src/case_18.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "performance",
+            "path": "src/case_18.py",
+            "line": 4,
+            "confidence": 0.9
+          },
+          {
+            "category": "concurrency",
+            "path": "src/case_18.py",
+            "line": 4,
+            "confidence": 0.9
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-19-iterator-once",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 24993.11,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-19-iterator-once",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_19.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_19.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_19.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_19.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-19-iterator-once:src/case_19.py::general",
+          "run_id": "v2-l3-19-iterator-once",
+          "kind": "role_review",
+          "target": "src/case_19.py::general",
+          "status": "completed",
+          "input_tokens": 894,
+          "output_tokens": 784,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-19-iterator-once:src/case_19.py::correctness",
+          "run_id": "v2-l3-19-iterator-once",
+          "kind": "role_review",
+          "target": "src/case_19.py::correctness",
+          "status": "completed",
+          "input_tokens": 879,
+          "output_tokens": 1227,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1773,
+        "output_tokens": 2011,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 24989,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_19.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_19.py",
+            "line": 4,
+            "confidence": 0.99
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_19.py",
+            "line": 4,
+            "confidence": 0.97
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-20-lock-required",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 45872.55,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-20-lock-required",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_20.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_20.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_20.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_20.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-20-lock-required:src/case_20.py::general",
+          "run_id": "v2-l3-20-lock-required",
+          "kind": "role_review",
+          "target": "src/case_20.py::general",
+          "status": "completed",
+          "input_tokens": 916,
+          "output_tokens": 2128,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-20-lock-required:src/case_20.py::correctness",
+          "run_id": "v2-l3-20-lock-required",
+          "kind": "role_review",
+          "target": "src/case_20.py::correctness",
+          "status": "completed",
+          "input_tokens": 901,
+          "output_tokens": 1672,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1817,
+        "output_tokens": 3800,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 45868,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "concurrency",
+            "path": "src/case_20.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "concurrency",
+            "path": "src/case_20.py",
+            "line": 4,
+            "confidence": 0.85
+          },
+          {
+            "category": "concurrency",
+            "path": "src/case_20.py",
+            "line": 4,
+            "confidence": 0.7
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-21-transaction-required",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 29466.06,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-21-transaction-required",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_21.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_21.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_21.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_21.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-21-transaction-required:src/case_21.py::general",
+          "run_id": "v2-l3-21-transaction-required",
+          "kind": "role_review",
+          "target": "src/case_21.py::general",
+          "status": "completed",
+          "input_tokens": 892,
+          "output_tokens": 1201,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-21-transaction-required:src/case_21.py::correctness",
+          "run_id": "v2-l3-21-transaction-required",
+          "kind": "role_review",
+          "target": "src/case_21.py::correctness",
+          "status": "completed",
+          "input_tokens": 877,
+          "output_tokens": 1080,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1769,
+        "output_tokens": 2281,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 29462,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_21.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_21.py",
+            "line": 4,
+            "confidence": 0.9
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_21.py",
+            "line": 4,
+            "confidence": 0.85
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-22-consumes-stream",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 40396.1,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-22-consumes-stream",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_22.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_22.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_22.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_22.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-22-consumes-stream:src/case_22.py::general",
+          "run_id": "v2-l3-22-consumes-stream",
+          "kind": "role_review",
+          "target": "src/case_22.py::general",
+          "status": "completed",
+          "input_tokens": 899,
+          "output_tokens": 959,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-22-consumes-stream:src/case_22.py::correctness",
+          "run_id": "v2-l3-22-consumes-stream",
+          "kind": "role_review",
+          "target": "src/case_22.py::correctness",
+          "status": "completed",
+          "input_tokens": 884,
+          "output_tokens": 2530,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1783,
+        "output_tokens": 3489,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 40391,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_22.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_22.py",
+            "line": 4,
+            "confidence": 0.95
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_22.py",
+            "line": 4,
+            "confidence": 0.85
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-23-cache-key",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 36887.27,
+      "expected_count": 1,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-23-cache-key",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_23.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_23.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_23.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_23.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-23-cache-key:src/case_23.py::general",
+          "run_id": "v2-l3-23-cache-key",
+          "kind": "role_review",
+          "target": "src/case_23.py::general",
+          "status": "completed",
+          "input_tokens": 894,
+          "output_tokens": 1450,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-23-cache-key:src/case_23.py::correctness",
+          "run_id": "v2-l3-23-cache-key",
+          "kind": "role_review",
+          "target": "src/case_23.py::correctness",
+          "status": "completed",
+          "input_tokens": 879,
+          "output_tokens": 1307,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1773,
+        "output_tokens": 2757,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 36882,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_23.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_23.py",
+            "line": 4,
+            "confidence": 0.95
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_23.py",
+            "line": 4,
+            "confidence": 0.95
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-24-retry-safety",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.3333333333333333,
+        "recall": 1.0,
+        "f1": 0.5,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 91972.43,
+      "expected_count": 1,
+      "accepted_count": 3,
+      "candidate_count": 3,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-24-retry-safety",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_24.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_24.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_24.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_24.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-24-retry-safety:src/case_24.py::general",
+          "run_id": "v2-l3-24-retry-safety",
+          "kind": "role_review",
+          "target": "src/case_24.py::general",
+          "status": "completed",
+          "input_tokens": 1833,
+          "output_tokens": 5617,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-24-retry-safety:src/case_24.py::correctness",
+          "run_id": "v2-l3-24-retry-safety",
+          "kind": "role_review",
+          "target": "src/case_24.py::correctness",
+          "status": "completed",
+          "input_tokens": 883,
+          "output_tokens": 1486,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 3,
+        "input_tokens": 2716,
+        "output_tokens": 7103,
+        "retries": 0,
+        "schema_repairs": 1,
+        "provider_latency_ms": 91967,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "correctness",
+            "path": "src/case_24.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_24.py",
+            "line": 4,
+            "confidence": 0.95
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_24.py",
+            "line": 4,
+            "confidence": 0.9
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_24.py",
+            "line": 4,
+            "confidence": 0.8
+          }
+        ],
+        "strict_hits": 1,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-25-negative-none",
+      "kind": "negative",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 11119.45,
+      "expected_count": 0,
+      "accepted_count": 0,
+      "candidate_count": 0,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-25-negative-none",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_25.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_25.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_25.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_25.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-25-negative-none:src/case_25.py::general",
+          "run_id": "v2-l3-25-negative-none",
+          "kind": "role_review",
+          "target": "src/case_25.py::general",
+          "status": "completed",
+          "input_tokens": 892,
+          "output_tokens": 288,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-25-negative-none:src/case_25.py::correctness",
+          "run_id": "v2-l3-25-negative-none",
+          "kind": "role_review",
+          "target": "src/case_25.py::correctness",
+          "status": "completed",
+          "input_tokens": 877,
+          "output_tokens": 362,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1769,
+        "output_tokens": 650,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 11115,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-27-negative-escape",
+      "kind": "negative",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 2
+      },
+      "elapsed_ms": 63165.72,
+      "expected_count": 0,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-27-negative-escape",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_27.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_27.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_27.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_27.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-27-negative-escape:src/case_27.py::general",
+          "run_id": "v2-l3-27-negative-escape",
+          "kind": "role_review",
+          "target": "src/case_27.py::general",
+          "status": "completed",
+          "input_tokens": 889,
+          "output_tokens": 2590,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-27-negative-escape:src/case_27.py::correctness",
+          "run_id": "v2-l3-27-negative-escape",
+          "kind": "role_review",
+          "target": "src/case_27.py::correctness",
+          "status": "completed",
+          "input_tokens": 874,
+          "output_tokens": 2188,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1763,
+        "output_tokens": 4778,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 63162,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_27.py",
+            "line": 4,
+            "confidence": 0.6
+          },
+          {
+            "category": "edge_case",
+            "path": "src/case_27.py",
+            "line": 4,
+            "confidence": 0.6
+          }
+        ],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-28-negative-await",
+      "kind": "negative",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 2
+      },
+      "elapsed_ms": 30530.22,
+      "expected_count": 0,
+      "accepted_count": 2,
+      "candidate_count": 2,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-28-negative-await",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_28.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_28.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_28.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_28.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-28-negative-await:src/case_28.py::general",
+          "run_id": "v2-l3-28-negative-await",
+          "kind": "role_review",
+          "target": "src/case_28.py::general",
+          "status": "completed",
+          "input_tokens": 885,
+          "output_tokens": 1097,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-28-negative-await:src/case_28.py::correctness",
+          "run_id": "v2-l3-28-negative-await",
+          "kind": "role_review",
+          "target": "src/case_28.py::correctness",
+          "status": "completed",
+          "input_tokens": 870,
+          "output_tokens": 1497,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1755,
+        "output_tokens": 2594,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 30526,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_28.py",
+            "line": 4,
+            "confidence": 1.0
+          },
+          {
+            "category": "correctness",
+            "path": "src/case_28.py",
+            "line": 4,
+            "confidence": 0.99
+          }
+        ],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-29-negative-iterator",
+      "kind": "negative",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 38468.33,
+      "expected_count": 0,
+      "accepted_count": 0,
+      "candidate_count": 0,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-29-negative-iterator",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_29.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_29.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_29.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_29.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-29-negative-iterator:src/case_29.py::general",
+          "run_id": "v2-l3-29-negative-iterator",
+          "kind": "role_review",
+          "target": "src/case_29.py::general",
+          "status": "completed",
+          "input_tokens": 884,
+          "output_tokens": 1202,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-29-negative-iterator:src/case_29.py::correctness",
+          "run_id": "v2-l3-29-negative-iterator",
+          "kind": "role_review",
+          "target": "src/case_29.py::correctness",
+          "status": "completed",
+          "input_tokens": 869,
+          "output_tokens": 1576,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 2,
+        "input_tokens": 1753,
+        "output_tokens": 2778,
+        "retries": 0,
+        "schema_repairs": 0,
+        "provider_latency_ms": 38464,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-30-negative-lock",
+      "kind": "negative",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 1
+      },
+      "elapsed_ms": 150459.2,
+      "expected_count": 0,
+      "accepted_count": 1,
+      "candidate_count": 1,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-30-negative-lock",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_30.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_30.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_30.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_30.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-30-negative-lock:src/case_30.py::general",
+          "run_id": "v2-l3-30-negative-lock",
+          "kind": "role_review",
+          "target": "src/case_30.py::general",
+          "status": "completed",
+          "input_tokens": 1855,
+          "output_tokens": 4930,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-30-negative-lock:src/case_30.py::correctness",
+          "run_id": "v2-l3-30-negative-lock",
+          "kind": "role_review",
+          "target": "src/case_30.py::correctness",
+          "status": "completed",
+          "input_tokens": 1825,
+          "output_tokens": 5768,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 0,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 4,
+        "input_tokens": 3680,
+        "output_tokens": 10698,
+        "retries": 0,
+        "schema_repairs": 2,
+        "provider_latency_ms": 150454,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [
+          {
+            "category": "concurrency",
+            "path": "src/case_30.py",
+            "line": 4,
+            "confidence": 0.75
+          }
+        ],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "id": "l3-12-path-containment",
+      "kind": "cross_file",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "position_accuracy": 0.0,
+        "negative_noise": 0
+      },
+      "elapsed_ms": 118205.54,
+      "expected_count": 1,
+      "accepted_count": 1,
+      "candidate_count": 1,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-12-path-containment",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_12.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_12.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_12.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_12.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-12-path-containment:src/case_12.py::general",
+          "run_id": "v2-l3-12-path-containment",
+          "kind": "role_review",
+          "target": "src/case_12.py::general",
+          "status": "failed",
+          "input_tokens": 1925,
+          "output_tokens": 6000,
+          "cost_usd": 0.0,
+          "error": "src/case_12.py: StructuredOutputError: 结构化输出解析失败（修复重试后仍失败）"
+        },
+        {
+          "task_id": "v2-l3-12-path-containment:src/case_12.py::correctness",
+          "run_id": "v2-l3-12-path-containment",
+          "kind": "role_review",
+          "target": "src/case_12.py::correctness",
+          "status": "completed",
+          "input_tokens": 929,
+          "output_tokens": 2640,
+          "cost_usd": 0.0,
+          "error": null
+        }
+      ],
+      "health": {
+        "required_failed": true,
+        "required_failure_count": 1,
+        "optional_failure_count": 0,
+        "coverage_complete": false
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 3,
+        "input_tokens": 2854,
+        "output_tokens": 8640,
+        "retries": 0,
+        "schema_repairs": 1,
+        "provider_latency_ms": 118198,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [
+          {
+            "category": "security",
+            "path": "src/case_12.py",
+            "line": 4
+          }
+        ],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_12.py",
+            "line": 4,
+            "confidence": 0.9
+          }
+        ],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 1,
+        "within_5_lines_hits_ignoring_category": 1,
+        "path_hits_ignoring_category": 1,
+        "category_confusions_at_exact_location": [
+          {
+            "path": "src/case_12.py",
+            "line": 4,
+            "expected": "security",
+            "actual": "correctness"
+          }
+        ]
+      },
+      "warnings": [
+        "src/case_12.py::general required 失败: src/case_12.py: StructuredOutputError: 结构化输出解析失败（修复重试后仍失败）"
+      ],
+      "failures": [
+        {
+          "target": "src/case_12.py::general",
+          "detail": "src/case_12.py: StructuredOutputError: 结构化输出解析失败（修复重试后仍失败）"
+        }
+      ]
+    },
+    {
+      "id": "l3-26-negative-ms",
+      "kind": "negative",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "position_accuracy": 1.0,
+        "negative_noise": 1
+      },
+      "elapsed_ms": 118434.24,
+      "expected_count": 0,
+      "accepted_count": 1,
+      "candidate_count": 1,
+      "l3_hits": 1,
+      "l3_diagnostics": {
+        "repository_id": "eval-l3-26-negative-ms",
+        "head_sha": "head",
+        "requests_attempted": 2,
+        "blobs_read": 2,
+        "candidates_considered": 1,
+        "blobs_kept": 2,
+        "skipped_by_cap": 0,
+        "truncated_by_cap": false,
+        "capability_miss": false,
+        "io_failures": [],
+        "cap_affected_paths": []
+      },
+      "gate_decisions": [
+        {
+          "role_id": "general",
+          "file_path": "src/case_26.py",
+          "enabled": true,
+          "matched_features": [],
+          "reason": "always",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "security",
+          "file_path": "src/case_26.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "correctness",
+          "file_path": "src/case_26.py",
+          "enabled": true,
+          "matched_features": [
+            "has_added_lines"
+          ],
+          "reason": "gate_hit",
+          "gate_version": "c139fc754291d619"
+        },
+        {
+          "role_id": "performance",
+          "file_path": "src/case_26.py",
+          "enabled": false,
+          "matched_features": [],
+          "reason": "gate_miss",
+          "gate_version": "c139fc754291d619"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "v2-l3-26-negative-ms:src/case_26.py::general",
+          "run_id": "v2-l3-26-negative-ms",
+          "kind": "role_review",
+          "target": "src/case_26.py::general",
+          "status": "completed",
+          "input_tokens": 888,
+          "output_tokens": 2895,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        {
+          "task_id": "v2-l3-26-negative-ms:src/case_26.py::correctness",
+          "run_id": "v2-l3-26-negative-ms",
+          "kind": "role_review",
+          "target": "src/case_26.py::correctness",
+          "status": "failed",
+          "input_tokens": 1783,
+          "output_tokens": 6000,
+          "cost_usd": 0.0,
+          "error": "src/case_26.py: StructuredOutputError: 结构化输出解析失败（修复重试后仍失败）"
+        }
+      ],
+      "health": {
+        "required_failed": false,
+        "required_failure_count": 0,
+        "optional_failure_count": 1,
+        "coverage_complete": true
+      },
+      "usage": {
+        "logical_invocations": 2,
+        "provider_requests": 3,
+        "input_tokens": 2671,
+        "output_tokens": 8895,
+        "retries": 0,
+        "schema_repairs": 1,
+        "provider_latency_ms": 118429,
+        "cost_usd": 0.0,
+        "by_role": {
+          "correctness": 1,
+          "general": 1
+        }
+      },
+      "diagnostics": {
+        "expected": [],
+        "accepted": [
+          {
+            "category": "correctness",
+            "path": "src/case_26.py",
+            "line": 4,
+            "confidence": 0.85
+          }
+        ],
+        "strict_hits": 0,
+        "exact_location_hits_ignoring_category": 0,
+        "within_5_lines_hits_ignoring_category": 0,
+        "path_hits_ignoring_category": 0,
+        "category_confusions_at_exact_location": []
+      },
+      "warnings": [
+        "src/case_26.py::correctness optional 失败: src/case_26.py: StructuredOutputError: 结构化输出解析失败（修复重试后仍失败）"
+      ],
+      "failures": [
+        {
+          "target": "src/case_26.py::correctness",
+          "detail": "src/case_26.py: StructuredOutputError: 结构化输出解析失败（修复重试后仍失败）"
+        }
+      ]
+    }
+  ]
+}

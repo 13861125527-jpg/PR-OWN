@@ -25,8 +25,9 @@ from ..domain.enums import ReviewStrategyName, ReviewTaskKind, ReviewTaskStatus
 from ..domain.finding import FindingCandidate
 from ..domain.models import GlobalBudget, ModelUsage, ModelUsageOutcome, ReviewUnit
 from ..domain.protocols import LLMProvider
-from ..domain.run import ReviewRun, ReviewTask, SourceRunResult
+from ..domain.run import ReviewRun, ReviewTask, SourceRunResult, StrategyHealth
 from ..domain.strategy import StrategyResult
+from .candidates import prepare_llm_candidate
 from .context import unit_to_messages
 
 
@@ -93,7 +94,7 @@ class SinglePassReviewer:
                 warnings.append(f"{path} 审查失败: {type(res).__name__}: {res}")
                 tasks.append(
                     ReviewTask(
-                        task_id=path,
+                        task_id=f"{run.run_id}:{path}",  # V1-f：全局唯一（跨 run 同 path 不撞键）
                         run_id=run.run_id,
                         kind=ReviewTaskKind.FILE_REVIEW,
                         target=path,
@@ -108,6 +109,13 @@ class SinglePassReviewer:
             tasks.append(task)
             if error is not None:
                 warnings.append(f"{path} 部分块失败: {error}")
+        failed_n = sum(1 for t in tasks if t.status is ReviewTaskStatus.FAILED)
+        health = StrategyHealth(
+            required_failed=failed_n > 0,
+            required_failure_count=failed_n,
+            optional_failure_count=0,
+            coverage_complete=failed_n == 0,
+        )
         return StrategyResult(
             candidates,
             SourceRunResult(
@@ -115,6 +123,7 @@ class SinglePassReviewer:
                 tasks=tasks,
                 usages=usages,
                 warnings=warnings,
+                health=health,
             ),
         )
 
@@ -158,7 +167,7 @@ class SinglePassReviewer:
                 output_tokens += usage.output_tokens
                 cost_usd += usage.cost_usd
             task = ReviewTask(
-                task_id=path,
+                task_id=f"{run.run_id}:{path}",  # V1-f：全局唯一（跨 run 同 path 不撞键）
                 run_id=run.run_id,
                 kind=ReviewTaskKind.FILE_REVIEW,
                 target=path,
@@ -290,10 +299,7 @@ class SinglePassReviewer:
             # - 用 model_copy 生成新候选，不原地修改 Provider 可能复用的对象（十轮 P2）。
             filled: list[FindingCandidate] = []
             for cand in candidates:
-                if cand.claimed_path is None and not cand.is_outside_diff:
-                    filled.append(cand.model_copy(update={"claimed_path": unit.file_path}))
-                else:
-                    filled.append(cand)
+                filled.append(prepare_llm_candidate(cand, file_path=unit.file_path))
             return filled, usage
 
 

@@ -76,11 +76,12 @@ class EvalRunner:
         pipeline = FindingPipeline(
             repo=self.repo, head_sha="head", min_confidence=self.min_confidence
         )
-        findings = pipeline.process(
+        pipe = await pipeline.process(
             run_id=run.run_id,
             candidates=result.candidates,
             file_map=file_map,
         )
+        findings = pipe.findings
         # 评测命中 = 会发表的 finding（accepted；suppressed/body_only 不计入指标）
         from reposage.domain.enums import FindingStatus
 

@@ -32,7 +32,7 @@ import os
 import re
 import sys
 import time
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -61,6 +61,7 @@ from reposage.providers.llm.openai_compat import (
     LLMRequestError,
     OpenAICompatProvider,
     StructuredOutputError,
+    resolve_credentials,
 )
 from reposage.review.context import ContextAssembler
 from reposage.review.pipeline import FindingPipeline
@@ -68,6 +69,63 @@ from reposage.review.single_pass import SinglePassReviewer, estimate_cost
 
 _DEFAULT_DATASET = "reposage/evals/datasets/v1_demo.yaml"
 _REPEATS = 1
+
+
+def _result_to_dict(result: SampleResult) -> dict[str, Any]:
+    return asdict(result)
+
+
+def _result_from_dict(raw: dict[str, Any]) -> SampleResult:
+    data = dict(raw)
+    for key in ("v1_metrics", "base_metrics"):
+        if data.get(key) is not None:
+            data[key] = Metrics(**data[key])
+    return SampleResult(**data)
+
+
+def _checkpoint_path(args: argparse.Namespace) -> Path:
+    if args.checkpoint:
+        return Path(args.checkpoint)
+    output = Path(args.output or "docs/evidence/v1-d-real-compare.json")
+    return output.with_suffix(".checkpoint.json")
+
+
+def _load_checkpoint(
+    path: Path,
+    *,
+    dataset: str,
+    model: str,
+    repeats: int,
+) -> list[SampleResult]:
+    if not path.exists():
+        return []
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    expected = {"dataset": dataset, "model": model, "repeats": repeats}
+    actual = {key: raw.get(key) for key in expected}
+    if actual != expected:
+        raise ValueError(f"检查点配置不匹配: expected={expected!r} actual={actual!r}")
+    return [_result_from_dict(item) for item in raw.get("results", [])]
+
+
+def _save_checkpoint(
+    path: Path,
+    results: list[SampleResult],
+    *,
+    dataset: str,
+    model: str,
+    repeats: int,
+) -> None:
+    payload = {
+        "dataset": dataset,
+        "model": model,
+        "repeats": repeats,
+        "completed_sample_ids": [result.sample_id for result in results],
+        "results": [_result_to_dict(result) for result in results],
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    temporary.replace(path)
 
 
 @dataclass
@@ -215,11 +273,11 @@ async def _v1_review(
         if t.status.value == "failed" and t.error
     ]
     pipeline = FindingPipeline(repo="eval-repo", head_sha="head", min_confidence=0.0)
-    findings = pipeline.process(
+    findings = (await pipeline.process(
         run_id=run.run_id,
         candidates=result.candidates,
         file_map=file_map,
-    )
+    )).findings
     accepted = [f for f in findings if f.status is FindingStatus.ACCEPTED]
     return accepted, budget, result.source_run.usages, task_failures, result.candidates, findings
 
@@ -869,8 +927,7 @@ def _resolve_output_paths(
 
 async def _main(args: argparse.Namespace) -> int:
     settings = Settings()
-    api_key = os.environ.get(settings.llm.api_key_env, "")
-    base_url = os.environ.get(settings.llm.base_url_env, "")
+    api_key, base_url = resolve_credentials(settings.llm)
     if not api_key or not base_url:
         print(f"缺少配置：请设置 {settings.llm.api_key_env} 与 {settings.llm.base_url_env} 环境变量")
         return 1
@@ -902,18 +959,46 @@ async def _main(args: argparse.Namespace) -> int:
 
     provider = OpenAICompatProvider.from_config(llm_cfg)
     try:
-        results = []
-        for sample in samples:
-            print(f"  样本 {sample.id} ...")
-            results.append(
-                await _run_sample(
-                    sample,
-                    provider,
-                    repeats=args.repeats,
-                    input_price=input_price,
-                    output_price=output_price,
-                )
+        checkpoint = _checkpoint_path(args)
+        if args.fresh and checkpoint.exists():
+            checkpoint.unlink()
+        results = _load_checkpoint(
+            checkpoint,
+            dataset=args.dataset,
+            model=llm_cfg.model,
+            repeats=args.repeats,
+        )
+        if args.retry_failed:
+            failed_ids = {result.sample_id for result in results if result.failures}
+            results = [result for result in results if result.sample_id not in failed_ids]
+            if failed_ids:
+                print(f"重新运行失败样本: {', '.join(sorted(failed_ids))}", flush=True)
+        completed_ids = {result.sample_id for result in results}
+        if completed_ids:
+            print(
+                f"从检查点恢复 {len(completed_ids)}/{len(samples)} 个样本: {checkpoint}",
+                flush=True,
             )
+        for sample in samples:
+            if sample.id in completed_ids:
+                continue
+            print(f"  样本 {len(results) + 1}/{len(samples)} {sample.id} ...", flush=True)
+            result = await _run_sample(
+                sample,
+                provider,
+                repeats=args.repeats,
+                input_price=input_price,
+                output_price=output_price,
+            )
+            results.append(result)
+            _save_checkpoint(
+                checkpoint,
+                results,
+                dataset=args.dataset,
+                model=llm_cfg.model,
+                repeats=args.repeats,
+            )
+            print(f"    已保存检查点 {len(results)}/{len(samples)}", flush=True)
     finally:
         await provider.aclose()
 
@@ -956,6 +1041,9 @@ def main() -> int:
     parser.add_argument("--sample-ids", default="", help="逗号分隔的样本 id 子集（调试单个样本用，V1-d 十二轮 P2）")
     parser.add_argument("--output", default=None, help="JSON 报告路径（默认按是否 --sample-ids 自动选择 debug/正式路径）")
     parser.add_argument("--markdown", default=None, help="Markdown 报告路径（同上）")
+    parser.add_argument("--checkpoint", default=None, help="逐样本检查点路径（默认跟随 JSON 输出路径）")
+    parser.add_argument("--fresh", action="store_true", help="忽略并删除已有检查点，从头运行")
+    parser.add_argument("--retry-failed", action="store_true", help="保留成功结果，仅重新运行含失败记录的样本")
     return asyncio.run(_main(parser.parse_args()))
 
 

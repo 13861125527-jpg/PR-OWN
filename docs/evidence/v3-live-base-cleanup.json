@@ -1,0 +1,289 @@
+{
+  "model": "deepseek-v4-pro",
+  "rows": [
+    {
+      "id": "l3-12-path-containment",
+      "base": {
+        "metrics": {
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6666666666666666,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "security",
+              "path": "src/case_12.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "security",
+              "path": "src/case_12.py",
+              "line": 4,
+              "confidence": 0.8
+            },
+            {
+              "category": "correctness",
+              "path": "src/case_12.py",
+              "line": 4,
+              "confidence": 0.9
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "4a2bd92a053843f9830730e3937407e6",
+            "title": "Path containment check result is discarded, returning unsanitized concatenated path",
+            "category": "security",
+            "path": "src/case_12.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Any call where value passes check() but the raw concatenation '/srv/data/' + value does not equal the validated target (e.g., symlinks, unresolved '..' components, or a symlink race between validation and use).",
+            "impact": "The returned path may resolve outside the intended /srv/data root, allowing path traversal and unauthorized file access.",
+            "explanation": "The diff changes the return from check(value) to a tuple expression that calls check(value) only for its side effect and then returns the raw string '/srv/data/' + value. The validated and resolved Path object produced by check is discarded, so the path containment guarantee is not applied to the value actually returned. This reintroduces path traversal risk even though check() still raises on direct `..` escapes.",
+            "suggestion": "Return the validated path directly: `return check(value)`, or if a string is required, `return str(check(value))`."
+          },
+          {
+            "finding_occurrence_id": "7a4b080f534d4c548275ae561e270a27",
+            "title": "Return type changes from Path object to string",
+            "category": "correctness",
+            "path": "src/case_12.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Any caller that expects the return value to be a pathlib.Path object (e.g., calling .read_text(), comparing to Path, or using Path methods).",
+            "impact": "The function now returns a str instead of Path, breaking downstream code that relies on Path methods or equality, causing AttributeError or unexpected behavior.",
+            "explanation": "The original code returns check(value), which returns a pathlib.Path. The new code returns a plain string built from concatenation. This is an unannounced API break for this function.",
+            "suggestion": "Keep the Path return type: `return check(value)`, or explicitly document and convert to str consistently."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "4a2bd92a053843f9830730e3937407e6",
+            "title": "Path containment check result is discarded, returning unsanitized concatenated path",
+            "category": "security",
+            "path": "src/case_12.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Any call where value passes check() but the raw concatenation '/srv/data/' + value does not equal the validated target (e.g., symlinks, unresolved '..' components, or a symlink race between validation and use).",
+            "impact": "The returned path may resolve outside the intended /srv/data root, allowing path traversal and unauthorized file access.",
+            "explanation": "The diff changes the return from check(value) to a tuple expression that calls check(value) only for its side effect and then returns the raw string '/srv/data/' + value. The validated and resolved Path object produced by check is discarded, so the path containment guarantee is not applied to the value actually returned. This reintroduces path traversal risk even though check() still raises on direct `..` escapes.",
+            "suggestion": "Return the validated path directly: `return check(value)`, or if a string is required, `return str(check(value))`.",
+            "status": "accepted",
+            "needs_evidence": false
+          },
+          {
+            "finding_occurrence_id": "7a4b080f534d4c548275ae561e270a27",
+            "title": "Return type changes from Path object to string",
+            "category": "correctness",
+            "path": "src/case_12.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Any caller that expects the return value to be a pathlib.Path object (e.g., calling .read_text(), comparing to Path, or using Path methods).",
+            "impact": "The function now returns a str instead of Path, breaking downstream code that relies on Path methods or equality, causing AttributeError or unexpected behavior.",
+            "explanation": "The original code returns check(value), which returns a pathlib.Path. The new code returns a plain string built from concatenation. This is an unannounced API break for this function.",
+            "suggestion": "Keep the Path return type: `return check(value)`, or explicitly document and convert to str consistently.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 2,
+        "accepted_count": 2,
+        "elapsed_ms": 236793.0,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 874,
+          "output_tokens": 6239,
+          "provider_latency_ms": 236784,
+          "retries": 2,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.5,
+            "recall": 1.0,
+            "f1": 0.6666666666666666,
+            "matched": 1,
+            "expected": 1,
+            "reported": 2,
+            "raw_reported": 2,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 2,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both identify that check(value)'s validated Path result is discarded and the raw concatenated untrusted path is returned, enabling path traversal."
+              },
+              {
+                "pair_id": "e0-f1",
+                "semantically_equivalent": false,
+                "confidence": 0.97,
+                "reason": "The finding describes a Path-to-str API/type regression, not the expected discarded containment check and path traversal vulnerability."
+              }
+            ]
+          },
+          {
+            "precision": 0.5,
+            "recall": 1.0,
+            "f1": 0.6666666666666666,
+            "matched": 1,
+            "expected": 1,
+            "reported": 2,
+            "raw_reported": 2,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 2,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.97,
+                "reason": "Both describe the same defect: the return statement calls check(value) only for its side effect and returns the raw concatenated '/srv/data/' + value, discarding the validated Path, which reintroduces path traversal outside the intended root with the same trigger and impact."
+              },
+              {
+                "pair_id": "e0-f1",
+                "semantically_equivalent": false,
+                "confidence": 0.95,
+                "reason": "The expected defect is the security issue of discarding the validated safe path and returning an unsanitized concatenated string (traversal). The finding f1 instead claims a different bug: an API/return-type break from Path to str causing AttributeError in callers. Same code location but a different defect, trigger, and impact."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-26-negative-ms",
+      "base": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 1.0,
+          "f1": 0.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 1
+        },
+        "diagnostics": {
+          "expected": [],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_26.py",
+              "line": 4,
+              "confidence": 0.7
+            }
+          ],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 0,
+          "within_5_lines_hits_ignoring_category": 0,
+          "path_hits_ignoring_category": 0,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "91e85e52d0bb4ee28e019bf59c620651",
+            "title": "process() changes return type from int to float and may lose precision",
+            "category": "correctness",
+            "path": "src/case_26.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "When value is an integer, check(value * 1000) returns (value * 1000) / 1000 which is a float in Python 3, whereas the original code returned the original integer object.",
+            "impact": "Callers may receive a float instead of an int, breaking type expectations or equality checks. For large integers (beyond 2^53), converting to float loses precision.",
+            "explanation": "The change wraps value in check(value * 1000). The check function from lib/contract_26.py divides its argument by 1000 using the / operator, which always produces a float in Python 3. Therefore the original integer value is transformed into a float, changing the API contract. Additionally, for values exceeding the precision limit of floating point numbers, the result may not equal the original value exactly, introducing subtle bugs.",
+            "suggestion": "Return value directly if no transformation is needed, or ensure the return type is preserved (e.g., use integer division or explicit int conversion if downstream expects int). Add tests covering large integers and type checks."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "91e85e52d0bb4ee28e019bf59c620651",
+            "title": "process() changes return type from int to float and may lose precision",
+            "category": "correctness",
+            "path": "src/case_26.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "When value is an integer, check(value * 1000) returns (value * 1000) / 1000 which is a float in Python 3, whereas the original code returned the original integer object.",
+            "impact": "Callers may receive a float instead of an int, breaking type expectations or equality checks. For large integers (beyond 2^53), converting to float loses precision.",
+            "explanation": "The change wraps value in check(value * 1000). The check function from lib/contract_26.py divides its argument by 1000 using the / operator, which always produces a float in Python 3. Therefore the original integer value is transformed into a float, changing the API contract. Additionally, for values exceeding the precision limit of floating point numbers, the result may not equal the original value exactly, introducing subtle bugs.",
+            "suggestion": "Return value directly if no transformation is needed, or ensure the return type is preserved (e.g., use integer division or explicit int conversion if downstream expects int). Add tests covering large integers and type checks.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 0,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 65852.41,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 818,
+          "output_tokens": 3346,
+          "provider_latency_ms": 65848,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          },
+          {
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 0,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 0,
+            "decisions": []
+          }
+        ],
+        "judge_agreement": true
+      }
+    }
+  ]
+}

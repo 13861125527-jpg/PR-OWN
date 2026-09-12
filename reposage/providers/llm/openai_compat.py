@@ -25,6 +25,7 @@ import asyncio
 import json
 import os
 import time
+import uuid
 from typing import Any
 
 import httpx
@@ -32,9 +33,10 @@ from pydantic import BaseModel, ValidationError
 
 from reposage.config.settings import LLMConfig
 from reposage.domain.finding import FindingCandidate
-from reposage.domain.models import ModelUsage
-from reposage.domain.protocols import ModelResponse
+from reposage.domain.models import AgentToolRequest, ModelUsage
+from reposage.domain.protocols import AgentSessionView, ModelResponse
 
+from .agent_chat import messages_to_chat
 from .schema import envelope_json_schema, envelope_to_candidates, parse_envelope
 
 # 结构化系统指令：要求只输出 JSON 信封（json_repair / 降级路径用）
@@ -97,6 +99,17 @@ class StructuredOutputError(RuntimeError):
         self.usage = usage
 
 
+def resolve_credentials(llm: LLMConfig) -> tuple[str, str]:
+    """Resolve normal env references and local-demo literal credentials."""
+    api_key = os.environ.get(llm.api_key_env, "")
+    if not api_key and llm.api_key_env.lower().startswith(("sk-", "key-", "api-")):
+        api_key = llm.api_key_env
+    base_url = os.environ.get(llm.base_url_env, "")
+    if not base_url and llm.base_url_env.startswith(("http://", "https://")):
+        base_url = llm.base_url_env
+    return api_key, base_url
+
+
 class OpenAICompatProvider:
     """OpenAI-compatible 提供者（httpx 异步客户端；自建 client 支持 aclose/async with）。"""
 
@@ -148,8 +161,7 @@ class OpenAICompatProvider:
         http_client: httpx.AsyncClient | None = None,
     ) -> OpenAICompatProvider:
         """从 LLMConfig 构造；api_key/base_url 读环境变量（09 §3：非法配置启动即失败）。"""
-        api_key = os.environ.get(llm.api_key_env, "")
-        base_url = os.environ.get(llm.base_url_env, "")
+        api_key, base_url = resolve_credentials(llm)
         if not api_key:
             raise ValueError(f"缺少 API key：环境变量 {llm.api_key_env} 未设置")
         if not base_url:
@@ -347,16 +359,86 @@ class OpenAICompatProvider:
         _accumulate_usage(usage_agg, usage)
         return _content_of(data), retries
 
-    # ---- V3 占位 ----
-
     async def tool_loop(
         self,
-        session: object,
+        session: AgentSessionView,
         tools: list[dict[str, Any]],
         *,
         budget: Any,
+        protocol: str = "native",
     ) -> ModelResponse:
-        raise NotImplementedError("tool_loop 属 V3（08 §9 方案 A/B），V1 不实现")
+        """Native tool calling 或 Action JSON；不执行工具、不热切换协议。"""
+        del budget
+        messages = messages_to_chat(session.messages, protocol=protocol)
+        body: dict[str, Any] = {
+            "model": self.model,
+            "messages": messages,
+            "temperature": self.temperature,
+            "max_tokens": self.max_output_tokens,
+        }
+        if protocol == "native":
+            body["tools"] = _openai_tools(tools)
+            body["tool_choice"] = "auto"
+        else:
+            body["response_format"] = {"type": "json_object"}
+        started = time.monotonic()
+        try:
+            data, usage, retries = await self._post(body)
+        except LLMRequestError as exc:
+            if protocol == "native" and _is_tools_unsupported(exc):
+                return ModelResponse(
+                    text="",
+                    action=None,
+                    data={"protocol_error": "native_unsupported"},
+                    usage=self._make_usage(
+                        {}, latency_ms=int((time.monotonic() - started) * 1000), retries=0
+                    ),
+                )
+            raise
+        message = _message_of(data)
+        content = message.get("content")
+        text = content if isinstance(content, str) else ""
+        model_usage = self._make_usage(
+            usage,
+            latency_ms=int((time.monotonic() - started) * 1000),
+            retries=retries,
+        )
+        model_usage = model_usage.model_copy(update={"role": "agent"})
+        if protocol == "native":
+            requests = _parse_tool_calls(message)
+            if not requests:
+                return ModelResponse(
+                    text=text,
+                    action=None,
+                    data={},
+                    usage=model_usage,
+                    reasoning_content=(
+                        str(message["reasoning_content"])
+                        if message.get("reasoning_content") is not None
+                        else None
+                    ),
+                )
+            first = requests[0]
+            action = first.name if first.name in {"submit_finding", "finish_review"} else "tool_call"
+            payload = {
+                "name": first.name,
+                "arguments": first.arguments,
+                "reason": first.arguments.get("reason") if isinstance(first.arguments, dict) else None,
+            }
+            return ModelResponse(
+                text=text,
+                action=action,
+                data=payload,
+                usage=model_usage,
+                provider_message_id=str(message.get("id") or "") or None,
+                tool_requests=requests,
+                reasoning_content=(
+                    str(message["reasoning_content"])
+                    if message.get("reasoning_content") is not None
+                    else None
+                ),
+            )
+        return _action_json_response(text, model_usage)
 
     # ---- 内部 ----
 
@@ -455,14 +537,136 @@ _REPAIR_INSTRUCTION = (
 )
 
 
-def _content_of(data: dict[str, Any]) -> str:
-    """提取 choices[0].message.content；结构异常抛 LLMRequestError（P2-5）。"""
+def _message_of(data: dict[str, Any]) -> dict[str, Any]:
     choices = data.get("choices")
     if not isinstance(choices, list) or not choices:
         raise LLMRequestError("200 响应缺少 choices")
     message = choices[0].get("message")
     if not isinstance(message, dict):
         raise LLMRequestError("choices[0] 缺少 message 对象")
+    return message
+
+
+def _openai_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    for item in tools:
+        out.append(
+            {
+                "type": "function",
+                "function": {
+                    "name": item.get("name", ""),
+                    "description": item.get("description", ""),
+                    "parameters": item.get("parameters") or {"type": "object", "properties": {}},
+                },
+            }
+        )
+    return out
+
+
+def _parse_tool_calls(message: dict[str, Any]) -> list[AgentToolRequest]:
+    raw = message.get("tool_calls")
+    if not isinstance(raw, list):
+        return []
+    requests: list[AgentToolRequest] = []
+    for index, item in enumerate(raw):
+        if not isinstance(item, dict):
+            continue
+        fn_obj = item.get("function")
+        fn: dict[str, Any] = fn_obj if isinstance(fn_obj, dict) else {}
+        args_raw = fn.get("arguments")
+        parsed: dict[str, Any]
+        if isinstance(args_raw, dict):
+            parsed = args_raw
+        elif isinstance(args_raw, str) and args_raw.strip():
+            try:
+                loaded = json.loads(args_raw)
+            except json.JSONDecodeError:
+                loaded = {}
+            parsed = loaded if isinstance(loaded, dict) else {}
+        else:
+            parsed = {}
+        call_id = str(item.get("id") or f"call-{index}")
+        requests.append(
+            AgentToolRequest(id=call_id, name=str(fn.get("name") or ""), arguments=parsed)
+        )
+    return requests
+
+
+def _strip_fence(text: str) -> str:
+    blob = text.strip()
+    if blob.startswith("```"):
+        lines = blob.splitlines()
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        blob = "\n".join(lines)
+    return blob.strip()
+
+
+def _new_action_json_id(name: str) -> str:
+    safe = "".join(ch if ch.isalnum() or ch in "-_" else "-" for ch in name)[:32] or "action"
+    return f"aj-{safe}-{uuid.uuid4().hex[:12]}"
+
+
+def _action_json_response(text: str, usage: ModelUsage) -> ModelResponse:
+    try:
+        obj = json.loads(_strip_fence(text))
+    except json.JSONDecodeError as exc:
+        return ModelResponse(
+            text=text,
+            action=None,
+            data={"parse_error": str(exc)},
+            usage=usage,
+        )
+    if not isinstance(obj, dict):
+        return ModelResponse(text=text, action=None, data={"parse_error": "not_object"}, usage=usage)
+    action = obj.get("action")
+    args = obj.get("args") if isinstance(obj.get("args"), dict) else obj.get("arguments")
+    if not isinstance(args, dict):
+        args = {}
+    name = str(obj.get("name") or "")
+    if action == "none":
+        return ModelResponse(
+            text=text, action=None, data={"summary": str(obj.get("summary") or "")}, usage=usage
+        )
+    if action in {"submit_finding", "finish_review"}:
+        if not name:
+            name = str(action)
+        req = AgentToolRequest(id=_new_action_json_id(name), name=name, arguments=args)
+        return ModelResponse(
+            text=text,
+            action=str(action),
+            data={"name": name, "arguments": args, "reason": args.get("reason")},
+            usage=usage,
+            tool_requests=[req],
+        )
+    if action == "tool_call":
+        if not name:
+            return ModelResponse(text=text, action=None, data={"parse_error": "missing_name"}, usage=usage)
+        req = AgentToolRequest(id=_new_action_json_id(name), name=name, arguments=args)
+        return ModelResponse(
+            text=text,
+            action="tool_call",
+            data={"name": name, "arguments": args},
+            usage=usage,
+            tool_requests=[req],
+        )
+    return ModelResponse(text=text, action=None, data={"parse_error": "unknown_action"}, usage=usage)
+
+
+def _is_tools_unsupported(exc: LLMRequestError) -> bool:
+    if exc.status_code != 400:
+        return False
+    body = (exc.error_body or "").lower()
+    has_semantics = any(hint in body for hint in _SCHEMA_UNSUPPORTED_SEMANTICS)
+    has_target = "tool" in body or "tools" in body or "tool_choice" in body
+    return has_semantics and has_target
+
+
+def _content_of(data: dict[str, Any]) -> str:
+    """提取 choices[0].message.content；结构异常抛 LLMRequestError（P2-5）。"""
+    message = _message_of(data)
     content = message.get("content")
     if not isinstance(content, str):
         raise LLMRequestError(f"message.content 不是字符串: {type(content).__name__}")

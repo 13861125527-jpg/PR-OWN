@@ -1,0 +1,90 @@
+{
+  "mode": "scripted_fake",
+  "dataset": "reposage/evals/datasets/v1_demo.yaml",
+  "samples": 20,
+  "real_api": "not_run",
+  "quality": {
+    "precision": {
+      "v1": 1.0,
+      "v2a": 1.0
+    },
+    "recall": {
+      "v1": 1.0,
+      "v2a": 1.0
+    },
+    "f1": {
+      "v1": 1.0,
+      "v2a": 1.0
+    },
+    "position_accuracy": {
+      "v1": 1.0,
+      "v2a": 1.0
+    },
+    "negative_noise": {
+      "v1": 0.0,
+      "v2a": 0.0
+    }
+  },
+  "cost": {
+    "model_calls": {
+      "v1": 21,
+      "v2a": 35
+    },
+    "input_tokens": {
+      "v1": 2100,
+      "v2a": 3500
+    },
+    "output_tokens": {
+      "v1": 1050,
+      "v2a": 1750
+    },
+    "total_tokens": {
+      "v1": 3150,
+      "v2a": 5250
+    },
+    "budget_rejects": {
+      "v1": 0,
+      "v2a": 0
+    },
+    "note": "脚本化 Fake 记账，非真实 API 账单"
+  },
+  "latency": {
+    "repeats": 3,
+    "total_ms": {
+      "v1": 3.94,
+      "v2a": 8.33
+    },
+    "p50_ms": {
+      "v1": 3.97,
+      "v2a": 8.3
+    },
+    "p95_ms": {
+      "v1": 4.11,
+      "v2a": 8.5
+    },
+    "note": "全数据集墙钟，repeats=3；Fake 延迟不代表真实模型"
+  },
+  "gate": {
+    "security": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "tp": 7,
+      "fp": 0,
+      "fn": 0
+    },
+    "correctness": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "tp": 4,
+      "fp": 0,
+      "fn": 0
+    },
+    "performance": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0
+    }
+  }
+}

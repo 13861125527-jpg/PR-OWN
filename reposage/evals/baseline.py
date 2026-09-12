@@ -10,6 +10,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -61,6 +62,16 @@ def compare(
     repo: str = "eval-repo",
 ) -> dict[str, dict[str, object]]:
     """输出三张对照表：质量 / 成本 / 延迟（macro 聚合）。"""
+    return asyncio.run(_compare_async(dataset_path, scripted=scripted, repo=repo))
+
+
+async def _compare_async(
+    dataset_path: str | Path,
+    *,
+    scripted: Callable[[str], list[FindingCandidate]],
+    repo: str,
+) -> dict[str, dict[str, object]]:
+    """输出三张对照表：质量 / 成本 / 延迟（macro 聚合）。"""
     ds = EvalDataset.load_yaml(Path(dataset_path))
     pipeline = FindingPipeline(repo=repo, head_sha="head", min_confidence=0.0)
 
@@ -73,9 +84,9 @@ def compare(
         cands = scripted(sample.id)
         # V1：完整链路（重定位/去重/门槛）
         t0 = time.perf_counter()
-        v1_findings = pipeline.process(
-            run_id=f"eval-{sample.id}", candidates=cands, file_map=_file_map_of(sample)
-        )
+        v1_findings = (await pipeline.process(
+            run_id=f"eval-{sample.id}", candidates=cands, file_map=await _file_map_of(sample)
+        )).findings
         v1_latency_ms += (time.perf_counter() - t0) * 1000
         v1_metrics.append(_evaluate(v1_findings, sample))
         # baseline：直拼 Prompt
@@ -112,17 +123,15 @@ def compare(
     return result
 
 
-def _file_map_of(sample: EvalSample) -> dict[str, ChangedFile]:
+async def _file_map_of(sample: EvalSample) -> dict[str, ChangedFile]:
     """样本文件路径映射（pipeline 需要 ChangedFile）。"""
-    import asyncio
-
     from reposage.domain.diff import filter_files, parse_unified_diff
     from reposage.providers.git.fake import FakeGitProvider
 
     fake = FakeGitProvider()
     fake.add_snapshot("base", sample.base_files)
     fake.add_snapshot("head", sample.head_files)
-    diff = asyncio.run(fake.get_diff("base", "head"))
+    diff = await fake.get_diff("base", "head")
     files = parse_unified_diff(diff)
     filtered = filter_files(files, languages=["python"], max_files=40)
     return {f.path: f for f in filtered.kept}

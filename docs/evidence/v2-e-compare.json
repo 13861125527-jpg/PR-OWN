@@ -1,0 +1,47 @@
+{
+  "mode": "scripted_fake",
+  "dataset": "reposage/evals/datasets/v2e_feedback.yaml",
+  "samples": 4,
+  "real_api": "not_run",
+  "feedback": {
+    "cases": [
+      {
+        "id": "suppress-false-positive",
+        "kind": "suppress",
+        "ok": true,
+        "n_accepted": 0,
+        "n_suppressed": 1,
+        "feedback_suppressed": 1
+      },
+      {
+        "id": "revoke-restores",
+        "kind": "restore",
+        "ok": true,
+        "n_accepted": 1,
+        "n_suppressed": 0,
+        "feedback_suppressed": 0
+      },
+      {
+        "id": "code-move-still-matches",
+        "kind": "move",
+        "ok": true,
+        "n_accepted": 0,
+        "n_suppressed": 1,
+        "feedback_suppressed": 1
+      },
+      {
+        "id": "feedback-disabled-ignores-mark",
+        "kind": "isolated",
+        "ok": true,
+        "n_accepted": 1,
+        "n_suppressed": 0,
+        "feedback_suppressed": 0
+      }
+    ],
+    "passed": 4,
+    "total": 4,
+    "global_reject": true,
+    "note": "mark 抑制 / 撤销恢复 / 代码移动 / 开关隔离；口径是程序状态，不是模型质量。"
+  },
+  "all_passed": true
+}

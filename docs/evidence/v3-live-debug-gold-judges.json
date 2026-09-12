@@ -1,0 +1,334 @@
+{
+  "version": "V3-live",
+  "model": "deepseek-v4-pro",
+  "judge_model": "deepseek-v4-flash",
+  "dataset": "reposage/evals/datasets/resume_l3_context_30.yaml",
+  "sample_count": 1,
+  "execution_completed": true,
+  "arms": {
+    "base": {
+      "judge_1": {
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "perfect_samples": 1
+      },
+      "judge_2": {
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "perfect_samples": 1
+      },
+      "judge_agreement_samples": 1,
+      "avg_latency_ms": 27473.6,
+      "total_calls": 1,
+      "input_tokens": 830,
+      "output_tokens": 1835,
+      "product_judge_calls": 0,
+      "tool_calls": 0,
+      "agent_failures": 0
+    },
+    "v3": {
+      "judge_1": {
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "perfect_samples": 1
+      },
+      "judge_2": {
+        "matched": 1,
+        "expected": 1,
+        "reported": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "perfect_samples": 1
+      },
+      "judge_agreement_samples": 1,
+      "avg_latency_ms": 92911.59,
+      "total_calls": 8,
+      "input_tokens": 37055,
+      "output_tokens": 6657,
+      "product_judge_calls": 0,
+      "tool_calls": 3,
+      "agent_failures": 0
+    }
+  },
+  "per_sample": [
+    {
+      "id": "l3-01-none-sentinel",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_01.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_01.py",
+              "line": 4,
+              "confidence": 0.9
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "f2ae9b09bfb9477a9b0223d249c2b823",
+            "title": "Negated result of check() changes None check to falsey check",
+            "category": "correctness",
+            "path": "src/case_01.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "When check(value) returns a falsy but valid value such as 0, empty string, empty list, or False.",
+            "impact": "The function will incorrectly return True for valid falsy values, falsely indicating absence and potentially causing downstream logic errors.",
+            "explanation": "The original code `check(value) is None` specifically tested for None. The new code `not check(value)` tests for falsiness. According to the referenced contract_01.check, zero is a valid result and not None. This change causes value=0 (and other falsy values) to be treated as absent, altering the semantics of the function.",
+            "suggestion": "Revert to `return check(value) is None` or, if the intent is to check for absence directly, use `return value is None` instead."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "f2ae9b09bfb9477a9b0223d249c2b823",
+            "title": "Negated result of check() changes None check to falsey check",
+            "category": "correctness",
+            "path": "src/case_01.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "When check(value) returns a falsy but valid value such as 0, empty string, empty list, or False.",
+            "impact": "The function will incorrectly return True for valid falsy values, falsely indicating absence and potentially causing downstream logic errors.",
+            "explanation": "The original code `check(value) is None` specifically tested for None. The new code `not check(value)` tests for falsiness. According to the referenced contract_01.check, zero is a valid result and not None. This change causes value=0 (and other falsy values) to be treated as absent, altering the semantics of the function.",
+            "suggestion": "Revert to `return check(value) is None` or, if the intent is to check for absence directly, use `return value is None` instead.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 27473.6,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 830,
+          "output_tokens": 1835,
+          "provider_latency_ms": 27466,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.99,
+                "reason": "Both describe the same defect: replacing a strict None sentinel check with a truthiness check, causing valid falsy values such as 0 to be treated as absent."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.99,
+                "reason": "Both describe the same defect: replacing a None check with a falsiness check causes valid falsy results such as 0 to be treated as absent."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_01.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_01.py",
+              "line": 4,
+              "confidence": 0.95
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "836b0ab675874bcfbdf90dc0a13fc2b1",
+            "title": "process() misclassifies valid falsy values (e.g. 0) as absent",
+            "category": "correctness",
+            "path": "src/case_01.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling process(0) (or process(False), process(\"\"), process([])) returns True, incorrectly indicating the value is absent.",
+            "impact": "",
+            "explanation": "The diff changed `check(value) is None` to `not check(value)`. Per lib/contract_01.py, `check` returns None only when value is None and otherwise returns the value itself, with the docstring explicitly stating \"zero is a valid result\". `not check(value)` is True not only for None but also for 0, False, \"\", [], etc., so any present-but-falsy value is silently reported as absent. This is a regression from the previous `is None` check.",
+            "suggestion": "Restore the None sentinel check: `return check(value) is None`."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "836b0ab675874bcfbdf90dc0a13fc2b1",
+            "title": "process() misclassifies valid falsy values (e.g. 0) as absent",
+            "category": "correctness",
+            "path": "src/case_01.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling process(0) (or process(False), process(\"\"), process([])) returns True, incorrectly indicating the value is absent.",
+            "impact": "",
+            "explanation": "The diff changed `check(value) is None` to `not check(value)`. Per lib/contract_01.py, `check` returns None only when value is None and otherwise returns the value itself, with the docstring explicitly stating \"zero is a valid result\". `not check(value)` is True not only for None but also for 0, False, \"\", [], etc., so any present-but-falsy value is silently reported as absent. This is a regression from the previous `is None` check.",
+            "suggestion": "Restore the None sentinel check: `return check(value) is None`.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 92911.59,
+        "usage": {
+          "logical_invocations": 8,
+          "input_tokens": 37055,
+          "output_tokens": 6657,
+          "provider_latency_ms": 92897,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 3,
+        "tool_attempts": 3,
+        "successful_tools": 3,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Submitted a high-severity correctness finding: `not check(value)` treats falsy values like 0 as absent, violating the helper contract.",
+            "candidate_count": 1,
+            "rounds": 8
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both describe the same defect at src/case_01.py line 4: the `not check(value)` check treats present-but-falsy values (notably 0) as the None sentinel, causing valid falsy inputs to be misreported as absent. Same root cause, trigger, and impact."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both identify the same regression at src/case_01.py:4: replacing the documented None sentinel check with `not check(value)`, causing valid falsy values such as 0 to be misclassified as absent."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      }
+    }
+  ],
+  "failures": []
+}

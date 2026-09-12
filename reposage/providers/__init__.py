@@ -1,6 +1,18 @@
 """providers 包。"""
 
-from .git import FakeGitProvider, GitProvider  # noqa: F401
+from .git import (  # noqa: F401
+    FakeGitProvider,
+    GitProvider,
+    LocalGitProvider,
+    LocalGitSnapshotProvider,
+)
 from .llm import FakeLLMProvider, LLMProvider  # noqa: F401
 
-__all__ = ["GitProvider", "FakeGitProvider", "LLMProvider", "FakeLLMProvider"]
+__all__ = [
+    "GitProvider",
+    "FakeGitProvider",
+    "LocalGitProvider",
+    "LocalGitSnapshotProvider",
+    "LLMProvider",
+    "FakeLLMProvider",
+]

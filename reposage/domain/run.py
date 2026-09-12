@@ -23,7 +23,15 @@ from .enums import (
     StageName,
     StageStatus,
 )
-from .models import CoverageManifest, ModelUsage, utcnow
+from .models import CoverageItem, CoverageManifest, ModelUsage, utcnow
+
+
+class LeaseLostError(RuntimeError):
+    """租约已被其他 Worker 接管（V1-e 五轮 fencing）。
+
+    持有租约的 Worker 在租约过期后被接管时，其后续状态写/远端调用必须立即停止，
+    避免旧 Worker 覆盖新 Worker 的状态或产生额外远端副作用。
+    """
 
 
 class StageResult(BaseModel):
@@ -54,13 +62,37 @@ class ReviewTask(BaseModel):
 
 
 class RoleSpec(BaseModel):
-    """角色注册表条目（V2，07 §2）。"""
+    """角色注册表条目（V2-A，07 §2 / 18 §3.1）。"""
 
     id: str = Field(description="如 security")
-    gate: str = Field(description="确定性门控规则描述（实现为纯函数）")
+    prompt_id: str = Field(default="", description="prompts/roles/<id>.md 键")
+    gate_id: str = Field(default="always", description="纯函数键；always = 只过语言门")
     model_requirement: str = Field(default="general", description="路由能力档")
-    enabled: bool = True
+    enabled: bool = True  # builtin 默认；有效启用见 RoleRegistry 公式
+    implemented: bool = True  # False = 占位 ID，禁止配置启用
     required: bool = False  # optional 角色失败不放大为 PARTIAL（P1-R2-4）
+    budget_weight: float = Field(default=1.0, gt=0.0)
+    languages: list[str] = Field(default_factory=list, description="空 = 跟随 review.languages")
+
+
+class GateDecision(BaseModel):
+    """一次 (file, role) 门控结果（可落库；matched_features 只含规则 ID）。"""
+
+    role_id: str
+    file_path: str
+    enabled: bool
+    matched_features: list[str] = Field(default_factory=list)
+    reason: str = Field(description="always | gate_hit | gate_miss | lang_miss | no_added_lines")
+    gate_version: str = ""
+
+
+class StrategyHealth(BaseModel):
+    """Strategy 向 Service 提供的通用归并契约（V2-A Blocking-4）。"""
+
+    required_failed: bool = False
+    required_failure_count: int = 0
+    optional_failure_count: int = 0
+    coverage_complete: bool = True
 
 
 class SourceRunResult(BaseModel):
@@ -70,6 +102,9 @@ class SourceRunResult(BaseModel):
     tasks: list[ReviewTask] = Field(default_factory=list)
     usages: list[ModelUsage] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
+    health: StrategyHealth = Field(default_factory=StrategyHealth)
+    gate_decisions: list[GateDecision] = Field(default_factory=list)
+    coverage_items: list[CoverageItem] = Field(default_factory=list)
 
 
 class CommentPlan(BaseModel):
@@ -79,6 +114,10 @@ class CommentPlan(BaseModel):
     required: bool = True
     finding_occurrence_id: str | None = None
     fingerprint: str | None = None
+    # 跨 run 幂等键（V1-e 返工 P0）：= cross_run_match_key（容忍代码移动，不含 head_sha）；
+    # summary 用固定槽位 "summary"。marker 由 pr_identity + stable_key + kind 构成，
+    # 不依赖随机 plan_id，保证同 PR 二次运行零增量。
+    stable_key: str = ""
     kind: CommentKind = CommentKind.INLINE
     path: str | None = None
     line: int | None = None
@@ -97,10 +136,19 @@ class PublishCommentResult(BaseModel):
     error: str | None = None
 
 
+class DeleteCommentRequest(BaseModel):
+    """结构化删除请求（V1-e 返工 P1）：Provider 删除前必须逐项校验归属。"""
+
+    remote_comment_id: int
+    pr_identity: str = Field(description="目标 PR 身份（repo#PR number）")
+    expected_marker: str = Field(description="预期机器人 marker；不匹配则拒绝删除")
+
+
 class PublishOperation(BaseModel):
     """发布独立任务（supersede 清理等，P0-R2-2）。"""
 
     op_id: str
+    plan_id: str = Field(description="所属发布计划")
     kind: PublishOperationKind = PublishOperationKind.SUPERSEDE_CLEANUP
     status: PublishOperationStatus = PublishOperationStatus.PENDING
     detail: str | None = None
@@ -111,12 +159,21 @@ class PublishPlan(BaseModel):
 
     plan_id: str
     run_id: str
+    pr_identity: str = Field(default="", description="稳定 PR 身份（repo#PR number；幂等键，V1-e 返工 P0）")
     mode: str = Field(default="dry_run", description="dry_run | publish")
     status: PublishPlanStatus = PublishPlanStatus.PREPARED
     summary_comment: str | None = None
     comments: list[CommentPlan] = Field(default_factory=list)
     operations: list[PublishOperation] = Field(default_factory=list)
-    watermark: str | None = None
+    # 候选值与已推进值分离（V1-e 四轮 P1）：target_head_sha 在准备阶段即可设置，
+    # committed_watermark 仅在必要评论全部发布成功后才写入，二者语义不再混同。
+    target_head_sha: str | None = Field(default=None, description="本计划目标发布的 head SHA")
+    committed_watermark: str | None = Field(default=None, description="必要评论全部发布成功后推进的 watermark")
+    allow_supersede_cleanup: bool = Field(
+        default=True,
+        description="False 时不删除未出现在本 plan 的旧评论（增量审查，V2-E）",
+    )
+    warnings: list[str] = Field(default_factory=list)
 
 
 class ReviewRun(BaseModel):
@@ -144,6 +201,7 @@ class ReviewRun(BaseModel):
 class FeedbackMemory(BaseModel):
     """仓库长期反馈记忆（V2，条件化匹配，P0-R2-1）。"""
 
+    id: int | None = None
     repo: str
     kind: FeedbackKind
     scope: str | None = None

@@ -21,8 +21,10 @@ from .enums import (
     DiffLineType,
     EvidenceKind,
     FindingSourceKind,
+    L3HitReason,
     ModelUsageOutcome,
     StageName,
+    SymbolKind,
     ToolCallStatus,
     ToolPermission,
 )
@@ -40,13 +42,19 @@ __all__ = [
     "Evidence",
     "FindingSource",
     "AgentMessage",
+    "AgentToolRequest",
     "AgentBudget",
+    "AgentSessionSnapshot",
     "ToolDefinition",
     "ToolCall",
     "ToolResult",
     "ModelUsage",
     "GlobalBudget",
+    "GateFeatures",
+    "SymbolDef",
+    "L3Hit",
     "utcnow",
+    "is_safe_repo_path",
     "ChangedFileStatus",
     "ChangeRequestSource",
     "ContextLayer",
@@ -62,6 +70,20 @@ __all__ = [
 
 def utcnow() -> datetime:
     return datetime.now(UTC)
+
+
+def is_safe_repo_path(path: str) -> bool:
+    """仓库相对路径：拒绝空、绝对、盘符、UNC、目录穿越。"""
+    if not path:
+        return False
+    if path.startswith(("\\", "/")):
+        return False
+    if path.startswith("\\\\") or path.startswith("//"):
+        return False
+    if len(path) >= 2 and path[1] == ":":
+        return False
+    normalized = path.replace("\\", "/")
+    return ".." not in normalized.split("/")
 
 
 class RepositoryRef(BaseModel):
@@ -225,6 +247,8 @@ class ContextChunk(BaseModel):
     content: str
     tokens: int = 0
     truncated: bool = False
+    start_line: int | None = None
+    end_line: int | None = None
 
 
 class ReviewContext(BaseModel):
@@ -260,6 +284,40 @@ class CoverageManifest(BaseModel):
     truncated: bool = False
 
 
+class GateFeatures(BaseModel):
+    """文件级门控事实（V2-A；CONTEXT 从 ChangedFile 抽取，禁止解析 prompt）。"""
+
+    path: str
+    language: str | None = None
+    status: ChangedFileStatus = ChangedFileStatus.MODIFIED
+    path_parts: list[str] = Field(default_factory=list)
+    added_imports: list[str] = Field(default_factory=list)
+    keyword_hits: list[str] = Field(default_factory=list)
+    combo_hits: list[str] = Field(default_factory=list)
+    has_added_lines: bool = False
+
+
+class SymbolDef(BaseModel):
+    """仓库内一个符号定义（V2-B；结构元数据，不是模型推理）。"""
+
+    name: str
+    qualname: str
+    kind: SymbolKind
+    path: str
+    start_line: int
+    end_line: int
+    signature: str = ""
+
+
+class L3Hit(BaseModel):
+    """一条最小 L3 检索命中。"""
+
+    symbol: SymbolDef
+    reason: L3HitReason
+    snippet: str = ""
+    notes: str | None = None
+
+
 class ReviewUnit(BaseModel):
     """单次模型调用的上下文单位（04 §1 per-file map-reduce 的原子任务粒度）。
 
@@ -276,6 +334,7 @@ class ReviewUnit(BaseModel):
     input_limit: int = Field(description="本 unit 输入预算上限（总窗口 - 输出预留）")
     output_reserve_tokens: int = Field(description="本 unit 保留的模型输出空间")
     total_window_tokens: int = Field(description="模型总窗口")
+    gate_features: GateFeatures | None = None
 
 
 class Evidence(BaseModel):
@@ -298,13 +357,43 @@ class FindingSource(BaseModel):
     verified_by: str = Field(default="program", description="program | model（事实字段只能 program）")
 
 
+class AgentToolRequest(BaseModel):
+    """模型本轮请求的一件工具（含 provider call id）。"""
+
+    id: str
+    name: str
+    arguments: dict[str, Any] = Field(default_factory=dict)
+
+
 class AgentMessage(BaseModel):
     """Agent 消息（V3）。"""
 
     role: str = Field(description="system | user | assistant | tool")
-    content: str
+    content: str = ""
+    reasoning_content: str | None = None
     is_compressed: bool = False
     summary_ref: str | None = None
+    name: str | None = None
+    tool_call_id: str | None = None
+    tool_calls: list[AgentToolRequest] = Field(default_factory=list)
+
+
+class AgentSessionSnapshot(BaseModel):
+    """只读会话视图（Provider 不得修改）。"""
+
+    model_config = ConfigDict(frozen=True)
+
+    session_id: str
+    mode: str
+    messages: tuple[AgentMessage, ...] = ()
+    remaining_rounds_value: int = 0
+    budget_summary_value: dict[str, Any] = Field(default_factory=dict)
+
+    def remaining_rounds(self) -> int:
+        return self.remaining_rounds_value
+
+    def budget_summary(self) -> dict[str, Any]:
+        return dict(self.budget_summary_value)
 
 
 class AgentBudget(BaseModel):
@@ -312,6 +401,7 @@ class AgentBudget(BaseModel):
 
     max_rounds: int = 8
     max_tool_calls: int = 12
+    max_tool_attempts: int = 36
     max_tokens: int = 0
     max_cost_usd: float = 0.0
     reserved_finalize_tokens: int = 0
@@ -319,6 +409,9 @@ class AgentBudget(BaseModel):
     max_wallclock_s: int = 300
     grace_rounds: int = 2
     repeat_threshold: int = 3
+    compact_threshold_ratio: float = 0.60
+    compact_keep_rounds: int = 2
+    max_session_chars: int = 200_000
 
 
 class ToolDefinition(BaseModel):
@@ -330,6 +423,7 @@ class ToolDefinition(BaseModel):
     permissions: ToolPermission = ToolPermission.READ_ONLY
     result_limit: int = 200
     timeout_s: int = 10
+    max_result_chars: int = Field(default=16000, ge=512)
 
 
 class ToolCall(BaseModel):
@@ -339,6 +433,7 @@ class ToolCall(BaseModel):
     name: str
     arguments: dict[str, Any] = Field(default_factory=dict)
     status: ToolCallStatus = ToolCallStatus.OK
+    task_id: str | None = None
     repeat_of: str | None = None
     tokens_used: int = 0
     attempt_count: int = 1
@@ -385,6 +480,9 @@ class BudgetReservation:
         self.max_output_tokens = max_output_tokens
         self.est_cost_usd = est_cost_usd  # None = 未定价（费用门控标记 unknown）
         self.settled = False
+        self.settled_input = 0
+        self.settled_output = 0
+        self.settled_cost = 0.0
 
 
 class GlobalBudget(BaseModel):
@@ -432,14 +530,17 @@ class GlobalBudget(BaseModel):
         input_tokens: int,
         max_output_tokens: int,
         est_cost_usd: float | None,
+        protect_tokens: int = 0,
+        protect_cost: float = 0.0,
     ) -> BudgetReservation | None:
         """发送前原子预留（admission control，P0-1）。
 
-        - Token：input + max_output 不超（已用 + 已预留）；
-        - 费用：est_cost_usd 提供时校验 cost_used + 预留 + est ≤ max_cost_usd；
+        - Token：input + max_output 不超（已用 + 已预留 + 保护额度）；
+        - 费用：est_cost_usd 提供时校验 cost_used + 预留 + est + 保护额度 ≤ max_cost_usd；
           未提供（未定价）→ 跳过费用门控并标记 pricing_status=unknown（不伪造零成本）；
         - 墙钟：到期后拒绝新请求（10 §7）。
         任一超限返回 None（调用方不得发请求）。
+        ``protect_*`` 用于为共享 finalize 池留出门槛（V3-B）；默认 0 保持 V1 行为。
         """
         async with self._lock:
             if self.overrun:
@@ -451,11 +552,18 @@ class GlobalBudget(BaseModel):
                 + self._reserved_tokens
                 + input_tokens
                 + max_output_tokens
+                + max(0, protect_tokens)
                 > self.max_total_tokens
             ):
                 return None
             if est_cost_usd is not None:
-                if self.cost_used + self._reserved_cost + est_cost_usd > self.max_cost_usd:
+                if (
+                    self.cost_used
+                    + self._reserved_cost
+                    + est_cost_usd
+                    + max(0.0, protect_cost)
+                    > self.max_cost_usd
+                ):
                     return None
             else:
                 self.pricing_status = "unknown"  # 未定价：费用门控无法验证
@@ -479,6 +587,12 @@ class GlobalBudget(BaseModel):
     ) -> None:
         """结算：释放预留，按实际 usage 入账（失败/取消同样必须调用，避免泄漏）。"""
         async with self._lock:
+            if reservation.settled:
+                return
+            reservation.settled = True
+            reservation.settled_input = actual_input
+            reservation.settled_output = actual_output
+            reservation.settled_cost = actual_cost
             self._reserved_tokens = max(
                 0, self._reserved_tokens - reservation.input_tokens - reservation.max_output_tokens
             )
@@ -486,7 +600,6 @@ class GlobalBudget(BaseModel):
                 self._reserved_cost = max(0.0, self._reserved_cost - reservation.est_cost_usd)
             self.tokens_used += actual_input + actual_output
             self.cost_used += actual_cost
-            reservation.settled = True
 
     def _wall_clock_expired(self) -> bool:
         return (utcnow() - self.started_at).total_seconds() >= self.max_runtime_seconds

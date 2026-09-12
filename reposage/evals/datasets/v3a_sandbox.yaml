@@ -1,0 +1,60 @@
+name: v3a-sandbox
+cases:
+  - id: escape-absolute
+    kind: escape
+    tool: read_file
+    args: {path: /etc/passwd}
+    expect_status: invalid_args
+    expect_error: invalid_path
+  - id: escape-dotdot
+    kind: escape
+    tool: read_file
+    args: {path: ../secret}
+    expect_status: invalid_args
+    expect_error: invalid_path
+  - id: read-ok
+    kind: read
+    tool: read_file
+    args: {path: src/a.py}
+    expect_status: ok
+    expect_line: SNAP
+  - id: truncate-read
+    kind: truncate
+    tool: read_file
+    args: {path: src/long.py, max_lines: 200}
+    expect_status: ok
+    expect_truncated: true
+  - id: search-literal
+    kind: search
+    tool: search_code
+    args: {query: foo.bar}
+    expect_status: ok
+    expect_hit_path: src/a.py
+  - id: search-regex-not-interpreted
+    kind: search
+    tool: search_code
+    args: {query: foo.*}
+    expect_status: ok
+    expect_hits: 0
+  - id: stub-submit
+    kind: stub
+    tool: submit_finding
+    args:
+      title: t
+      severity: high
+      confidence: 0.9
+      category: security
+    expect_status: error
+    expect_error: not_bound
+  - id: stub-finish
+    kind: stub
+    tool: finish_review
+    args: {reason: done}
+    expect_status: error
+    expect_error: not_bound
+  - id: unknown-tool
+    kind: schema
+    tool: nope
+    args: {}
+    expect_status: invalid_args
+    expect_error: unknown_tool

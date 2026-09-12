@@ -1,0 +1,1463 @@
+{
+  "version": "V3-live",
+  "model": "deepseek-v4-pro",
+  "judge_model": "deepseek-v4-flash",
+  "dataset": "reposage/evals/datasets/resume_l3_context_30.yaml",
+  "sample_count": 5,
+  "execution_completed": true,
+  "arms": {
+    "base": {
+      "judge_1": {
+        "matched": 4,
+        "expected": 5,
+        "reported": 5,
+        "precision": 0.8,
+        "recall": 0.8,
+        "f1": 0.8,
+        "perfect_samples": 4
+      },
+      "judge_2": {
+        "matched": 4,
+        "expected": 5,
+        "reported": 5,
+        "precision": 0.8,
+        "recall": 0.8,
+        "f1": 0.8,
+        "perfect_samples": 4
+      },
+      "judge_agreement_samples": 5,
+      "avg_latency_ms": 50211.29,
+      "median_latency_ms": 51353.79,
+      "total_calls": 5,
+      "input_tokens": 4148,
+      "output_tokens": 12784,
+      "product_judge_calls": 0,
+      "tool_calls": 0,
+      "agent_failures": 0,
+      "task_clean_samples": 5,
+      "tool_attempts": 0,
+      "successful_tools": 0,
+      "tool_effectiveness": null,
+      "repeat_rate": null,
+      "exact_location_recall": 1.0,
+      "within_5_lines_recall": 1.0,
+      "negative_false_positive_samples": [],
+      "missed_positive_samples": [
+        "l3-09-one-based"
+      ]
+    },
+    "v3": {
+      "judge_1": {
+        "matched": 5,
+        "expected": 5,
+        "reported": 5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "perfect_samples": 5
+      },
+      "judge_2": {
+        "matched": 5,
+        "expected": 5,
+        "reported": 5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "perfect_samples": 5
+      },
+      "judge_agreement_samples": 5,
+      "avg_latency_ms": 42076.18,
+      "median_latency_ms": 36598.04,
+      "total_calls": 26,
+      "input_tokens": 83232,
+      "output_tokens": 11155,
+      "product_judge_calls": 0,
+      "tool_calls": 13,
+      "agent_failures": 0,
+      "task_clean_samples": 5,
+      "tool_attempts": 19,
+      "successful_tools": 13,
+      "tool_effectiveness": 0.684,
+      "repeat_rate": 0.0,
+      "exact_location_recall": 1.0,
+      "within_5_lines_recall": 1.0,
+      "negative_false_positive_samples": [],
+      "missed_positive_samples": []
+    }
+  },
+  "per_sample": [
+    {
+      "id": "l3-02-milliseconds",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_02.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_02.py",
+              "line": 4,
+              "confidence": 0.6
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "f85dcb00985f4f549916074736a53b00",
+            "title": "Removal of milliseconds conversion may pass seconds to millisecond-expecting check()",
+            "category": "correctness",
+            "path": "src/case_02.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "A caller invokes process(value) with a value expressed in seconds (or any unit other than milliseconds).",
+            "impact": "check() interprets the input as milliseconds and divides by 1000, so process() returns value/1000 instead of the original value (or the intended converted value), leading to incorrect timeout calculations or other downstream behavior.",
+            "explanation": "The diff changes `return check(value * 1000)` to `return check(value)`. The unchanged helper contract states check() accepts a timeout in milliseconds and returns value / 1000. The original multiplication converted the caller's value to milliseconds before passing it; removing it means the raw value is passed directly. Unless value is guaranteed to already be in milliseconds, this breaks the unit contract and changes the return value by a factor of 1000.",
+            "suggestion": "Either retain the conversion (e.g., `check(value * 1000)`) if process's input is in seconds, or document/enforce that process's argument is already in milliseconds and add a test verifying both unit assumptions."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "f85dcb00985f4f549916074736a53b00",
+            "title": "Removal of milliseconds conversion may pass seconds to millisecond-expecting check()",
+            "category": "correctness",
+            "path": "src/case_02.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "A caller invokes process(value) with a value expressed in seconds (or any unit other than milliseconds).",
+            "impact": "check() interprets the input as milliseconds and divides by 1000, so process() returns value/1000 instead of the original value (or the intended converted value), leading to incorrect timeout calculations or other downstream behavior.",
+            "explanation": "The diff changes `return check(value * 1000)` to `return check(value)`. The unchanged helper contract states check() accepts a timeout in milliseconds and returns value / 1000. The original multiplication converted the caller's value to milliseconds before passing it; removing it means the raw value is passed directly. Unless value is guaranteed to already be in milliseconds, this breaks the unit contract and changes the return value by a factor of 1000.",
+            "suggestion": "Either retain the conversion (e.g., `check(value * 1000)`) if process's input is in seconds, or document/enforce that process's argument is already in milliseconds and add a test verifying both unit assumptions.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 65495.21,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 819,
+          "output_tokens": 3445,
+          "provider_latency_ms": 65487,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both describe the same defect: removing the milliseconds conversion causes a value in seconds to be passed to check(), which expects milliseconds, changing the result by a factor of 1000."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.97,
+                "reason": "Both describe the same defect: the diff removes the `value * 1000` conversion so `check()` receives seconds while its contract expects milliseconds, causing a factor-of-1000 error in the returned value and downstream timeout calculations. Same path/line, same trigger (caller passing seconds), same impact."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_02.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_02.py",
+              "line": 4,
+              "confidence": 0.9
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "12c2f2857e6b45c485669656682deace",
+            "title": "Removal of *1000 conversion changes process() return value by factor 1000",
+            "category": "correctness",
+            "path": "src/case_02.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Any caller passing a timeout in seconds to process() now receives a value 1000x smaller.",
+            "impact": "",
+            "explanation": "The helper check() has the contract \"Accept a timeout in milliseconds\" and returns value/1000. Previously process(value) called check(value * 1000), so if value was a timeout in seconds it was converted to milliseconds and check returned value (seconds). After the change process calls check(value) directly, so the same input is now treated as milliseconds and returned as value/1000, changing the public return value by a factor of 1000. No migration of callers is present in the diff, so this is a behavioral break rather than an internal refactor.",
+            "suggestion": "Keep the milliseconds conversion, e.g. return check(value * 1000), or if process's input contract is intentionally milliseconds, document and migrate all callers accordingly."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "12c2f2857e6b45c485669656682deace",
+            "title": "Removal of *1000 conversion changes process() return value by factor 1000",
+            "category": "correctness",
+            "path": "src/case_02.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Any caller passing a timeout in seconds to process() now receives a value 1000x smaller.",
+            "impact": "",
+            "explanation": "The helper check() has the contract \"Accept a timeout in milliseconds\" and returns value/1000. Previously process(value) called check(value * 1000), so if value was a timeout in seconds it was converted to milliseconds and check returned value (seconds). After the change process calls check(value) directly, so the same input is now treated as milliseconds and returned as value/1000, changing the public return value by a factor of 1000. No migration of callers is present in the diff, so this is a behavioral break rather than an internal refactor.",
+            "suggestion": "Keep the milliseconds conversion, e.g. return check(value * 1000), or if process's input contract is intentionally milliseconds, document and migrate all callers accordingly.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 24639.39,
+        "usage": {
+          "logical_invocations": 4,
+          "input_tokens": 11288,
+          "output_tokens": 1330,
+          "provider_latency_ms": 24629,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 2,
+        "tool_attempts": 3,
+        "successful_tools": 2,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Identified a unit-conversion removal that changes public return behavior; submitted a correctness finding.",
+            "candidate_count": 1,
+            "rounds": 4
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.9,
+                "reason": "Both describe the same root cause: the removal of the *1000 seconds-to-milliseconds conversion in process() before calling check(), which expects milliseconds. The expected note frames it as callers passing seconds to an ms-contract helper, and the finding describes the resulting 1000x return-value change; same trigger (unit mismatch) and same impact (behavioral break in process()'s result)."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both describe the same defect: removing the *1000 conversion makes process() treat a seconds timeout as milliseconds, changing the returned value by a factor of 1000."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-07-raises-missing",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "edge_case",
+              "path": "src/case_07.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_07.py",
+              "line": 4,
+              "confidence": 0.7
+            }
+          ],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": [
+            {
+              "path": "src/case_07.py",
+              "line": 4,
+              "expected": "edge_case",
+              "actual": "correctness"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "ac5a2e712b4b48029c558150d3c2775e",
+            "title": "process(None) now raises KeyError instead of returning 'default'",
+            "category": "correctness",
+            "path": "src/case_07.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling process(value) with value=None",
+            "impact": "Callers that relied on process returning 'default' for None will now receive KeyError('missing'), potentially crashing applications or breaking control flow.",
+            "explanation": "The diff removes the None guard that returned 'default'. Previously process(None) returned 'default'; now it calls check(None), which raises KeyError according to the imported helper. This is a breaking behavior change.",
+            "suggestion": "If raising is intended, update the function docstring and ensure all callers handle KeyError; if not, restore the None guard to preserve backward compatibility."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "ac5a2e712b4b48029c558150d3c2775e",
+            "title": "process(None) now raises KeyError instead of returning 'default'",
+            "category": "correctness",
+            "path": "src/case_07.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Calling process(value) with value=None",
+            "impact": "Callers that relied on process returning 'default' for None will now receive KeyError('missing'), potentially crashing applications or breaking control flow.",
+            "explanation": "The diff removes the None guard that returned 'default'. Previously process(None) returned 'default'; now it calls check(None), which raises KeyError according to the imported helper. This is a breaking behavior change.",
+            "suggestion": "If raising is intended, update the function docstring and ensure all callers handle KeyError; if not, restore the None guard to preserve backward compatibility.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 43550.23,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 837,
+          "output_tokens": 2179,
+          "provider_latency_ms": 43546,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both describe the same defect: removing the None guard causes process(None) to call the helper and raise its documented missing-value KeyError instead of returning 'default'."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.95,
+                "reason": "Both describe the removed None guard in process causing process(None) to raise the helper's missing-value KeyError instead of returning the previous default, with the same trigger and behavioral impact."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "edge_case",
+              "path": "src/case_07.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_07.py",
+              "line": 4,
+              "confidence": 0.9
+            }
+          ],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": [
+            {
+              "path": "src/case_07.py",
+              "line": 4,
+              "expected": "edge_case",
+              "actual": "correctness"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "20e8e9ec5c634461807b9e60e651a73f",
+            "title": "process(None) 行为由返回 'default' 变为抛出 KeyError，破坏公开契约",
+            "category": "correctness",
+            "path": "src/case_07.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "外部或未来调用方以 process(None) 调用时，会从得到 'default' 变为收到 KeyError。",
+            "impact": "",
+            "explanation": "修改前 process(None) 返回 'default'（通过 `check(value) if value is not None else 'default'` 显式兜底）。修改后直接 `return check(value)`，而 lib/contract_07.py 的 check 在 value 为 None 时抛出 KeyError('missing')。这是对 process 公开行为的破坏性变更：None 输入从返回默认值变为抛异常。仓库内 find_references 未发现调用方，也没有迁移证据证明所有使用方已适配，因此不能视为安全的内部重构。",
+            "suggestion": "若需保留兼容性，恢复对 None 的兜底（返回 'default'）或明确捕获 KeyError 并返回默认值；若确需抛异常，应同步迁移所有调用方并更新契约说明。"
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "20e8e9ec5c634461807b9e60e651a73f",
+            "title": "process(None) 行为由返回 'default' 变为抛出 KeyError，破坏公开契约",
+            "category": "correctness",
+            "path": "src/case_07.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "外部或未来调用方以 process(None) 调用时，会从得到 'default' 变为收到 KeyError。",
+            "impact": "",
+            "explanation": "修改前 process(None) 返回 'default'（通过 `check(value) if value is not None else 'default'` 显式兜底）。修改后直接 `return check(value)`，而 lib/contract_07.py 的 check 在 value 为 None 时抛出 KeyError('missing')。这是对 process 公开行为的破坏性变更：None 输入从返回默认值变为抛异常。仓库内 find_references 未发现调用方，也没有迁移证据证明所有使用方已适配，因此不能视为安全的内部重构。",
+            "suggestion": "若需保留兼容性，恢复对 None 的兜底（返回 'default'）或明确捕获 KeyError 并返回默认值；若确需抛异常，应同步迁移所有调用方并更新契约说明。",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 34305.82,
+        "usage": {
+          "logical_invocations": 5,
+          "input_tokens": 15200,
+          "output_tokens": 1817,
+          "provider_latency_ms": 34295,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 3,
+        "tool_attempts": 5,
+        "successful_tools": 3,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "已完成 diff 与直接相关 helper 的取证并提交兼容性候选。",
+            "candidate_count": 1,
+            "rounds": 5
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.95,
+                "reason": "Both describe the same defect: removal of the None guard at src/case_07.py:4 causes process(None) to fall through to the helper's missing-value exception (KeyError) instead of returning the 'default' fallback, changing the public contract. Same root cause, trigger (None input), and impact."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.96,
+                "reason": "Both findings identify the removal of the None-value guard at src/case_07.py line 4, causing the helper's documented missing-value exception (KeyError) to be exposed instead of returning the default value."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-08-empty-rejected",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "edge_case",
+              "path": "src/case_08.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_08.py",
+              "line": 4,
+              "confidence": 0.9
+            }
+          ],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": [
+            {
+              "path": "src/case_08.py",
+              "line": 4,
+              "expected": "edge_case",
+              "actual": "correctness"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "cf5ad239f265408c9e682f083e20a795",
+            "title": "Behavior change: falsy values now raise ValueError instead of returning None",
+            "category": "correctness",
+            "path": "src/case_08.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "When `value` is falsy (e.g., None, empty string, empty list).",
+            "impact": "Previously, falsy input caused `process` to return None. Now it raises ValueError('empty'), which may propagate to callers that do not expect or handle this exception, potentially causing crashes or breaking existing API contracts.",
+            "explanation": "The original code `return check(value) if value else None` explicitly returned None for any falsy value. The new code `return check(value)` unconditionally calls `check`, and `check` itself raises `ValueError` when `value` is falsy. This changes the function's behavior for empty or None inputs. If callers relied on the previous None return to handle empty cases gracefully, they will now receive an unhandled exception. Unless this change is intentional and all callers are updated to catch the new exception, it introduces a runtime risk.",
+            "suggestion": "If the behavioral change is intentional, ensure all callers of `process` are updated to handle the new `ValueError` exception. Otherwise, consider preserving the original behavior by retaining the conditional or explicitly handling falsy values inside `process` (e.g., `return check(value) if value else None` or use a custom handling that matches requirements)."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "cf5ad239f265408c9e682f083e20a795",
+            "title": "Behavior change: falsy values now raise ValueError instead of returning None",
+            "category": "correctness",
+            "path": "src/case_08.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "When `value` is falsy (e.g., None, empty string, empty list).",
+            "impact": "Previously, falsy input caused `process` to return None. Now it raises ValueError('empty'), which may propagate to callers that do not expect or handle this exception, potentially causing crashes or breaking existing API contracts.",
+            "explanation": "The original code `return check(value) if value else None` explicitly returned None for any falsy value. The new code `return check(value)` unconditionally calls `check`, and `check` itself raises `ValueError` when `value` is falsy. This changes the function's behavior for empty or None inputs. If callers relied on the previous None return to handle empty cases gracefully, they will now receive an unhandled exception. Unless this change is intentional and all callers are updated to catch the new exception, it introduces a runtime risk.",
+            "suggestion": "If the behavioral change is intentional, ensure all callers of `process` are updated to handle the new `ValueError` exception. Otherwise, consider preserving the original behavior by retaining the conditional or explicitly handling falsy values inside `process` (e.g., `return check(value) if value else None` or use a custom handling that matches requirements).",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 33702.27,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 831,
+          "output_tokens": 1560,
+          "provider_latency_ms": 33698,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.85,
+                "reason": "Both describe the same root cause at src/case_08.py:4: the falsy/empty-input guard was removed from `process`, so empty input is no longer handled gracefully (previously caused a None return, now the helper's ValueError propagates to callers). Same trigger (falsy/empty value) and same impact (callers no longer shielded from the empty-input precondition)."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.92,
+                "reason": "Both describe the same behavioral regression for empty/falsy input: the helper now raises ValueError instead of returning None, and callers are no longer handling that empty-input precondition, matching trigger and impact."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "edge_case",
+              "path": "src/case_08.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_08.py",
+              "line": 4,
+              "confidence": 0.95
+            }
+          ],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": [
+            {
+              "path": "src/case_08.py",
+              "line": 4,
+              "expected": "edge_case",
+              "actual": "correctness"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "789cddf528544a3c9fefb3f287567a05",
+            "title": "process() 对空值的行为从返回 None 变为抛出 ValueError（破坏性变更）",
+            "category": "correctness",
+            "path": "src/case_08.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "调用 process(None) 或 process(空序列/假值)。",
+            "impact": "",
+            "explanation": "修改前 process(value) 在 value 为假值时返回 None（check(value) if value else None），修改后直接返回 check(value)。check 对假值抛出 ValueError('empty')。因此 process 的公开行为从空值返回 None 变为空值抛 ValueError，属于破坏性变更。仓库内未发现其他调用方，diff 中也没有迁移证据，无法证明所有使用方已适配。",
+            "suggestion": "若需保留兼容性，应恢复空值守卫（如 `return check(value) if value else None`）；若有意改变契约，需同步迁移所有调用方并明确标注破坏性变更。"
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "789cddf528544a3c9fefb3f287567a05",
+            "title": "process() 对空值的行为从返回 None 变为抛出 ValueError（破坏性变更）",
+            "category": "correctness",
+            "path": "src/case_08.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "调用 process(None) 或 process(空序列/假值)。",
+            "impact": "",
+            "explanation": "修改前 process(value) 在 value 为假值时返回 None（check(value) if value else None），修改后直接返回 check(value)。check 对假值抛出 ValueError('empty')。因此 process 的公开行为从空值返回 None 变为空值抛 ValueError，属于破坏性变更。仓库内未发现其他调用方，diff 中也没有迁移证据，无法证明所有使用方已适配。",
+            "suggestion": "若需保留兼容性，应恢复空值守卫（如 `return check(value) if value else None`）；若有意改变契约，需同步迁移所有调用方并明确标注破坏性变更。",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 59377.77,
+        "usage": {
+          "logical_invocations": 7,
+          "input_tokens": 24796,
+          "output_tokens": 3500,
+          "provider_latency_ms": 59364,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 3,
+        "tool_attempts": 4,
+        "successful_tools": 3,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "提交了 process 空值行为破坏性变更的候选 Finding，完成审查。",
+            "candidate_count": 1,
+            "rounds": 7
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.9,
+                "reason": "Both findings point to the same change at src/case_08.py line 4: the falsy/empty-input guard (`return check(value) if value else None`) was dropped so process() now passes empty values straight to check(), which raises ValueError('empty'). The expected note frames this as the caller no longer handling the helper's empty-input precondition, and the finding frames it as a behavior change from returning None to raising on empty/falsy input. Same root cause, same trigger (empty/falsy value), same impact (empty input no longer gracefully handled / breaking contract change)."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.72,
+                "reason": "Both findings point to the same line 4 change: the removal of the falsy/empty guard so that empty input is no longer short-circuited (expected: caller/helper no longer handles the empty-input precondition; finding: process() raises ValueError instead of returning None on empty/falsy input). Same root cause, same trigger (empty/falsy value), same edge-case impact on the empty-input contract."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-09-one-based",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_09.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "test_gap",
+              "path": "src/case_09.py",
+              "line": 4,
+              "confidence": 0.8
+            }
+          ],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": [
+            {
+              "path": "src/case_09.py",
+              "line": 4,
+              "expected": "correctness",
+              "actual": "test_gap"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "f8fa15caced8440c9360e9588c7d6ab3",
+            "title": "缺少针对 one-based 修复的测试覆盖",
+            "category": "test_gap",
+            "path": "src/case_09.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "当传入 value=0 时 check 抛错；当传入 value=1 时返回 0，与原先 check(value+1) 输出不同",
+            "impact": "行为可能已修复，但无测试保障，无法确认边界正确性",
+            "explanation": "改动直接将 value 传给期望 one-based 输入的 check，可能为修复 off-by-one 错误，但无新增测试。建议覆盖边界条件如 value=0、value=1。",
+            "suggestion": "添加单元测试：process(1) 返回 0；process(0) 引发 ValueError；并考虑其他边界。"
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "f8fa15caced8440c9360e9588c7d6ab3",
+            "title": "缺少针对 one-based 修复的测试覆盖",
+            "category": "test_gap",
+            "path": "src/case_09.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "当传入 value=0 时 check 抛错；当传入 value=1 时返回 0，与原先 check(value+1) 输出不同",
+            "impact": "行为可能已修复，但无测试保障，无法确认边界正确性",
+            "explanation": "改动直接将 value 传给期望 one-based 输入的 check，可能为修复 off-by-one 错误，但无新增测试。建议覆盖边界条件如 value=0、value=1。",
+            "suggestion": "添加单元测试：process(1) 返回 0；process(0) 引发 ValueError；并考虑其他边界。",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 56954.93,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 833,
+          "output_tokens": 3001,
+          "provider_latency_ms": 56951,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": false,
+                "confidence": 0.85,
+                "reason": "The reference defect is a correctness bug: a zero-based caller value is passed to a one-based helper (off-by-one). The finding flags the same line but asserts a different defect — a test-coverage gap — and even states the behavior 'may already be fixed', with impact limited to missing tests rather than wrong behavior. Same code/trigger, different claimed bug and impact."
+              }
+            ]
+          },
+          {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "matched": 0,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": false,
+                "confidence": 0.9,
+                "reason": "The expected finding is a correctness bug: a zero-based caller value is passed to a one-based helper. The provided finding is a test_gap claim about missing coverage for a possible one-based fix, and it does not assert the same active correctness defect or impact."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "correctness",
+              "path": "src/case_09.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_09.py",
+              "line": 4,
+              "confidence": 0.9
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "f72aa6a0d5e440cf847e503081c74968",
+            "title": "process() behavior changes from zero-based identity to one-based decrement",
+            "category": "correctness",
+            "path": "src/case_09.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Any caller passing 0 (previously valid, now raises) or expecting the return value equal to input (now decremented).",
+            "impact": "",
+            "explanation": "The change removes the `+1` conversion before calling the one-based helper `check`. Old behavior: `process(0)` returned `0` (check(1) → 0), and `process(n)` returned `n` for n>=0; it raised only when value < 0. New behavior: `process(0)` raises ValueError and `process(n)` returns `n-1` for n>=1. Both the accepted domain and the return value shift by one. This is a breaking change to the public contract of `process`, and there are no in-repo callers or migration evidence showing all external use sites have been adapted.",
+            "suggestion": "If `process` is intended to keep accepting a zero-based value, restore `check(value + 1)`. If a one-based API is intended, document the contract and migrate/confirm every caller for the domain and return-value change."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "f72aa6a0d5e440cf847e503081c74968",
+            "title": "process() behavior changes from zero-based identity to one-based decrement",
+            "category": "correctness",
+            "path": "src/case_09.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Any caller passing 0 (previously valid, now raises) or expecting the return value equal to input (now decremented).",
+            "impact": "",
+            "explanation": "The change removes the `+1` conversion before calling the one-based helper `check`. Old behavior: `process(0)` returned `0` (check(1) → 0), and `process(n)` returned `n` for n>=0; it raised only when value < 0. New behavior: `process(0)` raises ValueError and `process(n)` returns `n-1` for n>=1. Both the accepted domain and the return value shift by one. This is a breaking change to the public contract of `process`, and there are no in-repo callers or migration evidence showing all external use sites have been adapted.",
+            "suggestion": "If `process` is intended to keep accepting a zero-based value, restore `check(value + 1)`. If a one-based API is intended, document the contract and migrate/confirm every caller for the domain and return-value change.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 55459.9,
+        "usage": {
+          "logical_invocations": 6,
+          "input_tokens": 20392,
+          "output_tokens": 2759,
+          "provider_latency_ms": 55447,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 3,
+        "tool_attempts": 4,
+        "successful_tools": 3,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Submitted one correctness finding for the behavior change; no further evidence available.",
+            "candidate_count": 1,
+            "rounds": 6
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.95,
+                "reason": "Both identify the same off-by-one contract break: a zero-based caller value is passed to the one-based check helper because the prior +1 conversion was removed, changing accepted inputs and return values."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both describe the same off-by-one defect at line 4: a zero-based value is passed to the one-based helper without restoring the +1 conversion, changing process() domain/return behavior."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      }
+    },
+    {
+      "id": "l3-10-negative-invalid",
+      "kind": "cross_file",
+      "base": {
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "position_accuracy": 1.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "edge_case",
+              "path": "src/case_10.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "edge_case",
+              "path": "src/case_10.py",
+              "line": 4,
+              "confidence": 0.45
+            }
+          ],
+          "strict_hits": 1,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": []
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "a39a90936bf34656b5979a511257250f",
+            "title": "Behavior change: negative values now raise ValueError instead of being clamped",
+            "category": "edge_case",
+            "path": "src/case_10.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "A caller passes a negative number to process().",
+            "impact": "The function now raises ValueError from check instead of returning 0; existing callers that relied on clamping may fail.",
+            "explanation": "The change removes max(value, 0) clamping and passes the raw input to check, which (per the L3 excerpt) raises ValueError for negative values. Whether this is intended depends on the function contract; if callers expected clamping, it is a breaking change.",
+            "suggestion": "If negative values are considered invalid, document the behavior and ensure all callers handle ValueError; if clamping is still required, retain max(value, 0) or add explicit validation before calling check."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "a39a90936bf34656b5979a511257250f",
+            "title": "Behavior change: negative values now raise ValueError instead of being clamped",
+            "category": "edge_case",
+            "path": "src/case_10.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "A caller passes a negative number to process().",
+            "impact": "The function now raises ValueError from check instead of returning 0; existing callers that relied on clamping may fail.",
+            "explanation": "The change removes max(value, 0) clamping and passes the raw input to check, which (per the L3 excerpt) raises ValueError for negative values. Whether this is intended depends on the function contract; if callers expected clamping, it is a breaking change.",
+            "suggestion": "If negative values are considered invalid, document the behavior and ensure all callers handle ValueError; if clamping is still required, retain max(value, 0) or add explicit validation before calling check.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 51353.79,
+        "usage": {
+          "logical_invocations": 1,
+          "input_tokens": 828,
+          "output_tokens": 2599,
+          "provider_latency_ms": 51350,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 0,
+        "tool_attempts": 0,
+        "successful_tools": 0,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.98,
+                "reason": "Both identify the same defect: removing clamping allows negative values to reach check(), which raises ValueError, changing behavior for negative inputs."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 1.0,
+            "category_agreement_count": 1,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.97,
+                "reason": "Both describe negative input reaching check and raising ValueError instead of being clamped, with the same trigger and impact."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      },
+      "v3": {
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "position_accuracy": 0.0,
+          "negative_noise": 0
+        },
+        "diagnostics": {
+          "expected": [
+            {
+              "category": "edge_case",
+              "path": "src/case_10.py",
+              "line": 4
+            }
+          ],
+          "accepted": [
+            {
+              "category": "correctness",
+              "path": "src/case_10.py",
+              "line": 4,
+              "confidence": 0.75
+            }
+          ],
+          "strict_hits": 0,
+          "exact_location_hits_ignoring_category": 1,
+          "within_5_lines_hits_ignoring_category": 1,
+          "path_hits_ignoring_category": 1,
+          "category_confusions_at_exact_location": [
+            {
+              "path": "src/case_10.py",
+              "line": 4,
+              "expected": "edge_case",
+              "actual": "correctness"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "finding_occurrence_id": "61b516d32931499084f4a2c10cebc813",
+            "title": "process() now raises ValueError on negative input, breaking previous clamping behavior",
+            "category": "correctness",
+            "path": "src/case_10.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Any caller passing a negative value to process(), which previously succeeded and returned 0, now gets an unhandled ValueError.",
+            "impact": "",
+            "explanation": "The diff removes `max(value, 0)`, so `check` (whose unchanged contract raises ValueError for value < 0) is now called with the raw input. Previously `process(-1)` returned 0; now it raises ValueError. This is a breaking change to the public contract of `process`. No in-repo callers of `process` were found (only the definition), and the PR provides no migration evidence for external callers, so all users are not proven to have adapted.",
+            "suggestion": "If rejecting negatives is intended, treat this as an intentional breaking change with a documented/versioned migration; otherwise preserve clamping by keeping `max(value, 0)` or explicitly handle negatives inside `process` with a clear, documented exception contract."
+          }
+        ],
+        "all_findings": [
+          {
+            "finding_occurrence_id": "61b516d32931499084f4a2c10cebc813",
+            "title": "process() now raises ValueError on negative input, breaking previous clamping behavior",
+            "category": "correctness",
+            "path": "src/case_10.py",
+            "start_line": 4,
+            "end_line": 4,
+            "trigger_condition": "Any caller passing a negative value to process(), which previously succeeded and returned 0, now gets an unhandled ValueError.",
+            "impact": "",
+            "explanation": "The diff removes `max(value, 0)`, so `check` (whose unchanged contract raises ValueError for value < 0) is now called with the raw input. Previously `process(-1)` returned 0; now it raises ValueError. This is a breaking change to the public contract of `process`. No in-repo callers of `process` were found (only the definition), and the PR provides no migration evidence for external callers, so all users are not proven to have adapted.",
+            "suggestion": "If rejecting negatives is intended, treat this as an intentional breaking change with a documented/versioned migration; otherwise preserve clamping by keeping `max(value, 0)` or explicitly handle negatives inside `process` with a clear, documented exception contract.",
+            "status": "accepted",
+            "needs_evidence": false
+          }
+        ],
+        "expected_count": 1,
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "elapsed_ms": 36598.04,
+        "usage": {
+          "logical_invocations": 4,
+          "input_tokens": 11556,
+          "output_tokens": 1749,
+          "provider_latency_ms": 36588,
+          "retries": 0,
+          "schema_repairs": 0
+        },
+        "product_judge_calls": 0,
+        "tool_calls": 2,
+        "tool_attempts": 3,
+        "successful_tools": 2,
+        "repeat_count": 0,
+        "agent_partial_or_failed": 0,
+        "agent_sessions": [
+          {
+            "status": "completed",
+            "stop_reason": "Identified breaking behavior change and submitted compatibility finding.",
+            "candidate_count": 1,
+            "rounds": 4
+          }
+        ],
+        "task_failures": 0,
+        "warnings": [],
+        "semantic_judges": [
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.96,
+                "reason": "Both describe the same defect: removing `max(value, 0)` lets negative inputs reach the helper `check`, which rejects them with ValueError, changing the previous clamping behavior. Identical trigger (negative input) and impact (ValueError instead of 0)."
+              }
+            ]
+          },
+          {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "matched": 1,
+            "expected": 1,
+            "reported": 1,
+            "raw_reported": 1,
+            "duplicates_suppressed": 0,
+            "category_agreement": 0.0,
+            "category_agreement_count": 0,
+            "eligible_pairs": 1,
+            "decisions": [
+              {
+                "pair_id": "e0-f0",
+                "semantically_equivalent": true,
+                "confidence": 0.97,
+                "reason": "Both describe the same change: removing clamping lets negative input reach the helper, which raises ValueError instead of returning 0."
+              }
+            ]
+          }
+        ],
+        "judge_agreement": true
+      }
+    }
+  ],
+  "delta_v3_minus_base": {
+    "precision": 0.2,
+    "recall": 0.2,
+    "f1": 0.2
+  },
+  "failures": []
+}

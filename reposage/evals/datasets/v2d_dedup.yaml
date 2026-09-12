@@ -1,0 +1,87 @@
+# V2-D 去重 / Judge 标注（程序指标；不是真实模型质量）
+name: v2d-dedup
+cases:
+  - id: collapse-five-duplicates
+    kind: dedup
+    diff: |
+      diff --git a/src/app.py b/src/app.py
+      --- a/src/app.py
+      +++ b/src/app.py
+      @@ -1,2 +1,4 @@
+       def f():
+           return 1
+      +def g():
+      +    return eval(x)
+    candidates:
+      - {title: a, start_line: 3, trigger: eval(x), category: security}
+      - {title: b, start_line: 3, trigger: eval(x), category: security}
+      - {title: c, start_line: 4, trigger: eval(x), category: security}
+      - {title: d, start_line: 4, trigger: eval(x), category: security}
+      - {title: e, start_line: 3, trigger: eval(x), category: security}
+    expect_merged: 1
+    expect_survival_max: 0.25
+  - id: no-merge-distinct-triggers
+    kind: no_merge
+    diff: |
+      diff --git a/src/app.py b/src/app.py
+      --- a/src/app.py
+      +++ b/src/app.py
+      @@ -1,2 +1,4 @@
+       def f():
+           return 1
+      +def g():
+      +    return eval(x)
+    candidates:
+      - {title: eval, start_line: 4, trigger: eval(x), category: security}
+      - {title: def, start_line: 3, trigger: def g, category: maintainability}
+    expect_merged: 2
+  - id: judge-downrank
+    kind: judge
+    judge_enabled: true
+    judge_action: downrank
+    diff: |
+      diff --git a/src/app.py b/src/app.py
+      --- a/src/app.py
+      +++ b/src/app.py
+      @@ -1,2 +1,4 @@
+       def f():
+           return 1
+      +def g():
+      +    return eval(x)
+    candidates:
+      - {title: eval, start_line: 4, trigger: eval(x), category: security}
+    expect_accepted: 0
+    expect_downrank: 1
+  - id: judge-keep
+    kind: judge
+    judge_enabled: true
+    judge_action: keep
+    diff: |
+      diff --git a/src/app.py b/src/app.py
+      --- a/src/app.py
+      +++ b/src/app.py
+      @@ -1,2 +1,4 @@
+       def f():
+           return 1
+      +def g():
+      +    return eval(x)
+    candidates:
+      - {title: eval, start_line: 4, trigger: eval(x), category: security}
+    expect_accepted: 1
+    expect_downrank: 0
+  - id: judge-fail-open
+    kind: judge
+    judge_enabled: true
+    judge_fail: true
+    diff: |
+      diff --git a/src/app.py b/src/app.py
+      --- a/src/app.py
+      +++ b/src/app.py
+      @@ -1,2 +1,4 @@
+       def f():
+           return 1
+      +def g():
+      +    return eval(x)
+    candidates:
+      - {title: eval, start_line: 4, trigger: eval(x), category: security}
+    expect_accepted: 1

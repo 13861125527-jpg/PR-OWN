@@ -20,6 +20,7 @@ from reposage.providers.llm.openai_compat import (
     LLMRequestError,
     OpenAICompatProvider,
     StructuredOutputError,
+    _action_json_response,
 )
 from reposage.providers.llm.schema import (
     StrictFindingsEnvelope,
@@ -184,6 +185,26 @@ def test_envelope_json_schema_has_required_findings():
     assert schema["type"] == "object"
     assert "findings" in schema["properties"]
     assert "findings" in schema.get("required", [])  # 必填约束进入端点 Schema
+
+
+def test_envelope_forbids_model_role_id():
+    """role_id 是程序盖戳字段，模型 Schema extra=forbid 必须拒绝。"""
+    schema = envelope_json_schema()
+    defs = schema.get("$defs") or schema.get("definitions") or {}
+    finding_props = defs.get("StrictFindingCandidateOutput", {}).get("properties", {})
+    assert "role_id" not in finding_props
+    assert "source_kind" not in finding_props
+    assert "rule_id" not in finding_props
+    assert "analyzer_id" not in finding_props
+    bad = _copy_envelope()
+    bad["findings"][0]["role_id"] = "security"
+    with pytest.raises(ValidationError):
+        parse_envelope(json.dumps(bad))
+    for field in ("source_kind", "rule_id", "analyzer_id"):
+        stuffed = _copy_envelope()
+        stuffed["findings"][0][field] = "ruff"
+        with pytest.raises(ValidationError):
+            parse_envelope(json.dumps(stuffed))
 
 
 # ================= structured：成功路径 =================
@@ -660,10 +681,109 @@ def test_provider_requires_base_url():
         OpenAICompatProvider(model="m", api_key="k", base_url="")
 
 
-def test_tool_loop_not_implemented_yet():
-    provider = _provider(lambda r: _ok_response("{}"))
-    with pytest.raises(NotImplementedError):
-        asyncio.run(provider.tool_loop(object(), [], budget={}))
+def test_tool_loop_native_parses_tool_calls():
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content.decode("utf-8"))
+        assert "tools" in body
+        return httpx.Response(
+            200,
+            json={
+                "choices": [
+                    {
+                        "message": {
+                            "role": "assistant",
+                            "content": None,
+                            "tool_calls": [
+                                {
+                                    "id": "call-1",
+                                    "type": "function",
+                                    "function": {
+                                        "name": "read_file",
+                                        "arguments": '{"path": "src/a.py"}',
+                                    },
+                                },
+                                {
+                                    "id": "call-2",
+                                    "type": "function",
+                                    "function": {
+                                        "name": "find_files",
+                                        "arguments": '{"pattern": "*.py"}',
+                                    },
+                                },
+                            ],
+                        }
+                    }
+                ],
+                "usage": {"prompt_tokens": 10, "completion_tokens": 5},
+            },
+        )
+
+    from reposage.domain.models import AgentMessage, AgentSessionSnapshot
+
+    provider = _provider(handler)
+    view = AgentSessionSnapshot(
+        session_id="s1",
+        mode="exploration",
+        messages=(AgentMessage(role="user", content="go"),),
+    )
+    resp = asyncio.run(provider.tool_loop(view, [{"name": "read_file", "parameters": {}}], budget=object()))
+    assert resp.action == "tool_call"
+    assert resp.tool_requests[0].id == "call-1"
+    assert len(resp.tool_requests) == 2
+
+
+def test_tool_loop_preserves_reasoning_content_without_tool_call():
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "choices": [{"message": {"role": "assistant", "content": "done", "reasoning_content": "state"}}],
+                "usage": {"prompt_tokens": 2, "completion_tokens": 2},
+            },
+        )
+
+    from reposage.domain.models import AgentMessage, AgentSessionSnapshot
+
+    provider = _provider(handler)
+    view = AgentSessionSnapshot(
+        session_id="s1", mode="exploration", messages=(AgentMessage(role="user", content="go"),)
+    )
+    resp = asyncio.run(provider.tool_loop(view, [], budget=object()))
+    assert resp.reasoning_content == "state"
+
+
+def test_tool_loop_action_json_parses():
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content.decode("utf-8"))
+        assert "tools" not in body
+        return _ok_response('{"action": "finish_review", "args": {"reason": "done"}}')
+
+    from reposage.domain.models import AgentMessage, AgentSessionSnapshot
+
+    provider = _provider(handler)
+    view = AgentSessionSnapshot(
+        session_id="s1",
+        mode="exploration",
+        messages=(AgentMessage(role="user", content="go"),),
+    )
+    resp = asyncio.run(
+        provider.tool_loop(view, [], budget=object(), protocol="action_json")
+    )
+    assert resp.action == "finish_review"
+    assert resp.tool_requests[0].arguments["reason"] == "done"
+
+
+def test_action_json_tool_ids_are_unique():
+    from reposage.domain.models import ModelUsage
+
+    usage = ModelUsage(model="m", role="agent", input_tokens=1, output_tokens=1, cost_usd=0.0)
+    text = '{"action": "tool_call", "name": "read_file", "args": {"path": "a.py"}}'
+    first = _action_json_response(text, usage)
+    second = _action_json_response(text, usage)
+    assert first.tool_requests[0].id != second.tool_requests[0].id
+    finish_a = _action_json_response('{"action": "finish_review", "args": {"reason": "x"}}', usage)
+    finish_b = _action_json_response('{"action": "finish_review", "args": {"reason": "y"}}', usage)
+    assert finish_a.tool_requests[0].id != finish_b.tool_requests[0].id
 
 
 # ================= smoke（P1-4：20 轮 / 并发 / 脱敏） =================
@@ -883,7 +1003,7 @@ async def test_smoke_default_model_when_no_env(monkeypatch):
     capture = _CaptureFactory()
     code = await smoke_mod._run(rounds=1, report_path=None, provider_factory=capture)
     assert code == 0
-    assert capture.model == "DP-V4-PRO"  # settings.llm.model 默认值
+    assert capture.model == "deepseek-v4-pro"  # settings.llm.model 默认值
 
 
 @pytest.mark.asyncio

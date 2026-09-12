@@ -1,0 +1,652 @@
+name: resume-l3-context-30
+samples:
+- id: l3-01-none-sentinel
+  kind: cross_file
+  pr_title: none sentinel
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_01.py: "from lib.contract_01 import check\n\ndef process(value):\n  \
+      \  return check(value) is None\n"
+    lib/contract_01.py: "def check(value):\n    \"\"\"Return None when value is absent;\
+      \ zero is a valid result.\"\"\"\n    return None if value is None else value\n"
+  head_files:
+    src/case_01.py: "from lib.contract_01 import check\n\ndef process(value):\n  \
+      \  return not check(value)\n"
+    lib/contract_01.py: "def check(value):\n    \"\"\"Return None when value is absent;\
+      \ zero is a valid result.\"\"\"\n    return None if value is None else value\n"
+  expected:
+  - category: correctness
+    path: src/case_01.py
+    line: 4
+    severity: medium
+    note: Falsy zero is confused with the documented None sentinel.
+  notes: requires_l3=true; expected_l3_path=lib/contract_01.py; expected_l3_symbol=check;
+    audit=Falsy zero is confused with the documented None sentinel.
+- id: l3-02-milliseconds
+  kind: cross_file
+  pr_title: milliseconds
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_02.py: "from lib.contract_02 import check\n\ndef process(value):\n  \
+      \  return check(value * 1000)\n"
+    lib/contract_02.py: "def check(value):\n    \"\"\"Accept a timeout in milliseconds.\"\
+      \"\"\n    return value / 1000\n"
+  head_files:
+    src/case_02.py: "from lib.contract_02 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_02.py: "def check(value):\n    \"\"\"Accept a timeout in milliseconds.\"\
+      \"\"\n    return value / 1000\n"
+  expected:
+  - category: correctness
+    path: src/case_02.py
+    line: 4
+    severity: medium
+    note: The caller now passes seconds where the unchanged helper expects milliseconds.
+  notes: requires_l3=true; expected_l3_path=lib/contract_02.py; expected_l3_symbol=check;
+    audit=The caller now passes seconds where the unchanged helper expects milliseconds.
+- id: l3-03-inclusive-bound
+  kind: cross_file
+  pr_title: inclusive bound
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_03.py: "from lib.contract_03 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_03.py: "def check(value):\n    \"\"\"Return True for values in the\
+      \ inclusive range 0..100.\"\"\"\n    return 0 <= value <= 100\n"
+  head_files:
+    src/case_03.py: "from lib.contract_03 import check\n\ndef process(value):\n  \
+      \  return check(value - 1)\n"
+    lib/contract_03.py: "def check(value):\n    \"\"\"Return True for values in the\
+      \ inclusive range 0..100.\"\"\"\n    return 0 <= value <= 100\n"
+  expected:
+  - category: correctness
+    path: src/case_03.py
+    line: 4
+    severity: medium
+    note: Subtracting one violates the helper's inclusive-bound contract.
+  notes: requires_l3=true; expected_l3_path=lib/contract_03.py; expected_l3_symbol=check;
+    audit=Subtracting one violates the helper's inclusive-bound contract.
+- id: l3-04-tuple-order
+  kind: cross_file
+  pr_title: tuple order
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_04.py: "from lib.contract_04 import check\n\ndef process(value):\n  \
+      \  return check(value)[0]\n"
+    lib/contract_04.py: "def check(value):\n    \"\"\"Return (payload, error); error\
+      \ is None on success.\"\"\"\n    return (value, None)\n"
+  head_files:
+    src/case_04.py: "from lib.contract_04 import check\n\ndef process(value):\n  \
+      \  return check(value)[1]\n"
+    lib/contract_04.py: "def check(value):\n    \"\"\"Return (payload, error); error\
+      \ is None on success.\"\"\"\n    return (value, None)\n"
+  expected:
+  - category: correctness
+    path: src/case_04.py
+    line: 4
+    severity: medium
+    note: The new code returns the error slot instead of the payload slot.
+  notes: requires_l3=true; expected_l3_path=lib/contract_04.py; expected_l3_symbol=check;
+    audit=The new code returns the error slot instead of the payload slot.
+- id: l3-05-mutates-input
+  kind: cross_file
+  pr_title: mutates input
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_05.py: "from lib.contract_05 import check\n\ndef process(value):\n  \
+      \  return (check(value), value)[1]\n"
+    lib/contract_05.py: "def check(value):\n    \"\"\"Sort value in place and return\
+      \ None.\"\"\"\n    value.sort()\n"
+  head_files:
+    src/case_05.py: "from lib.contract_05 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_05.py: "def check(value):\n    \"\"\"Sort value in place and return\
+      \ None.\"\"\"\n    value.sort()\n"
+  expected:
+  - category: correctness
+    path: src/case_05.py
+    line: 4
+    severity: medium
+    note: The helper mutates in place and returns None, which is now returned to callers.
+  notes: requires_l3=true; expected_l3_path=lib/contract_05.py; expected_l3_symbol=check;
+    audit=The helper mutates in place and returns None, which is now returned to callers.
+- id: l3-06-bytes-output
+  kind: cross_file
+  pr_title: bytes output
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_06.py: "from lib.contract_06 import check\n\ndef process(value):\n  \
+      \  return check(value).decode('utf-8')\n"
+    lib/contract_06.py: "def check(value):\n    \"\"\"Encode text and return bytes.\"\
+      \"\"\n    return value.encode('utf-8')\n"
+  head_files:
+    src/case_06.py: "from lib.contract_06 import check\n\ndef process(value):\n  \
+      \  return check(value) + '!'\n"
+    lib/contract_06.py: "def check(value):\n    \"\"\"Encode text and return bytes.\"\
+      \"\"\n    return value.encode('utf-8')\n"
+  expected:
+  - category: correctness
+    path: src/case_06.py
+    line: 4
+    severity: medium
+    note: The unchanged helper returns bytes, so concatenating a string raises TypeError.
+  notes: requires_l3=true; expected_l3_path=lib/contract_06.py; expected_l3_symbol=check;
+    audit=The unchanged helper returns bytes, so concatenating a string raises TypeError.
+- id: l3-07-raises-missing
+  kind: cross_file
+  pr_title: raises missing
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_07.py: "from lib.contract_07 import check\n\ndef process(value):\n  \
+      \  return check(value) if value is not None else 'default'\n"
+    lib/contract_07.py: "def check(value):\n    \"\"\"Raise KeyError when value is\
+      \ absent.\"\"\"\n    if value is None:\n        raise KeyError('missing')\n\
+      \    return value\n"
+  head_files:
+    src/case_07.py: "from lib.contract_07 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_07.py: "def check(value):\n    \"\"\"Raise KeyError when value is\
+      \ absent.\"\"\"\n    if value is None:\n        raise KeyError('missing')\n\
+      \    return value\n"
+  expected:
+  - category: edge_case
+    path: src/case_07.py
+    line: 4
+    severity: medium
+    note: The removed guard exposes the helper's documented missing-value exception.
+  notes: requires_l3=true; expected_l3_path=lib/contract_07.py; expected_l3_symbol=check;
+    audit=The removed guard exposes the helper's documented missing-value exception.
+- id: l3-08-empty-rejected
+  kind: cross_file
+  pr_title: empty rejected
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_08.py: "from lib.contract_08 import check\n\ndef process(value):\n  \
+      \  return check(value) if value else None\n"
+    lib/contract_08.py: "def check(value):\n    \"\"\"Require a non-empty sequence.\"\
+      \"\"\n    if not value:\n        raise ValueError('empty')\n    return value[0]\n"
+  head_files:
+    src/case_08.py: "from lib.contract_08 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_08.py: "def check(value):\n    \"\"\"Require a non-empty sequence.\"\
+      \"\"\n    if not value:\n        raise ValueError('empty')\n    return value[0]\n"
+  expected:
+  - category: edge_case
+    path: src/case_08.py
+    line: 4
+    severity: medium
+    note: The caller no longer handles the helper's empty-input precondition.
+  notes: requires_l3=true; expected_l3_path=lib/contract_08.py; expected_l3_symbol=check;
+    audit=The caller no longer handles the helper's empty-input precondition.
+- id: l3-09-one-based
+  kind: cross_file
+  pr_title: one based
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_09.py: "from lib.contract_09 import check\n\ndef process(value):\n  \
+      \  return check(value + 1)\n"
+    lib/contract_09.py: "def check(value):\n    \"\"\"Accept a one-based item number.\"\
+      \"\"\n    if value < 1:\n        raise ValueError('one based')\n    return value\
+      \ - 1\n"
+  head_files:
+    src/case_09.py: "from lib.contract_09 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_09.py: "def check(value):\n    \"\"\"Accept a one-based item number.\"\
+      \"\"\n    if value < 1:\n        raise ValueError('one based')\n    return value\
+      \ - 1\n"
+  expected:
+  - category: correctness
+    path: src/case_09.py
+    line: 4
+    severity: medium
+    note: A zero-based caller value is passed to a one-based helper.
+  notes: requires_l3=true; expected_l3_path=lib/contract_09.py; expected_l3_symbol=check;
+    audit=A zero-based caller value is passed to a one-based helper.
+- id: l3-10-negative-invalid
+  kind: cross_file
+  pr_title: negative invalid
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_10.py: "from lib.contract_10 import check\n\ndef process(value):\n  \
+      \  return check(max(value, 0))\n"
+    lib/contract_10.py: "def check(value):\n    \"\"\"Reject negative amounts.\"\"\
+      \"\n    if value < 0:\n        raise ValueError('negative')\n    return value\n"
+  head_files:
+    src/case_10.py: "from lib.contract_10 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_10.py: "def check(value):\n    \"\"\"Reject negative amounts.\"\"\
+      \"\n    if value < 0:\n        raise ValueError('negative')\n    return value\n"
+  expected:
+  - category: edge_case
+    path: src/case_10.py
+    line: 4
+    severity: medium
+    note: Negative values now reach a helper that explicitly rejects them.
+  notes: requires_l3=true; expected_l3_path=lib/contract_10.py; expected_l3_symbol=check;
+    audit=Negative values now reach a helper that explicitly rejects them.
+- id: l3-11-raw-html
+  kind: cross_file
+  pr_title: raw html
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_11.py: "from lib.contract_11 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_11.py: "def check(value):\n    \"\"\"Return HTML-escaped untrusted\
+      \ text.\"\"\"\n    import html\n    return html.escape(value)\n"
+  head_files:
+    src/case_11.py: "from lib.contract_11 import check\n\ndef process(value):\n  \
+      \  return (check(value), value)[1]\n"
+    lib/contract_11.py: "def check(value):\n    \"\"\"Return HTML-escaped untrusted\
+      \ text.\"\"\"\n    import html\n    return html.escape(value)\n"
+  expected:
+  - category: security
+    path: src/case_11.py
+    line: 4
+    severity: medium
+    note: The caller discards the unchanged escaping helper's result before rendering
+      text.
+  notes: requires_l3=true; expected_l3_path=lib/contract_11.py; expected_l3_symbol=check;
+    audit=The caller discards the unchanged escaping helper's result before rendering
+    text.
+- id: l3-12-path-containment
+  kind: cross_file
+  pr_title: path containment
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_12.py: "from lib.contract_12 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_12.py: "def check(value):\n    \"\"\"Resolve a relative name and\
+      \ reject paths outside /srv/data.\"\"\"\n    from pathlib import Path\n    root\
+      \ = Path('/srv/data').resolve()\n    target = (root / value).resolve()\n   \
+      \ if root not in target.parents:\n        raise ValueError('escape')\n    return\
+      \ target\n"
+  head_files:
+    src/case_12.py: "from lib.contract_12 import check\n\ndef process(value):\n  \
+      \  return (check(value), '/srv/data/' + value)[1]\n"
+    lib/contract_12.py: "def check(value):\n    \"\"\"Resolve a relative name and\
+      \ reject paths outside /srv/data.\"\"\"\n    from pathlib import Path\n    root\
+      \ = Path('/srv/data').resolve()\n    target = (root / value).resolve()\n   \
+      \ if root not in target.parents:\n        raise ValueError('escape')\n    return\
+      \ target\n"
+  expected:
+  - category: security
+    path: src/case_12.py
+    line: 4
+    severity: medium
+    note: The caller discards the containment helper's safe path, allowing traversal
+      through an untrusted name.
+  notes: requires_l3=true; expected_l3_path=lib/contract_12.py; expected_l3_symbol=check;
+    audit=The caller discards the containment helper's safe path, allowing traversal
+    through an untrusted name.
+- id: l3-13-auth-result
+  kind: cross_file
+  pr_title: auth result
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_13.py: "from lib.contract_13 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_13.py: "def check(value):\n    \"\"\"Return True only when the token\
+      \ is authenticated.\"\"\"\n    return bool(value and value.startswith('signed:'))\n"
+  head_files:
+    src/case_13.py: "from lib.contract_13 import check\n\ndef process(value):\n  \
+      \  return (check(value), value is not None)[1]\n"
+    lib/contract_13.py: "def check(value):\n    \"\"\"Return True only when the token\
+      \ is authenticated.\"\"\"\n    return bool(value and value.startswith('signed:'))\n"
+  expected:
+  - category: security
+    path: src/case_13.py
+    line: 4
+    severity: medium
+    note: Presence is substituted for the unchanged authentication result.
+  notes: requires_l3=true; expected_l3_path=lib/contract_13.py; expected_l3_symbol=check;
+    audit=Presence is substituted for the unchanged authentication result.
+- id: l3-14-sql-identifier
+  kind: negative
+  pr_title: sql identifier
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_14.py: "from lib.contract_14 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_14.py: "def check(value):\n    \"\"\"Allow only known SQL column\
+      \ identifiers.\"\"\"\n    if value not in {'name', 'created_at'}:\n        raise\
+      \ ValueError('column')\n    return value\n"
+  head_files:
+    src/case_14.py: "from lib.contract_14 import check\n\ndef process(value):\n  \
+      \  return (check(value), value)[1]\n"
+    lib/contract_14.py: "def check(value):\n    \"\"\"Allow only known SQL column\
+      \ identifiers.\"\"\"\n    if value not in {'name', 'created_at'}:\n        raise\
+      \ ValueError('column')\n    return value\n"
+  expected: []
+  notes: requires_l3=true; expected_l3_path=lib/contract_14.py; expected_l3_symbol=check;
+    audit=Tuple evaluation still runs validation, and allowed identifiers are returned unchanged.
+- id: l3-15-redaction
+  kind: cross_file
+  pr_title: redaction
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_15.py: "from lib.contract_15 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_15.py: "def check(value):\n    \"\"\"Redact all but the final four\
+      \ characters of a secret.\"\"\"\n    return '*' * max(0, len(value) - 4) + value[-4:]\n"
+  head_files:
+    src/case_15.py: "from lib.contract_15 import check\n\ndef process(value):\n  \
+      \  return (check(value), value)[1]\n"
+    lib/contract_15.py: "def check(value):\n    \"\"\"Redact all but the final four\
+      \ characters of a secret.\"\"\"\n    return '*' * max(0, len(value) - 4) + value[-4:]\n"
+  expected:
+  - category: security
+    path: src/case_15.py
+    line: 4
+    severity: medium
+    note: The caller discards the helper's redacted result and exposes the raw secret.
+  notes: requires_l3=true; expected_l3_path=lib/contract_15.py; expected_l3_symbol=check;
+    audit=The caller discards the helper's redacted result and exposes the raw secret.
+- id: l3-16-signature-bool
+  kind: cross_file
+  pr_title: signature bool
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_16.py: "from lib.contract_16 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_16.py: "def check(value):\n    \"\"\"Verify a signed token and return\
+      \ a boolean.\"\"\"\n    return value == 'signed:ok'\n"
+  head_files:
+    src/case_16.py: "from lib.contract_16 import check\n\ndef process(value):\n  \
+      \  return (check(value), bool(value))[1]\n"
+    lib/contract_16.py: "def check(value):\n    \"\"\"Verify a signed token and return\
+      \ a boolean.\"\"\"\n    return value == 'signed:ok'\n"
+  expected:
+  - category: security
+    path: src/case_16.py
+    line: 4
+    severity: medium
+    note: Any non-empty token is accepted after discarding the signature verification
+      result.
+  notes: requires_l3=true; expected_l3_path=lib/contract_16.py; expected_l3_symbol=check;
+    audit=Any non-empty token is accepted after discarding the signature verification
+    result.
+- id: l3-17-async-required
+  kind: cross_file
+  pr_title: async required
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_17.py: "from lib.contract_17 import check\n\ndef process(value):\n  \
+      \  return await check(value)\n"
+    lib/contract_17.py: "async def check(value):\n    \"\"\"Asynchronously validate\
+      \ and return a boolean.\"\"\"\n    return value > 0\n"
+  head_files:
+    src/case_17.py: "from lib.contract_17 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_17.py: "async def check(value):\n    \"\"\"Asynchronously validate\
+      \ and return a boolean.\"\"\"\n    return value > 0\n"
+  expected:
+  - category: correctness
+    path: src/case_17.py
+    line: 4
+    severity: medium
+    note: The coroutine is returned without awaiting it.
+  notes: requires_l3=true; expected_l3_path=lib/contract_17.py; expected_l3_symbol=check;
+    audit=The coroutine is returned without awaiting it.
+- id: l3-18-blocking-helper
+  kind: cross_file
+  pr_title: blocking helper
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_18.py: "from lib.contract_18 import check\n\ndef process(value):\n  \
+      \  return await asyncio.to_thread(check, value)\n"
+    lib/contract_18.py: "def check(value):\n    \"\"\"Blocking network operation;\
+      \ callers in async code must offload it.\"\"\"\n    return value.read()\n"
+  head_files:
+    src/case_18.py: "from lib.contract_18 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_18.py: "def check(value):\n    \"\"\"Blocking network operation;\
+      \ callers in async code must offload it.\"\"\"\n    return value.read()\n"
+  expected:
+  - category: performance
+    path: src/case_18.py
+    line: 4
+    severity: medium
+    note: A documented blocking helper is called directly on the event loop.
+  notes: requires_l3=true; expected_l3_path=lib/contract_18.py; expected_l3_symbol=check;
+    audit=A documented blocking helper is called directly on the event loop.
+- id: l3-19-iterator-once
+  kind: cross_file
+  pr_title: iterator once
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_19.py: "from lib.contract_19 import check\n\ndef process(value):\n  \
+      \  return list(check(value))\n"
+    lib/contract_19.py: "def check(value):\n    \"\"\"Return a single-pass iterator\
+      \ over matching records.\"\"\"\n    return (x for x in value if x)\n"
+  head_files:
+    src/case_19.py: "from lib.contract_19 import check\n\ndef process(value):\n  \
+      \  return len(check(value))\n"
+    lib/contract_19.py: "def check(value):\n    \"\"\"Return a single-pass iterator\
+      \ over matching records.\"\"\"\n    return (x for x in value if x)\n"
+  expected:
+  - category: correctness
+    path: src/case_19.py
+    line: 4
+    severity: medium
+    note: The helper returns an iterator, which has no length.
+  notes: requires_l3=true; expected_l3_path=lib/contract_19.py; expected_l3_symbol=check;
+    audit=The helper returns an iterator, which has no length.
+- id: l3-20-lock-required
+  kind: cross_file
+  pr_title: lock required
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_20.py: "from lib.contract_20 import check\n\ndef process(value):\n  \
+      \  return check(value)  # called while STATE_LOCK is held\n"
+    lib/contract_20.py: "def check(value):\n    \"\"\"Mutate shared state; caller\
+      \ must hold STATE_LOCK.\"\"\"\n    value['count'] += 1\n    return value['count']\n"
+  head_files:
+    src/case_20.py: "from lib.contract_20 import check\n\ndef process(value):\n  \
+      \  return check(value)  # lock no longer held\n"
+    lib/contract_20.py: "def check(value):\n    \"\"\"Mutate shared state; caller\
+      \ must hold STATE_LOCK.\"\"\"\n    value['count'] += 1\n    return value['count']\n"
+  expected:
+  - category: concurrency
+    path: src/case_20.py
+    line: 4
+    severity: medium
+    note: The unchanged helper requires the caller to hold STATE_LOCK.
+  notes: requires_l3=true; expected_l3_path=lib/contract_20.py; expected_l3_symbol=check;
+    audit=The unchanged helper requires the caller to hold STATE_LOCK.
+- id: l3-21-transaction-required
+  kind: cross_file
+  pr_title: transaction required
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_21.py: "from lib.contract_21 import check\n\ndef process(value):\n  \
+      \  return transaction.run(lambda: check(value))\n"
+    lib/contract_21.py: "def check(value):\n    \"\"\"Persist value; caller must execute\
+      \ inside an active transaction.\"\"\"\n    value.save()\n"
+  head_files:
+    src/case_21.py: "from lib.contract_21 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_21.py: "def check(value):\n    \"\"\"Persist value; caller must execute\
+      \ inside an active transaction.\"\"\"\n    value.save()\n"
+  expected:
+  - category: correctness
+    path: src/case_21.py
+    line: 4
+    severity: medium
+    note: The persistence helper is now called outside its required transaction.
+  notes: requires_l3=true; expected_l3_path=lib/contract_21.py; expected_l3_symbol=check;
+    audit=The persistence helper is now called outside its required transaction.
+- id: l3-22-consumes-stream
+  kind: cross_file
+  pr_title: consumes stream
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_22.py: "from lib.contract_22 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_22.py: "def check(value):\n    \"\"\"Consume and close the input\
+      \ stream.\"\"\"\n    try:\n        return value.read()\n    finally:\n     \
+      \   value.close()\n"
+  head_files:
+    src/case_22.py: "from lib.contract_22 import check\n\ndef process(value):\n  \
+      \  return check(value) + value.read()\n"
+    lib/contract_22.py: "def check(value):\n    \"\"\"Consume and close the input\
+      \ stream.\"\"\"\n    try:\n        return value.read()\n    finally:\n     \
+      \   value.close()\n"
+  expected:
+  - category: correctness
+    path: src/case_22.py
+    line: 4
+    severity: medium
+    note: The caller reads the stream after the helper has closed it.
+  notes: requires_l3=true; expected_l3_path=lib/contract_22.py; expected_l3_symbol=check;
+    audit=The caller reads the stream after the helper has closed it.
+- id: l3-23-cache-key
+  kind: cross_file
+  pr_title: cache key
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_23.py: "from lib.contract_23 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_23.py: "def check(value):\n    \"\"\"Normalize cache keys to lowercase\
+      \ strings.\"\"\"\n    return str(value).lower()\n"
+  head_files:
+    src/case_23.py: "from lib.contract_23 import check\n\ndef process(value):\n  \
+      \  return (check(value), str(value))[1]\n"
+    lib/contract_23.py: "def check(value):\n    \"\"\"Normalize cache keys to lowercase\
+      \ strings.\"\"\"\n    return str(value).lower()\n"
+  expected:
+  - category: correctness
+    path: src/case_23.py
+    line: 4
+    severity: medium
+    note: Discarding normalization creates case-sensitive duplicate cache entries.
+  notes: requires_l3=true; expected_l3_path=lib/contract_23.py; expected_l3_symbol=check;
+    audit=Discarding normalization creates case-sensitive duplicate cache entries.
+- id: l3-24-retry-safety
+  kind: cross_file
+  pr_title: retry safety
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_24.py: "from lib.contract_24 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_24.py: "def check(value):\n    \"\"\"Perform a non-idempotent charge\
+      \ exactly once.\"\"\"\n    return value.charge()\n"
+  head_files:
+    src/case_24.py: "from lib.contract_24 import check\n\ndef process(value):\n  \
+      \  return retry(lambda: check(value), attempts=3)\n"
+    lib/contract_24.py: "def check(value):\n    \"\"\"Perform a non-idempotent charge\
+      \ exactly once.\"\"\"\n    return value.charge()\n"
+  expected:
+  - category: correctness
+    path: src/case_24.py
+    line: 4
+    severity: medium
+    note: A non-idempotent helper is placed inside a retry loop.
+  notes: requires_l3=true; expected_l3_path=lib/contract_24.py; expected_l3_symbol=check;
+    audit=A non-idempotent helper is placed inside a retry loop.
+- id: l3-25-negative-none
+  kind: negative
+  pr_title: negative none
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_25.py: "from lib.contract_25 import check\n\ndef process(value):\n  \
+      \  return value is None\n"
+    lib/contract_25.py: "def check(value):\n    \"\"\"Return None for absent input.\"\
+      \"\"\n    return None if value is None else value\n"
+  head_files:
+    src/case_25.py: "from lib.contract_25 import check\n\ndef process(value):\n  \
+      \  return check(value) is None\n"
+    lib/contract_25.py: "def check(value):\n    \"\"\"Return None for absent input.\"\
+      \"\"\n    return None if value is None else value\n"
+  expected: []
+  notes: requires_l3=true; expected_l3_path=lib/contract_25.py; expected_l3_symbol=check;
+    audit=Correct use of the helper's None sentinel.
+- id: l3-26-negative-ms
+  kind: negative
+  pr_title: negative ms
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_26.py: "from lib.contract_26 import check\n\ndef process(value):\n  \
+      \  return value\n"
+    lib/contract_26.py: "def check(value):\n    \"\"\"Accept timeout in milliseconds.\"\
+      \"\"\n    return value / 1000\n"
+  head_files:
+    src/case_26.py: "from lib.contract_26 import check\n\ndef process(value):\n  \
+      \  return check(value * 1000)\n"
+    lib/contract_26.py: "def check(value):\n    \"\"\"Accept timeout in milliseconds.\"\
+      \"\"\n    return value / 1000\n"
+  expected: []
+  notes: requires_l3=true; expected_l3_path=lib/contract_26.py; expected_l3_symbol=check;
+    audit=Correct seconds-to-milliseconds conversion.
+- id: l3-27-negative-escape
+  kind: negative
+  pr_title: negative escape
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_27.py: "from lib.contract_27 import check\n\ndef process(value):\n  \
+      \  return value\n"
+    lib/contract_27.py: "def check(value):\n    \"\"\"Return escaped HTML safe for\
+      \ rendering.\"\"\"\n    import html\n    return html.escape(value)\n"
+  head_files:
+    src/case_27.py: "from lib.contract_27 import check\n\ndef process(value):\n  \
+      \  return check(value)\n"
+    lib/contract_27.py: "def check(value):\n    \"\"\"Return escaped HTML safe for\
+      \ rendering.\"\"\"\n    import html\n    return html.escape(value)\n"
+  expected: []
+  notes: requires_l3=true; expected_l3_path=lib/contract_27.py; expected_l3_symbol=check;
+    audit=Untrusted text is correctly escaped through the helper.
+- id: l3-28-negative-await
+  kind: cross_file
+  pr_title: negative await
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_28.py: "from lib.contract_28 import check\n\ndef process(value):\n  \
+      \  return value\n"
+    lib/contract_28.py: "async def check(value):\n    \"\"\"Asynchronously return\
+      \ the validated value.\"\"\"\n    return value\n"
+  head_files:
+    src/case_28.py: "from lib.contract_28 import check\n\ndef process(value):\n  \
+      \  return await check(value)\n"
+    lib/contract_28.py: "async def check(value):\n    \"\"\"Asynchronously return\
+      \ the validated value.\"\"\"\n    return value\n"
+  expected:
+  - category: correctness
+    path: src/case_28.py
+    line: 4
+    severity: high
+    note: Await is used inside a synchronous function, causing a SyntaxError when the module is parsed.
+  notes: requires_l3=true; expected_l3_path=lib/contract_28.py; expected_l3_symbol=check;
+    audit=Await inside a synchronous def is a SyntaxError; the function must be async.
+- id: l3-29-negative-iterator
+  kind: negative
+  pr_title: negative iterator
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_29.py: "from lib.contract_29 import check\n\ndef process(value):\n  \
+      \  return list(value)\n"
+    lib/contract_29.py: "def check(value):\n    \"\"\"Return a single-pass iterator.\"\
+      \"\"\n    return iter(value)\n"
+  head_files:
+    src/case_29.py: "from lib.contract_29 import check\n\ndef process(value):\n  \
+      \  return list(check(value))\n"
+    lib/contract_29.py: "def check(value):\n    \"\"\"Return a single-pass iterator.\"\
+      \"\"\n    return iter(value)\n"
+  expected: []
+  notes: requires_l3=true; expected_l3_path=lib/contract_29.py; expected_l3_symbol=check;
+    audit=Iterator is deliberately materialized once.
+- id: l3-30-negative-lock
+  kind: negative
+  pr_title: negative lock
+  pr_description: The imported helper contract is defined in an unchanged module.
+  base_files:
+    src/case_30.py: "from lib.contract_30 import check\n\ndef process(value):\n  \
+      \  return value['count']\n"
+    lib/contract_30.py: "def check(value):\n    \"\"\"Increment shared state while\
+      \ the caller holds STATE_LOCK.\"\"\"\n    value['count'] += 1\n    return value['count']\n"
+  head_files:
+    src/case_30.py: "from lib.contract_30 import check\n\ndef process(value):\n  \
+      \  return check(value)  # STATE_LOCK held by caller\n"
+    lib/contract_30.py: "def check(value):\n    \"\"\"Increment shared state while\
+      \ the caller holds STATE_LOCK.\"\"\"\n    value['count'] += 1\n    return value['count']\n"
+  expected: []
+  notes: requires_l3=true; expected_l3_path=lib/contract_30.py; expected_l3_symbol=check;
+    audit=Call respects the helper's locking precondition.

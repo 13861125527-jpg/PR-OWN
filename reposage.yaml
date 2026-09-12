@@ -1,0 +1,38 @@
+project:
+  name: RepoSage
+
+llm:
+  provider: openai_compatible
+  model: deepseek-v4-pro
+  api_key_env: MODEL_API_KEY
+  base_url_env: MODEL_BASE_URL
+  temperature: 0.1
+  timeout_seconds: 60
+  max_retries: 2
+  structured_strategy: schema_first
+  max_output_tokens: 8000
+
+review:
+  strategy: agentic
+  languages: [python, javascript, typescript, go, java, ruby]
+  min_confidence: 0.75
+  max_files: 40
+  feedback:
+    enabled: true
+
+context:
+  token_budget: 32000
+  symbol_retrieval: true
+
+agent:
+  enabled: true
+  max_rounds: 12
+  max_tool_calls: 16
+  max_wallclock_s: 300
+  tool_protocol: native
+
+publishing:
+  dry_run: true
+  request_changes: false
+  idempotent: true
+  body_threshold_severity: medium
