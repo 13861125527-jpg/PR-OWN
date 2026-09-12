@@ -1,5 +1,7 @@
 """domain 模型与指纹测试。"""
 
+from pathlib import Path
+
 import pytest
 from reposage.domain.enums import (
     ChangeRequestSource,
@@ -189,7 +191,7 @@ def test_diff_line_added_requires_new_ln():
         DiffLine(type=DiffLineType.REMOVED, old_ln=None)
 
 
-def test_repository_ref_source_fields():
+def test_repository_ref_source_fields(tmp_path: Path):
     """P2-1：github 必须 owner/name；local 必须 local_path。"""
     from reposage.domain.models import RepositoryRef
 
@@ -198,7 +200,7 @@ def test_repository_ref_source_fields():
     with pytest.raises(ValueError):
         RepositoryRef(provider="local")
     RepositoryRef(provider="github", owner="o", name="n")  # ok
-    RepositoryRef(provider="local", local_path="C:/repo")  # ok
+    RepositoryRef(provider="local", local_path=tmp_path)  # ok on Windows and Linux
 
 
 def test_global_budget_can_admit_tokens():
