@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import yaml
 
 OUTPUT = Path("reposage/evals/datasets/holdout_cross_file_30.yaml")
 
 
-def _case(index: int, slug: str, helper: str, before: str, after: str, category: str | None, note: str) -> dict:
+def _case(index: int, slug: str, helper: str, before: str, after: str, category: str | None, note: str) -> dict[str, Any]:
     changed = f"app/review_{index:02d}.py"
     related = f"contracts/rule_{index:02d}.py"
     module = f"contracts.rule_{index:02d}"
@@ -28,7 +29,7 @@ def _case(index: int, slug: str, helper: str, before: str, after: str, category:
     }
 
 
-def build_samples() -> list[dict]:
+def build_samples() -> list[dict[str, Any]]:
     rows = [
         ("decimal-money", "from decimal import Decimal\ndef apply(value):\n    return Decimal(value).quantize(Decimal('0.01'))\n", "str(apply(value))", "str(float(apply(value)))", "correctness", "Converting the normalized Decimal through float can change exact monetary output."),
         ("safe-path", "from pathlib import Path\ndef apply(value):\n    root = Path('/srv/files').resolve()\n    target = (root / value).resolve()\n    if root not in target.parents:\n        raise ValueError('outside root')\n    return target\n", "apply(value)", "(apply(value), '/srv/files/' + value)[1]", "security", "The validated resolved path is discarded and traversal text is returned."),

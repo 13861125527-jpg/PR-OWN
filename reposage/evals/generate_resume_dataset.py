@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import difflib
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -25,7 +26,7 @@ VALID_CATEGORIES = {
 }
 
 
-def finding(category: str, path: str, line: int, severity: str, note: str) -> dict:
+def finding(category: str, path: str, line: int, severity: str, note: str) -> dict[str, Any]:
     return {"category": category, "path": path, "line": line, "severity": severity, "note": note}
 
 
@@ -35,9 +36,9 @@ def sample(
     title: str,
     base: dict[str, str],
     head: dict[str, str],
-    expected: list[dict],
+    expected: list[dict[str, Any]],
     notes: str,
-) -> dict:
+) -> dict[str, Any]:
     return {
         "id": id_,
         "kind": kind,
@@ -50,8 +51,8 @@ def sample(
     }
 
 
-def build_samples() -> list[dict]:
-    s: list[dict] = []
+def build_samples() -> list[dict[str, Any]]:
+    s: list[dict[str, Any]] = []
     add = s.append
 
     add(
@@ -853,7 +854,7 @@ def build_samples() -> list[dict]:
     return s
 
 
-def validate(samples: list[dict]) -> None:
+def validate(samples: list[dict[str, Any]]) -> None:
     assert len(samples) == 40
     ids = [item["id"] for item in samples]
     assert len(ids) == len(set(ids))

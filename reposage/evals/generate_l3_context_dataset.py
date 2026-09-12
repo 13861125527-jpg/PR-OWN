@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -18,7 +19,7 @@ def _case(
     *,
     category: str | None,
     note: str,
-) -> dict:
+) -> dict[str, Any]:
     helper = f"contract_{index:02d}"
     changed = f"src/case_{index:02d}.py"
     related = f"lib/{helper}.py"
@@ -51,7 +52,7 @@ def _case(
     }
 
 
-def build_samples() -> list[dict]:
+def build_samples() -> list[dict[str, Any]]:
     raw = [
         # correctness / contract mismatches
         ("none-sentinel", "def check(value):\n    \"\"\"Return None when value is absent; zero is a valid result.\"\"\"\n    return None if value is None else value\n", "check(value) is None", "not check(value)", "correctness", "Falsy zero is confused with the documented None sentinel."),
@@ -94,7 +95,7 @@ def build_samples() -> list[dict]:
     ]
 
 
-def validate(samples: list[dict]) -> None:
+def validate(samples: list[dict[str, Any]]) -> None:
     assert len(samples) == 30
     assert len({s["id"] for s in samples}) == 30
     assert sum(bool(s["expected"]) for s in samples) == 24
